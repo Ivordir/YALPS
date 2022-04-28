@@ -164,11 +164,11 @@ interface Model<VariableKey = string, ConstraintKey = string> {
             : never)
 
     /**
-   * An object or `Iterable` representing the variables of the problem.
-   * In the case `variables` is an `Iterable`, duplicate keys are not ignored.
-   * The order of variables is preserved in the solution,
-   * but variables with a value of `0` are not included in the solution.
-   */
+     * An object or `Iterable` representing the variables of the problem.
+     * In the case `variables` is an `Iterable`, duplicate keys are not ignored.
+     * The order of variables is preserved in the solution,
+     * but variables with a value of `0` are not included in the solution.
+     */
     variables:
         | Iterable<[key: VariableKey, variable: Coefficients<ConstraintKey>]>
         | (VariableKey extends string

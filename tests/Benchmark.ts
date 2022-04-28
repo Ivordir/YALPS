@@ -247,6 +247,6 @@ const benchamrkGLPK = () => benchmark(largeProblems, "YALPS", yalpsTimer, "GLPK"
 
 // benchmarkCheckCycles()
 
-benchamrkjsLP()
+// benchamrkjsLP()
 
 // benchamrkGLPK()
