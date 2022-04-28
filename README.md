@@ -295,65 +295,62 @@ const solve: <VarKey = string, ConKey = string>(model: Model<VarKey, ConKey>, op
 # Performance
 While YALPS generally performs better than javascript-lp-solver, this solver is still geared towards small-ish problems. For example, the solver keeps the full representation of the matrix in memory as an array. I.e., there are currently no sparse matrix optimizations. As a general rule, the number of variables and constraints should probably be a few thousand or less, and the number of integer variables should be a few hundred at the most. If your use case has large-ish problems, it is recommended that you first benchmark and test the solver on your own before committing to using it. For very large and/or integral problems, a more professional solver is recommended, e.g. [glpk.js](https://www.npmjs.com/package/glpk.js).
 
-Nevertheless, here are the results from some benchmarks of medium/large problems compared to other solvers (all times are in milliseconds):
+Nevertheless, here are the results from some benchmarks of medium/large problems comparing YALPS to other solvers (all times are in milliseconds):
 
 ## YALPS vs jsLPSolver
 ```
 Large Farm MIP.json: 35 constraints, 100 variables, 100 integers:
-t=-5.31, jsLPSolver took 51.16% more time on average compared to YALPS
-jsLPSolver: (n=11, mean=63.42, stdErr=3.24)
-YALPS: (n=11, mean=41.95, stdErr=2.42)
+t=5.65, jsLPSolver took 59.04% more time on average compared to YALPS
+jsLPSolver: (n=10, mean=67.77, stdErr=3.81)
+YALPS: (n=10, mean=42.61, stdErr=2.30)
 
 Monster 2.json: 888 constraints, 924 variables, 112 integers:
-t=-9.60, jsLPSolver took 161.04% more time on average compared to YALPS
-jsLPSolver: (n=5, mean=191.05, stdErr=10.94)
-YALPS: (n=5, mean=73.19, stdErr=5.57)
+t=14.19, jsLPSolver took 150.36% more time on average compared to YALPS
+jsLPSolver: (n=5, mean=196.74, stdErr=3.02)
+YALPS: (n=5, mean=78.58, stdErr=7.76)
 
 Monster Problem.json: 600 constraints, 552 variables, 0 integers:
-t=-8.48, jsLPSolver took 217.40% more time on average compared to YALPS
-jsLPSolver: (n=7, mean=5.96, stdErr=0.45)
-YALPS: (n=7, mean=1.88, stdErr=0.16)
+t=8.74, jsLPSolver took 208.00% more time on average compared to YALPS
+jsLPSolver: (n=6, mean=6.31, stdErr=0.46)
+YALPS: (n=6, mean=2.05, stdErr=0.16)
 
 Sudoku 4x4.json: 64 constraints, 64 variables, 64 integers:
-t=-4.61, jsLPSolver took 168.62% more time on average compared to YALPS
-jsLPSolver: (n=28, mean=3.57, stdErr=0.49)
-YALPS: (n=28, mean=1.33, stdErr=0.03)
+t=4.46, jsLPSolver took 126.71% more time on average compared to YALPS
+jsLPSolver: (n=32, mean=3.86, stdErr=0.47)
+YALPS: (n=32, mean=1.70, stdErr=0.10)
 
 Vendor Selection.json: 1641 constraints, 1640 variables, 40 integers:
-t=-11.64, jsLPSolver took 26.63% more time on average compared to YALPS
-jsLPSolver: (n=5, mean=490.49, stdErr=8.28)
-YALPS: (n=5, mean=387.34, stdErr=3.14)
+t=11.01, jsLPSolver took 25.55% more time on average compared to YALPS
+jsLPSolver: (n=5, mean=522.75, stdErr=7.20)
+YALPS: (n=5, mean=416.37, stdErr=6.44)
 ```
 
 ## YALPS vs glpk.js
 ```
 Large Farm MIP.json: 35 constraints, 100 variables, 100 integers:
-t=36.00, GLPK took -79.73% more time on average compared to YALPS
-GLPK: (n=4, mean=11.57, stdErr=0.90)
-YALPS: (n=4, mean=57.08, stdErr=0.89)
+t=-8.58, GLPK took -73.82% more time on average compared to YALPS
+GLPK: (n=7, mean=11.76, stdErr=0.42)
+YALPS: (n=7, mean=44.91, stdErr=3.84)
 
 Monster 2.json: 888 constraints, 924 variables, 112 integers:
-t=-13.29, GLPK took 183.91% more time on average compared to YALPS
-GLPK: (n=6, mean=197.67, stdErr=0.61)
-YALPS: (n=6, mean=69.63, stdErr=9.62)
+t=18.41, GLPK took 187.38% more time on average compared to YALPS
+GLPK: (n=4, mean=217.21, stdErr=5.25)
+YALPS: (n=4, mean=75.58, stdErr=5.62)
 
 Monster Problem.json: 600 constraints, 552 variables, 0 integers:
-t=-13.37, GLPK took 258.06% more time on average compared to YALPS
-GLPK: (n=4, mean=7.67, stdErr=0.27)
-YALPS: (n=4, mean=2.14, stdErr=0.32)
+t=7.49, GLPK took 249.37% more time on average compared to YALPS
+GLPK: (n=6, mean=9.08, stdErr=0.70)
+YALPS: (n=6, mean=2.60, stdErr=0.51)
 
 Sudoku 4x4.json: 64 constraints, 64 variables, 64 integers:
-t=12.06, GLPK took -57.48% more time on average compared to YALPS
-GLPK: (n=6, mean=0.59, stdErr=0.06)
-YALPS: (n=6, mean=1.39, stdErr=0.02)
+t=-19.27, GLPK took -56.64% more time on average compared to YALPS
+GLPK: (n=4, mean=0.69, stdErr=0.05)
+YALPS: (n=4, mean=1.59, stdErr=0.01)
 
 Vendor Selection.json: 1641 constraints, 1640 variables, 40 integers:
-t=26.85, GLPK took -69.77% more time on average compared to YALPS
-GLPK: (n=4, mean=123.46, stdErr=4.63)
-YALPS: (n=4, mean=408.34, stdErr=9.55)
+t=-26.49, GLPK took -70.50% more time on average compared to YALPS
+GLPK: (n=4, mean=127.70, stdErr=2.64)
+YALPS: (n=4, mean=432.85, stdErr=11.22)
 ```
 
-The code used for these benchmarks is available under `tests/Bechmark.ts`.
-Measuring performance isn't always straightforward, so take these synthetic benchmarks with a grain of salt.
-It is always recommened to benchmark for your use case.
-Then again, if your problems are typically small, then this solver *should* have no issue (and may be much faster!).
+The code used for these benchmarks is available under `tests/Bechmark.ts`. Measuring performance isn't always straightforward, so take these synthetic benchmarks with a grain of salt. It is always recommended to benchmark for your use case. Then again, if your problems are typically of small or medium size, then this solver should have no issue (and may be much faster!).

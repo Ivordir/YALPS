@@ -187,7 +187,7 @@ const welch = (
     // variance / N = mean squared error?
     const mse1 = variance(s1) / s1.n
     const mse2 = variance(s2) / s2.n
-    const t = (s1.mean - s2.mean) / Math.sqrt(mse1 + mse2)
+    const t = (s2.mean - s1.mean) / Math.sqrt(mse1 + mse2)
     const df =
       mse1 === 0 && mse2 === 0 ? 1
       : Math.floor((square(mse1 + mse2) / (square(mse1) / (s1.n - 1) + square(mse2) / (s2.n - 1))))
