@@ -1,0 +1,30 @@
+{
+  "model": {
+    "variables": {
+      "x": {
+        "fritzJohn1": 1.5,
+        "fritzJohn2": -0.3
+      },
+      "y": {
+        "fritzJohn1": -0.3,
+        "fritzJohn2": 1.5
+      }
+    },
+    "constraints": {
+      "fritzJohn1": {
+        "equal": 1.4
+      },
+      "fritzJohn2": {
+        "equal": 1.4
+      }
+    }
+  },
+  "expected": {
+    "status": "optimal",
+    "result": 0,
+    "variables": {
+      "x": 1.16666667,
+      "y": 1.16666667
+    }
+  }
+}

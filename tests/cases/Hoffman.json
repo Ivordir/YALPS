@@ -1,0 +1,77 @@
+{
+  "model": {
+    "direction": "minimize",
+    "objective": "objective",
+    "variables": {
+      "x1": {
+        "c1": 1
+      },
+      "x2": {
+        "c2": 1
+      },
+      "x3": {
+        "c3": 1
+      },
+      "x4": {
+        "objective": -2.361,
+        "c2": 0.3090,
+        "c3": 1.4635
+      },
+      "x5": {
+        "objective": 2,
+        "c2": -0.6180,
+        "c3": 0.3090
+      },
+      "x6": {
+        "c2": -0.8090,
+        "c3": 1.4635
+      },
+      "x7": {
+        "objective": 4,
+        "c2": -0.3820,
+        "c3": -0.8090
+      },
+      "x8": {
+        "objective": 3.6180,
+        "c2": 0.8090,
+        "c3": -0.9045
+      },
+      "x9": {
+        "objective": 3.236,
+        "c2": 0.3820,
+        "c3": -0.8090
+      },
+      "x10": {
+        "objective": 3.6180,
+        "c2": 0.3090,
+        "c3": 0.4635
+      },
+      "x11": {
+        "objective": 0.764,
+        "c2": 0.6180,
+        "c3": 0.3090
+      }
+    },
+    "constraints": {
+      "c1": {
+        "equal": 1
+      },
+      "c2": {
+        "equal": 0
+      },
+      "c3": {
+        "equal": 0
+      }
+    }
+  },
+  "expected": {
+    "status": "optimal",
+    "result": 0,
+    "variables": {
+      "x1": 1
+    }
+  },
+  "options": {
+    "checkCycles": true
+  }
+}

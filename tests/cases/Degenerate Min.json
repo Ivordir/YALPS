@@ -1,0 +1,49 @@
+{
+  "model": {
+    "direction": "minimize",
+    "objective": "objective",
+    "variables": {
+      "x1": {
+        "c1": 1,
+        "c2": 0,
+        "c3": 1,
+        "c4": 3,
+        "c5": 5,
+        "objective": 3
+      },
+      "x2": {
+        "c1": 0,
+        "c2": 1,
+        "c3": 1,
+        "c4": 2,
+        "c5": 4,
+        "objective": 5
+      }
+    },
+    "constraints": {
+      "c1": {
+        "max": 4
+      },
+      "c2": {
+        "min": 6
+      },
+      "c3": {
+        "min": 8
+      },
+      "c4": {
+        "min": 18
+      },
+      "c5": {
+        "min": 32
+      }
+    }
+  },
+  "expected": {
+    "status": "optimal",
+    "result": 36,
+    "variables": {
+      "x1": 2,
+      "x2": 6
+    }
+  }
+}

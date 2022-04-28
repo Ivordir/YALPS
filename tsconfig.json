@@ -1,0 +1,44 @@
+{
+  "compilerOptions": { /* Docs: https://www.typescriptlang.org/tsconfig */
+    "target": "ES2020",
+    "module": "ES2020",
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "declaration": true,
+    "allowJs": true,
+    "checkJs": true,
+    "moduleResolution": "node",
+    "types": [
+      "node",
+      "mocha"
+    ],
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "alwaysStrict": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    "strictPropertyInitialization": true,
+    "sourceMap": false,
+    "isolatedModules": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "<node_internals>/**",
+  ],
+  "ts-node": {
+    "esm": true
+  }
+}

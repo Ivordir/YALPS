@@ -1,0 +1,46 @@
+{
+  "model": {
+    "direction": "minimize",
+    "objective": "cost",
+    "variables": {
+      "nachos": {
+        "nachos": 1,
+        "people_served": 21,
+        "cost": 75
+      },
+      "tacos": {
+        "tacos": 1,
+        "people_served": 26,
+        "cost": 90
+      },
+      "burritos": {
+        "burritos": 1,
+        "people_served": 31,
+        "cost": 105
+      },
+      "fajitas": {
+        "fajitas": 1,
+        "people_served": 36,
+        "cost": 120
+      }
+    },
+    "constraints": {
+      "people_served": {
+        "min": 25
+      }
+    },
+    "integers": [
+      "nachos",
+      "tacos",
+      "burritos",
+      "fajitas"
+    ]
+  },
+  "expected": {
+    "status": "optimal",
+    "result": 90,
+    "variables": {
+      "tacos": 1
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "model": {
+    "direction": "maximize",
+    "objective": "profit",
+    "variables": {
+      "coat": {
+        "hours": 10,
+        "yards": 3,
+        "profit": 50
+      },
+      "pants": {
+        "hours": 4,
+        "yards": 5,
+        "profit": 40
+      }
+    },
+    "constraints": {
+      "yards": {
+        "max": 150
+      },
+      "hours": {
+        "max": 200
+      }
+    },
+    "integers": [
+      "coat",
+      "pants"
+    ]
+  },
+  "expected": {
+    "status": "optimal",
+    "result": 1460,
+    "variables": {
+      "coat": 10,
+      "pants": 24
+    }
+  }
+}

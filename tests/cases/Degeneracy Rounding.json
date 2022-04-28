@@ -1,0 +1,39 @@
+{
+  "model": {
+    "direction": "maximize",
+    "objective": "profit",
+    "variables": {
+      "x1": {
+        "cst1": 3,
+        "cst2": 1,
+        "cst3": 0,
+        "profit": 2
+      },
+      "x2": {
+        "cst1": 1,
+        "cst2": -1,
+        "cst3": 1,
+        "profit": 1
+      }
+    },
+    "constraints": {
+      "cst1": {
+        "max": 6
+      },
+      "cst2": {
+        "max": 2
+      },
+      "cst3": {
+        "max": 3
+      }
+    }
+  },
+  "expected": {
+    "status": "optimal",
+    "result": 5,
+    "variables": {
+      "x1": 1,
+      "x2": 3
+    }
+  }
+}

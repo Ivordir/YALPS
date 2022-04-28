@@ -1,0 +1,34 @@
+{
+  "model": {
+    "direction": "maximize",
+    "objective": "profit",
+    "variables": {
+      "Yusip": {
+        "Costa Rican": 0.5,
+        "Etheopian": 0.5,
+        "profit": 3.5
+      },
+      "Exotic": {
+        "Costa Rican": 0.25,
+        "Etheopian": 0.75,
+        "profit": 4
+      }
+    },
+    "constraints": {
+      "Costa Rican": {
+        "max": 200
+      },
+      "Etheopian": {
+        "max": 330
+      }
+    }
+  },
+  "expected": {
+    "status": "optimal",
+    "result": 1985,
+    "variables": {
+      "Yusip": 270,
+      "Exotic": 260
+    }
+  }
+}

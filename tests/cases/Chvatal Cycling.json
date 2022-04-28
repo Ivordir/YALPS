@@ -1,0 +1,51 @@
+{
+  "model": {
+    "direction": "maximize",
+    "objective": "objective",
+    "variables": {
+      "x1": {
+        "objective": 10,
+        "c1": 0.5,
+        "c2": 0.5,
+        "c3": 1
+      },
+      "x2": {
+        "objective": -57,
+        "c1": -5.5,
+        "c2": -1.5,
+        "c3": 0
+      },
+      "x3": {
+        "objective": -9,
+        "c1": -2.5,
+        "c2": -0.5,
+        "c3": 0
+      },
+      "x4": {
+        "objective": -24,
+        "c1": 9,
+        "c2": 1,
+        "c3": 0
+      }
+    },
+    "constraints": {
+      "c1": {
+        "max": 0
+      },
+      "c2": {
+        "max": 0
+      },
+      "c3": {
+        "max": 1
+      }
+    }
+  },
+  "expected": {
+    "status": "cycled",
+    "result": null,
+    "variables": {}
+  },
+  "options": {
+    "checkCycles": true
+  }
+}

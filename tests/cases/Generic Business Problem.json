@@ -1,0 +1,34 @@
+{
+  "model": {
+    "direction": "maximize",
+    "objective": "profit",
+    "variables": {
+      "large": {
+        "size": 60,
+        "units": 1,
+        "profit": 250
+      },
+      "small": {
+        "size": 40,
+        "units": 1,
+        "profit": 150
+      }
+    },
+    "constraints": {
+      "size": {
+        "max": 2400
+      },
+      "units": {
+        "min": 50
+      }
+    }
+  },
+  "expected": {
+    "status": "optimal",
+    "result": 9500,
+    "variables": {
+      "large": 20,
+      "small": 30
+    }
+  }
+}

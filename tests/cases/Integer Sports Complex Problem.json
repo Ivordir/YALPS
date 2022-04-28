@@ -1,0 +1,68 @@
+{
+  "model": {
+    "direction": "maximize",
+    "objective": "usage",
+    "variables": {
+      "pool": {
+        "land": 4,
+        "cost": 35000,
+        "usage": 300,
+        "pools": 1
+      },
+      "tennisCourt": {
+        "land": 2,
+        "cost": 10000,
+        "usage": 90,
+        "tennisCourts": 1
+      },
+      "field": {
+        "land": 7,
+        "cost": 25000,
+        "usage": 400,
+        "fields": 1
+      },
+      "gym": {
+        "land": 3,
+        "cost": 90000,
+        "usage": 150,
+        "gyms": 1
+      }
+    },
+    "constraints": {
+      "cost": {
+        "max": 120000
+      },
+      "land": {
+        "max": 12
+      },
+      "pools": {
+        "max": 1
+      },
+      "tennisCourts": {
+        "max": 1
+      },
+      "fields": {
+        "max": 1
+      },
+      "gyms": {
+        "max": 1
+      }
+    },
+    "integers": [
+      "pool",
+      "tennisCourt",
+      "field",
+      "gym"
+    ]
+  },
+  "expected": {
+    "status": "optimal",
+    "result": 700,
+    "variables": {
+      "pool": 1,
+      "tennisCourt": 0,
+      "field": 1,
+      "gym": 0
+    }
+  }
+}

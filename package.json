@@ -1,0 +1,54 @@
+{
+  "name": "yalps",
+  "version": "0.1.0",
+  "author": "Ivordir <Ivordir@pm.me>",
+  "description": "Yet another linear programming solver. (A rewrite of javascript-lp-solver.) Aims to be decently fast.",
+  "keywords": [
+    "Linear Programming",
+    "Integer Programming",
+    "Mixed Integer Programming",
+    "Mixed Integer Linear Programming",
+    "LP",
+    "MIP",
+    "MILP",
+    "solver",
+    "Simplex",
+    "Linear Optimization"
+  ],
+  "homepage": "https://github.com/Ivordir/YALPS",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ivordir/YALPS.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Ivordir/YALPS/issues"
+  },
+  "license": "MIT",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "main": "dist/YALPS.js",
+  "type": "module",
+  "scripts": {
+    "test": "ts-node node_modules/mocha/bin/_mocha tests/Tests.ts",
+    "benchmark": "ts-node tests/Benchmark.ts",
+    "start": "tsc -w -p tsconfig.json",
+    "build": "tsc -p tsconfig.json",
+    "prepare": "npm test && npm build"
+  },
+  "dependencies": {
+    "heap": "^0.2.7"
+  },
+  "devDependencies": {
+    "@types/heap": "^0.2.30",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "^17.0.24",
+    "assert": "^2.0.0",
+    "fs": "^0.0.1-security",
+    "glpk.js": "^4.0.1",
+    "javascript-lp-solver": "^0.4.24",
+    "mocha": "^9.2.2",
+    "perf_hooks": "^0.0.1"
+  }
+}

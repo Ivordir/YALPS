@@ -1,0 +1,34 @@
+{
+  "model": {
+    "direction": "maximize",
+    "objective": "profit",
+    "variables": {
+      "computer": {
+        "size": 12,
+        "cost": 1000,
+        "profit": 1000
+      },
+      "printer": {
+        "size": 8,
+        "cost": 300,
+        "profit": 350
+      }
+    },
+    "constraints": {
+      "cost": {
+        "max": 70000
+      },
+      "size": {
+        "max": 1000
+      }
+    }
+  },
+  "expected": {
+    "status": "optimal",
+    "result": 71818.18181818182,
+    "variables": {
+      "computer": 59.09090909090909,
+      "printer": 36.36363636363636
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "model": {
+    "direction": "maximize",
+    "objective": "profit",
+    "variables": {
+      "table": {
+        "wood": 30,
+        "labor": 5,
+        "profit": 6
+      },
+      "chair": {
+        "wood": 20,
+        "labor": 10,
+        "profit": 8,
+        "chairs": 1
+      }
+    },
+    "constraints": {
+      "wood": {
+        "max": 300
+      },
+      "labor": {
+        "max": 110
+      },
+      "chairs": {
+        "max": 8
+      }
+    },
+    "integers": [
+      "table",
+      "chair"
+    ]
+  },
+  "expected": {
+    "status": "optimal",
+    "result": 88,
+    "variables": {
+      "table": 4,
+      "chair": 8
+    }
+  }
+}
