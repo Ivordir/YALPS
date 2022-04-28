@@ -1,5 +1,5 @@
 # What is this?
-This is **Yet Another Linear Programming Solver (YALPS)**. It is intended as a performant, lightweight linear programming (LP) solver geared towards medium and small LP problems. It can solve non-integer, integer, and mixed integer LP problems. The outputed JS has only ~500 lines and is ~20kb in size (not minified).
+This is **Yet Another Linear Programming Solver (YALPS)**. It is intended as a performant, lightweight linear programming (LP) solver geared towards medium and small LP problems. It can solve non-integer, integer, and mixed integer LP problems. The outputed JS has only ~500 lines and is ~20kB in size (not minified).
 
 YALPS is a rewrite of [jsLPSolver](https://www.npmjs.com/package/javascript-lp-solver). The people there have made a great and easy to use solver. However, the API was limited to objects only, and I saw other areas that could have been improved. You can check out [jsLPSolver](https://www.npmjs.com/package/javascript-lp-solver) for more background and information regarding LP problems.
 

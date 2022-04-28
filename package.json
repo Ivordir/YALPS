@@ -1,6 +1,6 @@
 {
   "name": "yalps",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Ivordir <Ivordir@pm.me>",
   "description": "Yet another linear programming solver. (A rewrite of javascript-lp-solver.) Aims to be decently fast.",
   "keywords": [
@@ -26,7 +26,8 @@
   "license": "MIT",
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "main": "dist/YALPS.js",
   "type": "module",
@@ -35,7 +36,7 @@
     "benchmark": "ts-node tests/Benchmark.ts",
     "start": "tsc -w -p tsconfig.json",
     "build": "tsc -p tsconfig.json",
-    "prepare": "npm test && npm build"
+    "prepare": "npm test && npm run build"
   },
   "dependencies": {
     "heap": "^0.2.7"

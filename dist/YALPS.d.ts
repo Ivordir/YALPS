@@ -127,44 +127,22 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
     } : never);
     /**
      * An `Iterable` of variable keys that indicates these variables are integer.
-     * It can also be a boolean, indicating whether all variables are integer or not.
+     * It can also be a `boolean`, indicating whether all variables are integer or not.
      * All variables are treated as not integer if this is left blank.
      */
     readonly integers?: boolean | Iterable<VariableKey>;
     /**
      * An `Iterable` of variable keys that indicates these variables are binary
      * (can only be 0 or 1 in the solution).
-     * It can also be a boolean, indicating whether all variables are binary or not.
+     * It can also be a `boolean`, indicating whether all variables are binary or not.
      * All variables are treated as not binary if this is left blank.
      */
     readonly binaries?: boolean | Iterable<VariableKey>;
 }
 /**
  * This indicates what type of solution, if any, the solver was able to find.
- *
- * `"optimal"` indicates everything went ok, and the solver found an optimal solution.
- *
- * `"infeasible"` indicates that the problem has no possible solutions.
- * `result` will be `NaN` in this case.
- *
- * `"unbounded"` indicates a variable, or combination of variables, are not sufficiently constrained.
- * As such, the `result` of the solution will be +-`Infinity`.
- * `variables` in the solution might contain a variable,
- * in which case it is the variable that the solver happened to finish on.
- * This may be the unbounded variable or one of the combination of variables that are unbounded.
- *
- * `"timedout"` indicates that the solver exited early for an integer problem.
- * This may happen if the solver takes too long and exceeds the `timeout` option.
- * Similarly, the number of branch and cut iterations may exceeed `maxIterations` as set in the options.
- * In both of these cases, the current sub-optimal solution/result, if any, is returned.
- * If `result` is `NaN`, then this means no integer solutions were found before the solver timed out.
- *
- * `"cycled"` indicates that the simplex method cycled and exited.
- * This case is rare, but `checkCycles` can be set to `true` in the options to check for it.
- * Otherwise, if `maxPivots` (as set in the options) is reached by the simplex method,
- * then it is assumed that a cycle was encountered.
- * `result` will be `NaN` in this case.
-*/
+ * @see `status` on `Solution` for detailed information.
+ */
 export declare type SolutionStatus = "optimal" | "infeasible" | "unbounded" | "timedout" | "cycled";
 /**
  * The solution object returned by the solver.
@@ -172,9 +150,30 @@ export declare type SolutionStatus = "optimal" | "infeasible" | "unbounded" | "t
  */
 export declare type Solution<VariableKey = string> = {
     /**
-     * The status of the solution, indicating whether the optimal solution was found
-     * or something else was encountered.
-     * @see `SolutionStatus` for more information.
+     * `status` indicates what type of solution, if any, the solver was able to find.
+     *
+     * `"optimal"` indicates everything went ok, and the solver found an optimal solution.
+     *
+     * `"infeasible"` indicates that the problem has no possible solutions.
+     * `result` will be `NaN` in this case.
+     *
+     * `"unbounded"` indicates a variable, or combination of variables, are not sufficiently constrained.
+     * As such, the `result` of the solution will be +-`Infinity`.
+     * `variables` in the solution might contain a variable,
+     * in which case it is the variable that the solver happened to finish on.
+     * This may be the unbounded variable or one of the combination of variables that are unbounded.
+     *
+     * `"timedout"` indicates that the solver exited early for an integer problem.
+     * This may happen if the solver takes too long and exceeds the `timeout` option.
+     * Similarly, the number of branch and cut iterations may exceeed `maxIterations` as set in the options.
+     * In both of these cases, the current sub-optimal solution/result, if any, is returned.
+     * If `result` is `NaN`, then this means no integer solutions were found before the solver timed out.
+     *
+     * `"cycled"` indicates that the simplex method cycled and exited.
+     * This case is rare, but `checkCycles` can be set to `true` in the options to check for it.
+     * Otherwise, if `maxPivots` (as set in the options) is reached by the simplex method,
+     * then it is assumed that a cycle was encountered.
+     * `result` will be `NaN` in this case.
      */
     status: SolutionStatus;
     /**
@@ -265,7 +264,7 @@ export declare const greaterEq: (value: number) => Constraint;
  */
 export declare const equalTo: (value: number) => Constraint;
 /**
- * Returns a `Constraint` that specifies something should be between `lower` an `upper` (inclusive).
+ * Returns a `Constraint` that specifies something should be between `lower` and `upper` (inclusive).
  * Equivalent to `{ min: lower, max: upper }`.
  */
 export declare const inRange: (lower: number, upper: number) => Constraint;
@@ -294,7 +293,7 @@ export declare const applyDefaultOptions: (options?: Options | undefined) => Req
 /**
  * Runs the solver on the given model and using the given options (if any).
  * @see `Model` on how to specify/create the model.
- * @see `Solution` and `SolutionStatus` as well for more detailed information on what is returned.
+ * @see `Solution` as well for more detailed information on what is returned.
  */
 export declare const solve: <VarKey = string, ConKey = string>(model: Model<VarKey, ConKey>, options?: Options | undefined) => Solution<VarKey>;
 export {};

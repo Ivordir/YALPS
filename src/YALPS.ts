@@ -854,7 +854,7 @@ export const applyDefaultOptions = (options?: Options): Required<Options> => ({
 /**
  * Runs the solver on the given model and using the given options (if any).
  * @see `Model` on how to specify/create the model.
- * @see `Solution` and `SolutionStatus` as well for more detailed information on what is returned.
+ * @see `Solution` as well for more detailed information on what is returned.
  */
 export const solve = <VarKey = string, ConKey = string>(
   model: Model<VarKey, ConKey>,

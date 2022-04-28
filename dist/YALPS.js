@@ -1,4 +1,5 @@
 import heap from "heap";
+// Actual code starts here.
 /**
  * Returns a `Constraint` that specifies something should be less than or equal to `value`.
  * Equivalent to `{ max: value }`.
@@ -15,7 +16,7 @@ export const greaterEq = (value) => ({ min: value });
  */
 export const equalTo = (value) => ({ equal: value });
 /**
- * Returns a `Constraint` that specifies something should be between `lower` an `upper` (inclusive).
+ * Returns a `Constraint` that specifies something should be between `lower` and `upper` (inclusive).
  * Equivalent to `{ min: lower, max: upper }`.
  */
 export const inRange = (lower, upper) => ({
@@ -478,7 +479,7 @@ export const applyDefaultOptions = (options) => ({
 /**
  * Runs the solver on the given model and using the given options (if any).
  * @see `Model` on how to specify/create the model.
- * @see `Solution` and `SolutionStatus` as well for more detailed information on what is returned.
+ * @see `Solution` as well for more detailed information on what is returned.
  */
 export const solve = (model, options) => {
     if (model == null)
