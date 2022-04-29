@@ -36,7 +36,8 @@
     "benchmark": "ts-node tests/Benchmark.ts",
     "start": "tsc -w -p tsconfig.json",
     "build": "tsc -p tsconfig.json",
-    "prepare": "npm test && npm run build"
+    "prepare": "npm run build",
+    "release": "np"
   },
   "dependencies": {
     "heap": "^0.2.7"
