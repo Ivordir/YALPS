@@ -133,7 +133,7 @@ type Coefficients<ConstraintKey = string> =
         : never)
 
 /**
- * The model representing an LP problem.
+ * The model representing a LP problem.
  * `constraints`, `variables`, and each variable's `Coefficients` in `variables`
  * can be either an object or an `Iterable`.
  * If there are objects present, their corresponding type parameter(s) for the keys must extend string.
@@ -285,8 +285,12 @@ interface Options {
     maxIterations?: number
 }
 
-/** Applies the default values for each option if the option is not specified. */
-const applyDefaultOptions: (options?: Options) => Required<Options>
+/**
+ * The default options used by the solver.
+ * You may change these so that you do not have to
+ * pass a custom `Options` object every time you call `solve`.
+ */
+let defaultOptions: Options
 
 /** Runs the solver on the given model and using the given options (if any). */
 const solve: <VarKey = string, ConKey = string>(model: Model<VarKey, ConKey>, options?: Options) => Solution<VarKey>

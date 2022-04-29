@@ -1,4 +1,4 @@
-import { tableauModel, solve, applyDefaultOptions, Model, Solution, Options, Coefficients, Constraint, index } from "../src/YALPS.js"
+import { tableauModel, solve, Model, Solution, Options, Coefficients, Constraint, index, defaultOptions } from "../src/YALPS.js"
 import * as File from "fs"
 import assert from "assert"
 
@@ -21,7 +21,7 @@ const testData: readonly TestData[] =
     data.file = file
     data.variables = Object.entries(data.model.variables)
     data.constraints = Object.entries(data.model.constraints)
-    data.options = applyDefaultOptions(data.options)
+    data.options = { ...defaultOptions, ...data.options }
     data.expected.result =
       data.expected.result === null ? NaN
       : data.expected.result === "Infinity" ? Infinity

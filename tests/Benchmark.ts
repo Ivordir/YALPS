@@ -2,7 +2,7 @@ import { performance } from "perf_hooks"
 import * as File from "fs"
 import { Model, Options, Solution, solve } from "../src/YALPS.js"
 // @ts-ignore
-import jslp from "javascript-lp-solver"
+import jsLP from "javascript-lp-solver"
 // @ts-ignore
 import glpk from "glpk.js"
 
@@ -60,7 +60,7 @@ const jsLPOptions = (options?: Options) =>
     exitOnCycles: options?.checkCycles ?? false
   }
 
-const jsLPSolve = (model: any, precision?: number) => jslp.Solve(model, precision)
+const jsLPSolve = (model: any, precision?: number) => jsLP.Solve(model, precision)
 
 const jsLPTimer = (bench: Benchmark) => {
   const model = jsLPModel(bench.model, bench.options)

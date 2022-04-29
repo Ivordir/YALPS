@@ -34,7 +34,7 @@ export type Coefficients<ConstraintKey = string> =
       : never)
 
 /**
- * The model representing an LP problem.
+ * The model representing a LP problem.
  * `constraints`, `variables`, and each variable's `Coefficients` in `variables` can be either an object or an `Iterable`.
  * The model is treated as readonly (recursively) by the solver, so nothing on it is mutated.
  *
@@ -113,7 +113,7 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
    *   y: { a: 3, c: 22 }
    * }
    * ```
-   * @exmaple
+   * @example
    * Variables as an `Iterable`:
    * ```
    * type VariableKey = string // can be whatever you like
@@ -397,6 +397,7 @@ export const tableauModel = <VarKey = string, ConKey = string>(model: Model<VarK
 
   const constraints = new Map<ConKey, { row: number, lower: number, upper: number }>()
   for (const [key, constraint] of convertToIterable("constraints", model.constraints)) {
+    if (constraint == null) throw "A constraint was null or undefined."
     const bounds = constraints.get(key) ?? { row: NaN, lower: -Infinity, upper: Infinity }
     bounds.lower = Math.max(bounds.lower, constraint.equal ?? constraint.min ?? -Infinity)
     bounds.upper = Math.min(bounds.upper, constraint.equal ?? constraint.max ?? Infinity)
@@ -775,7 +776,7 @@ const branchAndCut = <VarKey, ConKey>(
   const optimalThreshold = initResult * (1 - tabmod.sign * options.tolerance)
   const timeout = options.timeout + Date.now()
   let timedout = Date.now() >= timeout // in case options.timeout <= 0
-  let bestStatus: SolutionStatus = "infeasible"
+  let solutionFound = false
   let bestEval = Infinity
   let bestTableau = tabmod.tableau
   let iter = 0
@@ -797,7 +798,7 @@ const branchAndCut = <VarKey, ConKey>(
       const [variable, value, frac] = mostFractionalVar(tableau, tabmod.integers)
       if (frac <= options.precision) {
         // The solution is integer
-        bestStatus = "optimal"
+        solutionFound = true
         bestEval = result
         bestTableau = tableau
         currentBuffer = !currentBuffer
@@ -835,25 +836,39 @@ const branchAndCut = <VarKey, ConKey>(
 
   return solution(
     { ...tabmod, tableau: bestTableau },
-    unfinished ? "timedout" : bestStatus,
-    bestStatus === "infeasible" ? NaN : bestEval,
+    unfinished ? "timedout"
+    : !solutionFound ? "infeasible"
+    : "optimal",
+    solutionFound ? bestEval : NaN,
     options.precision
   )
 }
 
-/** Applies the default values for each option if the option is not specified. */
-export const applyDefaultOptions = (options?: Options): Required<Options> => ({
-  precision: options?.precision ?? 1E-08,
-  checkCycles: options?.checkCycles ?? false,
-  maxPivots: options?.maxPivots ?? 4096,
-  tolerance: options?.tolerance ?? 0,
-  timeout: options?.timeout ?? Infinity,
-  maxIterations: options?.maxIterations ?? 4096
+/**
+ * The initial, default options for the solver.
+ * Can be used to reset `defaultOptions`.
+ * Do not try to mutate this object - it is frozen.
+*/
+export const backupDefaultOptions: Required<Options> = Object.freeze({
+  precision: 1E-08,
+  checkCycles: false,
+  maxPivots: 4096,
+  tolerance: 0,
+  timeout: Infinity,
+  maxIterations: 4096
 })
+
+/**
+ * The default options used by the solver.
+ * You may change these so that you do not have to
+ * pass a custom `Options` object every time you call `solve`.
+ */
+export let defaultOptions: Options = { ...backupDefaultOptions }
 
 /**
  * Runs the solver on the given model and using the given options (if any).
  * @see `Model` on how to specify/create the model.
+ * @see `Options` for the kinds of options available.
  * @see `Solution` as well for more detailed information on what is returned.
  */
 export const solve = <VarKey = string, ConKey = string>(
@@ -863,7 +878,7 @@ export const solve = <VarKey = string, ConKey = string>(
   if (model == null) throw "model was null or undefined."
 
   const tabmod = tableauModel(model)
-  const opt = applyDefaultOptions(options)
+  const opt = { ...backupDefaultOptions, ...defaultOptions, ...options }
   const [status, result] = phase1(tabmod.tableau, opt)
   return (
     // Non-integer problem, return the simplex result.

@@ -26,7 +26,7 @@ export declare type Coefficients<ConstraintKey = string> = Iterable<readonly [co
     readonly [constraint in ConstraintKey]?: number;
 } : never);
 /**
- * The model representing an LP problem.
+ * The model representing a LP problem.
  * `constraints`, `variables`, and each variable's `Coefficients` in `variables` can be either an object or an `Iterable`.
  * The model is treated as readonly (recursively) by the solver, so nothing on it is mutated.
  *
@@ -100,7 +100,7 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
      *   y: { a: 3, c: 22 }
      * }
      * ```
-     * @exmaple
+     * @example
      * Variables as an `Iterable`:
      * ```
      * type VariableKey = string // can be whatever you like
@@ -288,11 +288,22 @@ declare type TableauModel<VariableKey, ConstraintKey> = {
 };
 /** Intended to be called internally. It constructs a Tableau from a `Model`. */
 export declare const tableauModel: <VarKey = string, ConKey = string>(model: Model<VarKey, ConKey>) => TableauModel<VarKey, ConKey>;
-/** Applies the default values for each option if the option is not specified. */
-export declare const applyDefaultOptions: (options?: Options | undefined) => Required<Options>;
+/**
+ * The initial, default options for the solver.
+ * Can be used to reset `defaultOptions`.
+ * Do not try to mutate this object - it is frozen.
+*/
+export declare const backupDefaultOptions: Required<Options>;
+/**
+ * The default options used by the solver.
+ * You may change these so that you do not have to
+ * pass a custom `Options` object every time you call `solve`.
+ */
+export declare let defaultOptions: Options;
 /**
  * Runs the solver on the given model and using the given options (if any).
  * @see `Model` on how to specify/create the model.
+ * @see `Options` for the kinds of options available.
  * @see `Solution` as well for more detailed information on what is returned.
  */
 export declare const solve: <VarKey = string, ConKey = string>(model: Model<VarKey, ConKey>, options?: Options | undefined) => Solution<VarKey>;
