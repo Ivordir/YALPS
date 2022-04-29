@@ -863,7 +863,7 @@ export const backupDefaultOptions: Required<Options> = Object.freeze({
  * You may change these so that you do not have to
  * pass a custom `Options` object every time you call `solve`.
  */
-export let defaultOptions: Options = { ...backupDefaultOptions }
+export let defaultOptions = { ...backupDefaultOptions }
 
 /**
  * Runs the solver on the given model and using the given options (if any).

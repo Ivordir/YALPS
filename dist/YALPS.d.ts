@@ -299,7 +299,14 @@ export declare const backupDefaultOptions: Required<Options>;
  * You may change these so that you do not have to
  * pass a custom `Options` object every time you call `solve`.
  */
-export declare let defaultOptions: Options;
+export declare let defaultOptions: {
+    precision: number;
+    checkCycles: boolean;
+    maxPivots: number;
+    tolerance: number;
+    timeout: number;
+    maxIterations: number;
+};
 /**
  * Runs the solver on the given model and using the given options (if any).
  * @see `Model` on how to specify/create the model.
