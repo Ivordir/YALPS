@@ -479,10 +479,10 @@ const branchAndCut = (tabmod, initResult, options) => {
 export const backupDefaultOptions = Object.freeze({
     precision: 1E-08,
     checkCycles: false,
-    maxPivots: 4096,
+    maxPivots: 8192,
     tolerance: 0,
     timeout: Infinity,
-    maxIterations: 4096
+    maxIterations: 32768
 });
 /**
  * The default options used by the solver.
