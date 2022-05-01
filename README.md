@@ -249,7 +249,7 @@ interface Options {
     /**
      * This determines the maximum number of pivots allowed within the simplex method.
      * If this is exceeded, then it assumed that the solver cycled.
-     * The default value is `4096`.
+     * The default value is `8192`.
      */
     maxPivots?: number
 
@@ -280,7 +280,7 @@ interface Options {
      * for the main branch and cut algorithm.
      * It can be used alongside or instead of `timeout`
      * to prevent the algorithm from taking too long.
-     * The default value is `4096`.
+     * The default value is `32768`.
      */
     maxIterations?: number
 }

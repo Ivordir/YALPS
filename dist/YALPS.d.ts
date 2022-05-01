@@ -213,7 +213,7 @@ export interface Options {
      * If this is exceeded, then it assumed that the simplex method cycled,
      * and the returned solution will have the `"cycled"` status.
      * If your problem is *very* large, you *may* have to set this option higher.
-     * The default value is `4096`.
+     * The default value is `8192`.
      */
     readonly maxPivots?: number;
     /**
@@ -244,7 +244,7 @@ export interface Options {
      * for the main branch and cut algorithm.
      * It can be used alongside or instead of `timeout`
      * to prevent the algorithm from taking too long.
-     * The default value is `4096`.
+     * The default value is `32768`.
      */
     readonly maxIterations?: number;
 }
