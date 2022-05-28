@@ -29,13 +29,21 @@
     "README.md",
     "LICENSE"
   ],
-  "main": "dist/YALPS.js",
+  "main": "./dist/YALPS.cjs",
+  "exports": {
+    "import": "./dist/YALPS.js",
+    "require": "./dist/YALPS.cjs",
+    "default": "./dist/YALPS.js"
+  },
   "type": "module",
+  "types": "./dist/YALPS.d.ts",
   "scripts": {
     "test": "ts-node node_modules/mocha/bin/_mocha tests/Tests.ts",
     "benchmark": "ts-node tests/Benchmark.ts",
     "start": "tsc -w -p tsconfig.json",
-    "build": "tsc -p tsconfig.json",
+    "build:esm": "tsc",
+    "build:cjs": "tsc --module commonjs && mv ./dist/YALPS.js ./dist/YALPS.cjs",
+    "build": "npm run build:cjs && npm run build:esm",
     "prepare": "npm run build",
     "release": "np"
   },
