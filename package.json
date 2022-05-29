@@ -40,9 +40,9 @@
   "scripts": {
     "test": "ts-node node_modules/mocha/bin/_mocha tests/Tests.ts",
     "benchmark": "ts-node tests/Benchmark.ts",
-    "start": "tsc -w -p tsconfig.json",
+    "start": "tsc -w",
     "build:esm": "tsc",
-    "build:cjs": "tsc --module commonjs && mv ./dist/YALPS.js ./dist/YALPS.cjs",
+    "build:cjs": "tsc -m commonjs && mv ./dist/YALPS.js ./dist/YALPS.cjs",
     "build": "npm run build:cjs && npm run build:esm",
     "prepare": "npm run build",
     "release": "np"
