@@ -1,6 +1,6 @@
 {
   "name": "yalps",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "author": "Ivordir <Ivordir@pm.me>",
   "description": "Yet another linear programming solver. (A rewrite of javascript-lp-solver.) Aims to be decently fast.",
   "keywords": [
