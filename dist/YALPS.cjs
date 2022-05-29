@@ -1,34 +1,46 @@
-import heap from "heap";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.solve = exports.defaultOptions = exports.backupDefaultOptions = exports.tableauModel = exports.update = exports.index = exports.inRange = exports.equalTo = exports.greaterEq = exports.lessEq = void 0;
+const heap_1 = __importDefault(require("heap"));
 // Actual code starts here.
 /**
  * Returns a `Constraint` that specifies something should be less than or equal to `value`.
  * Equivalent to `{ max: value }`.
  */
-export const lessEq = (value) => ({ max: value });
+const lessEq = (value) => ({ max: value });
+exports.lessEq = lessEq;
 /**
  * Returns a `Constraint` that specifies something should be greater than or equal to `value`.
  * Equivalent to `{ min: value }`.
  */
-export const greaterEq = (value) => ({ min: value });
+const greaterEq = (value) => ({ min: value });
+exports.greaterEq = greaterEq;
 /**
  * Returns a `Constraint` that specifies something should be exactly equal to `value`.
  * Equivalent to `{ equal: value }`.
  */
-export const equalTo = (value) => ({ equal: value });
+const equalTo = (value) => ({ equal: value });
+exports.equalTo = equalTo;
 /**
  * Returns a `Constraint` that specifies something should be between `lower` and `upper` (both inclusive).
  * Equivalent to `{ min: lower, max: upper }`.
  */
-export const inRange = (lower, upper) => ({
+const inRange = (lower, upper) => ({
     max: upper,
     min: lower
 });
+exports.inRange = inRange;
 /** Intended to be called internally. It gives the element at the row and col of the tableau. */
-export const index = (tableau, row, col) => tableau.matrix[row * tableau.width + col];
+const index = (tableau, row, col) => tableau.matrix[row * tableau.width + col];
+exports.index = index;
 /** Intended to be called internally. It overwrites the element at the row and col of the tableau. */
-export const update = (tableau, row, col, value) => {
+const update = (tableau, row, col, value) => {
     tableau.matrix[row * tableau.width + col] = value;
 };
+exports.update = update;
 const convertToIterable = (msg, seq) => {
     if (seq == null)
         throw `${msg} was null or undefined.`;
@@ -43,7 +55,7 @@ const convertToSet = (set) => set === true ? true
         : set instanceof Set ? set
             : new Set(set);
 /** Intended to be called internally. It constructs a Tableau from a `Model`. */
-export const tableauModel = (model) => {
+const tableauModel = (model) => {
     if (model.variables == null)
         throw "variables was null or undefined.";
     if (model.constraints == null)
@@ -111,37 +123,37 @@ export const tableauModel = (model) => {
     for (let c = 1; c < width; c++) {
         for (const [constraint, coef] of convertToIterable("A variable", variables[c - 1][1])) {
             if (hasObjective && constraint === model.objective) {
-                update(tableau, 0, c, sign * coef);
+                (0, exports.update)(tableau, 0, c, sign * coef);
             }
             const bounds = constraints.get(constraint);
             if (bounds != null) {
                 if (Number.isFinite(bounds.upper)) {
-                    update(tableau, bounds.row, c, coef);
+                    (0, exports.update)(tableau, bounds.row, c, coef);
                     if (Number.isFinite(bounds.lower)) {
-                        update(tableau, bounds.row + 1, c, -coef);
+                        (0, exports.update)(tableau, bounds.row + 1, c, -coef);
                     }
                 }
                 else if (Number.isFinite(bounds.lower)) {
-                    update(tableau, bounds.row, c, -coef);
+                    (0, exports.update)(tableau, bounds.row, c, -coef);
                 }
             }
         }
     }
     for (const bounds of constraints.values()) {
         if (Number.isFinite(bounds.upper)) {
-            update(tableau, bounds.row, 0, bounds.upper);
+            (0, exports.update)(tableau, bounds.row, 0, bounds.upper);
             if (Number.isFinite(bounds.lower)) {
-                update(tableau, bounds.row + 1, 0, -bounds.lower);
+                (0, exports.update)(tableau, bounds.row + 1, 0, -bounds.lower);
             }
         }
         else if (Number.isFinite(bounds.lower)) {
-            update(tableau, bounds.row, 0, -bounds.lower);
+            (0, exports.update)(tableau, bounds.row, 0, -bounds.lower);
         }
     }
     for (let b = 0; b < binaryConstraintCol.length; b++) {
         const row = numConstraints + b;
-        update(tableau, row, 0, 1);
-        update(tableau, row, binaryConstraintCol[b], 1);
+        (0, exports.update)(tableau, row, 0, 1);
+        (0, exports.update)(tableau, row, binaryConstraintCol[b], 1);
     }
     return {
         tableau: tableau,
@@ -150,8 +162,9 @@ export const tableauModel = (model) => {
         integers: intVars
     };
 };
+exports.tableauModel = tableauModel;
 const pivot = (tableau, row, col) => {
-    const quotient = index(tableau, row, col);
+    const quotient = (0, exports.index)(tableau, row, col);
     const leaving = tableau.variableAtPosition[tableau.width + row];
     const entering = tableau.variableAtPosition[col];
     tableau.variableAtPosition[tableau.width + row] = entering;
@@ -161,27 +174,27 @@ const pivot = (tableau, row, col) => {
     const nonZeroColumns = [];
     // (1 / quotient) * R_pivot -> R_pivot
     for (let c = 0; c < tableau.width; c++) {
-        const value = index(tableau, row, c);
+        const value = (0, exports.index)(tableau, row, c);
         if (Math.abs(value) > 1E-16) {
-            update(tableau, row, c, value / quotient);
+            (0, exports.update)(tableau, row, c, value / quotient);
             nonZeroColumns.push(c);
         }
         else {
-            update(tableau, row, c, 0);
+            (0, exports.update)(tableau, row, c, 0);
         }
     }
-    update(tableau, row, col, 1 / quotient);
+    (0, exports.update)(tableau, row, col, 1 / quotient);
     // -M[r, col] * R_pivot + R_r -> R_r
     for (let r = 0; r < tableau.height; r++) {
         if (r === row)
             continue;
-        const coef = index(tableau, r, col);
+        const coef = (0, exports.index)(tableau, r, col);
         if (Math.abs(coef) > 1E-16) {
             for (let i = 0; i < nonZeroColumns.length; i++) {
                 const c = nonZeroColumns[i];
-                update(tableau, r, c, index(tableau, r, c) - coef * index(tableau, row, c));
+                (0, exports.update)(tableau, r, c, (0, exports.index)(tableau, r, c) - coef * (0, exports.index)(tableau, row, c));
             }
-            update(tableau, r, col, -coef / quotient);
+            (0, exports.update)(tableau, r, col, -coef / quotient);
         }
     }
 };
@@ -220,22 +233,22 @@ const phase2 = (tableau, options) => {
         let col = 0;
         let value = precision;
         for (let c = 1; c < tableau.width; c++) {
-            const reducedCost = index(tableau, 0, c);
+            const reducedCost = (0, exports.index)(tableau, 0, c);
             if (reducedCost > value) {
                 value = reducedCost;
                 col = c;
             }
         }
         if (col === 0)
-            return ["optimal", roundToPrecision(index(tableau, 0, 0), precision)];
+            return ["optimal", roundToPrecision((0, exports.index)(tableau, 0, 0), precision)];
         // Find the leaving row/variable
         let row = 0;
         let minRatio = Infinity;
         for (let r = 1; r < tableau.height; r++) {
-            const value = index(tableau, r, col);
+            const value = (0, exports.index)(tableau, r, col);
             if (value <= precision)
                 continue; // pivot entry must be positive
-            const rhs = index(tableau, r, 0);
+            const rhs = (0, exports.index)(tableau, r, 0);
             const ratio = rhs / value;
             if (ratio < minRatio) {
                 row = r;
@@ -261,7 +274,7 @@ const phase1 = (tableau, options) => {
         let row = 0;
         let rhs = -precision;
         for (let r = 1; r < tableau.height; r++) {
-            const value = index(tableau, r, 0);
+            const value = (0, exports.index)(tableau, r, 0);
             if (value < rhs) {
                 rhs = value;
                 row = r;
@@ -273,9 +286,9 @@ const phase1 = (tableau, options) => {
         let col = 0;
         let maxRatio = -Infinity;
         for (let c = 1; c < tableau.width; c++) {
-            const coefficient = index(tableau, row, c);
+            const coefficient = (0, exports.index)(tableau, row, c);
             if (coefficient < -precision) {
-                const ratio = -index(tableau, 0, c) / coefficient;
+                const ratio = -(0, exports.index)(tableau, 0, c) / coefficient;
                 if (ratio > maxRatio) {
                     maxRatio = ratio;
                     col = c;
@@ -297,7 +310,7 @@ const solution = (tabmod, status, result, precision, includeZeroVariables) => {
         for (let i = 0; i < tabmod.variables.length; i++) {
             const variable = tabmod.variables[i][0];
             const row = tabmod.tableau.positionOfVariable[i + 1] - tabmod.tableau.width;
-            const value = row >= 0 ? index(tabmod.tableau, row, 0) : 0;
+            const value = row >= 0 ? (0, exports.index)(tabmod.tableau, row, 0) : 0;
             if (value > precision) {
                 variables.push([variable, roundToPrecision(value, precision)]);
             }
@@ -380,7 +393,7 @@ const mostFractionalVar = (tableau, intVars) => {
         const row = tableau.positionOfVariable[intVar] - tableau.width;
         if (row < 0)
             continue;
-        const val = index(tableau, row, 0);
+        const val = (0, exports.index)(tableau, row, 0);
         const frac = Math.abs(val - Math.round(val));
         if (frac > highestFrac) {
             highestFrac = frac;
@@ -398,7 +411,7 @@ const branchAndCut = (tabmod, initResult, options) => {
         // Wow, the initial solution is integer
         return solution(tabmod, "optimal", initResult, options.precision, options.includeZeroVariables);
     }
-    const branches = new heap((x, y) => x[0] - y[0]);
+    const branches = new heap_1.default((x, y) => x[0] - y[0]);
     branches.push([initResult, [[-1, initVariable, Math.ceil(initValue)]]]);
     branches.push([initResult, [[1, initVariable, Math.floor(initValue)]]]);
     // Set aside arrays/buffers to be reused over the course of the algorithm.
@@ -477,7 +490,7 @@ const branchAndCut = (tabmod, initResult, options) => {
  * Can be used to reset `defaultOptions`.
  * Do not try to mutate this object - it is frozen.
 */
-export const backupDefaultOptions = Object.freeze({
+exports.backupDefaultOptions = Object.freeze({
     precision: 1E-08,
     checkCycles: false,
     maxPivots: 8192,
@@ -491,18 +504,18 @@ export const backupDefaultOptions = Object.freeze({
  * You may change these so that you do not have to
  * pass a custom `Options` object every time you call `solve`.
  */
-export let defaultOptions = { ...backupDefaultOptions };
+exports.defaultOptions = { ...exports.backupDefaultOptions };
 /**
  * Runs the solver on the given model and using the given options (if any).
  * @see `Model` on how to specify/create the model.
  * @see `Options` for the kinds of options available.
  * @see `Solution` as well for more detailed information on what is returned.
  */
-export const solve = (model, options) => {
+const solve = (model, options) => {
     if (model == null)
         throw "model was null or undefined.";
-    const tabmod = tableauModel(model);
-    const opt = { ...backupDefaultOptions, ...defaultOptions, ...options };
+    const tabmod = (0, exports.tableauModel)(model);
+    const opt = { ...exports.backupDefaultOptions, ...exports.defaultOptions, ...options };
     const [status, result] = phase1(tabmod.tableau, opt);
     return (
     // Non-integer problem, return the simplex result.
@@ -514,3 +527,4 @@ export const solve = (model, options) => {
             // 2) cycled => cannot get an initial solution, return invalid solution
             : solution(tabmod, status, result, opt.precision, opt.includeZeroVariables));
 };
+exports.solve = solve;
