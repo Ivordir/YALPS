@@ -376,13 +376,15 @@ const solutionOptimal = (data: TestData, solution: Solution) => {
     } else {
       assert(Math.abs(solution.result - data.expected.result) <= precision)
     }
-    precision *= 1e2
+    precision *= 1e3
     for (const [key, num] of solution.variables) {
       const variable = (data.model.variables as any)[key] as Coefficients
       for (const [constraint, coef] of Object.entries(variable)) {
         sums.set(constraint, num * coef + (sums.get(constraint) ?? 0))
       }
     }
+    const objectiveSum = data.model.objective == null ? 0 : (sums.get(data.model.objective) ?? 0)
+    assert(Math.abs(objectiveSum - solution.result) <= precision)
     for (const [key, constraint] of data.constraints) {
       const sum = sums.get(key) ?? 0
       if (constraint.equal == null) {
@@ -427,7 +429,7 @@ section("Solver Tests", () => {
       })
     }
 
-    testProperty("Variable order is preserved in solution", (data, {solution}) => {
+    testProperty("Variable order is preserved in solution (zero variables not included)", (data, {solution}) => {
       // i.e., solution.variables should be a subsequence of data.variables
       let i = 0
       for (const [key, ] of solution.variables) {
@@ -438,6 +440,14 @@ section("Solver Tests", () => {
         }
         assert(found)
       }
+    })
+
+    testProperty("Variable order is preserved in solution (zero variables included)", (data, {}) => {
+      const solution = solve(data.model, { ...data.options, includeZeroVariables: true })
+      if (solution.status == "optimal") {
+        assert.deepStrictEqual(solution.variables.map(([key,]) => key), data.variables.map(([key,]) => key))
+      }
+      solutionOptimal(data, solution)
     })
 
     testProperty("Removing unused variables gives optimal solution", (data, {solution}) => {

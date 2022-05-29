@@ -233,7 +233,8 @@ const largeProblems = benchmarks.filter(bench => bench.numConstraints > 10 && be
 
 // @ts-ignore
 const benchmarkCheckCycles = () =>
-  // only Monster 2 seems to be affected, and the performance hit is only ~16%.
+  // Only Monster 2 seems to be affected when benchmarking all largeProblems,
+  // but benchmarking Monster 2 by itself gives no performance difference?
   benchmark(largeProblems, "YALPS", yalpsTimer, "CheckCycles", bench => {
     const options = { ...bench.options, checkCycles: true }
     return () => solve(bench.model, options)
