@@ -23,26 +23,28 @@ export interface Constraint {
 }
 
 /**
- * The coefficients of a variable represented as either an object or an `Iterable<[ConstraintKey, number]>`.
+ * The coefficients of a variable represented as either an object or an `Iterable`.
  * `ConstraintKey` should extend `string` if this is an object.
- * If it is an `Iterable` and has duplicate keys, then the last entry is used for each set of duplicate keys.
+ * If this is an `Iterable` and has duplicate keys,
+ * then the last entry is used for each set of duplicate keys.
  */
 export type Coefficients<ConstraintKey = string> =
-  | Iterable<readonly [constraint: ConstraintKey, coef: number]>
+  | Iterable<readonly [ConstraintKey, number]>
   | (ConstraintKey extends string
       ? { readonly [constraint in ConstraintKey]?: number }
       : never)
 
 /**
  * The model representing a LP problem.
- * `constraints`, `variables`, and each variable's `Coefficients` in `variables` can be either an object or an `Iterable`.
+ * `constraints`, `variables`, and each variable's `Coefficients` can be either an object or an `Iterable`.
  * The model is treated as readonly (recursively) by the solver, so nothing on it is mutated.
  *
  * @typeparam `VariableKey` - the type of the key used to distinguish variables.
  * It should extend `string` if `variables` is an object (`VariableKey` is `string` by default).
  * In the case `variables` is an `Iterable`, duplicate keys are not ignored.
- * The order of variables is preserved in the solution, but variables with a value of `0` are not included in the solution.
- * As such, it may be hard to tell what the corresponding variable is for a duplicate key in the solution.
+ * The order of variables is preserved in the solution,
+ * but variables that end up having a value of `0`
+ * are not included in the solution by default.
  *
  * @typeparam `ConstraintKey` - the type of the key used to distinguish constraints,
  * the objective, and the coefficients on each variable.
@@ -63,7 +65,8 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
   * The name of the value to optimize. Can be omitted,
   * in which case the solver gives some solution (if any) that satisfies the constraints.
   * @example
-  * Note that constraints can be placed upon the objective itself. Maximize up to a certain point:
+  * Note that constraints can be placed upon the objective itself.
+  * Maximize up to a certain point:
   * ```
   * {
   *   direction: "maximize",
@@ -76,7 +79,7 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
   readonly objective?: ConstraintKey
 
   /**
-   * An object or an `Iterable<[ConstraintKey, Constraint]>` representing the constraints of the problem.
+   * An object or an `Iterable` representing the constraints of the problem.
    * @see `Constraint` for valid bounds.
    * @example
    * Constraints as an object:
@@ -98,13 +101,13 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
    * ```
    */
   readonly constraints:
-    | Iterable<readonly [key: ConstraintKey, constraint: Constraint]>
+    | Iterable<readonly [ConstraintKey, Constraint]>
     | (ConstraintKey extends string
         ? { readonly [constraint in ConstraintKey]: Constraint }
         : never)
 
   /**
-   * An object or `Iterable<[VariableKey, Coefficients<ConstraintKey>]>` representing the variables of the problem.
+   * An object or `Iterable` representing the variables of the problem.
    * @example
    * Variables as an object:
    * ```
@@ -136,7 +139,7 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
    * ```
    */
   readonly variables:
-    | Iterable<readonly [key: VariableKey, variable: Coefficients<ConstraintKey>]>
+    | Iterable<readonly [VariableKey, Coefficients<ConstraintKey>]>
     | (VariableKey extends string
         ? { readonly [variable in VariableKey]: Coefficients<ConstraintKey> }
         : never)
@@ -144,7 +147,7 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
   /**
    * An `Iterable` of variable keys that indicates these variables are integer.
    * It can also be a `boolean`, indicating whether all variables are integer or not.
-   * All variables are treated as not integer if this is left blank.
+   * If this is left blank, then all variables are treated as not integer.
    */
   readonly integers?: boolean | Iterable<VariableKey>
 
@@ -152,7 +155,7 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
     * An `Iterable` of variable keys that indicates these variables are binary
     * (can only be 0 or 1 in the solution).
     * It can also be a `boolean`, indicating whether all variables are binary or not.
-    * All variables are treated as not binary if this is left blank.
+    * If this is left blank, then all variables are treated as not binary.
     */
   readonly binaries?: boolean | Iterable<VariableKey>
 }
@@ -211,7 +214,7 @@ export type Solution<VariableKey = string> = {
   /**
    * An array of variables and their coefficients that add up to `result`
    * while satisfying the constraints of the problem.
-   * Variables with a coefficient of `0` are not included in this.
+   * Variables with a coefficient of `0` are not included in this by default.
    * In the case that `status` is `"unbounded"`,
    * `variables` may contain one variable which is (one of) the unbounded variable(s).
    */
@@ -279,6 +282,13 @@ export interface Options {
    * The default value is `32768`.
    */
   readonly maxIterations?: number
+
+  /**
+   * Controls whether variables that end up having a value of `0`
+   * should be included in `variables` in the resulting `Solution`.
+   * The default value is `false`.
+   */
+  readonly includeZeroVariables?: boolean
 }
 
 // Actual code starts here.
@@ -302,7 +312,7 @@ export const greaterEq = (value: number): Constraint => ({ min: value })
 export const equalTo = (value: number): Constraint => ({ equal: value })
 
 /**
- * Returns a `Constraint` that specifies something should be between `lower` and `upper` (inclusive).
+ * Returns a `Constraint` that specifies something should be between `lower` and `upper` (both inclusive).
  * Equivalent to `{ min: lower, max: upper }`.
  */
 export const inRange = (lower: number, upper: number): Constraint => ({
@@ -333,7 +343,7 @@ export const update = (tableau: Tableau, row: number, col: number, value: number
   tableau.matrix[row * tableau.width + col] = value
 }
 
-type Variables<VarKey, ConKey> = readonly (readonly [key: VarKey, coefs: Coefficients<ConKey>])[]
+type Variables<VarKey, ConKey> = readonly (readonly [VarKey, Coefficients<ConKey>])[]
 
 // A tableau with some additional context.
 type TableauModel<VariableKey, ConstraintKey> = {
@@ -502,7 +512,7 @@ const pivot = (tableau: Tableau, row: number, col: number) => {
     if (Math.abs(coef) > 1E-16) {
       for (let i = 0; i < nonZeroColumns.length; i++) {
         const c = nonZeroColumns[i]
-        update(tableau, r, c, index(tableau, r, c) - coef * index(tableau, row, c));
+        update(tableau, r, c, index(tableau, r, c) - coef * index(tableau, row, c))
       }
       update(tableau, r, col, -coef / quotient)
     }
@@ -516,10 +526,11 @@ const hasCycle = (
   row: number,
   col: number
 ) => {
-  // This seems somewhat inefficient,
-  // but there was little or no noticable impact in most benchmarks.
+  // This whole function seems somewhat inefficient,
+  // but there was no? noticable impact in the benchmarks.
   history.push([tableau.variableAtPosition[tableau.width + row], tableau.variableAtPosition[col]])
-  for (let length = 1; length <= Math.floor(history.length / 2); length++) {
+  // the minimum length of a cycle is 6
+  for (let length = 6; length <= Math.floor(history.length / 2); length++) {
     let cycle = true
     for (let i = 0; i < length; i++) {
       const item = history.length - 1 - i
@@ -562,18 +573,13 @@ const phase2 = (tableau: Tableau, options: Required<Options>): [SolutionStatus, 
     let minRatio = Infinity
     for (let r = 1; r < tableau.height; r++) {
       const value = index(tableau, r, col)
-      if (Math.abs(value) <= precision) continue
-
+      if (value <= precision) continue // pivot entry must be positive
       const rhs = index(tableau, r, 0)
-      if (Math.abs(rhs) <= precision && value > 0) {
-        row = r
-        break
-      }
-
       const ratio = rhs / value
-      if (precision < ratio && ratio < minRatio) {
-        minRatio = ratio
+      if (ratio < minRatio) {
         row = r
+        if (minRatio <= precision) break // ratio is 0, lowest possible
+        minRatio = ratio
       }
     }
     if (row === 0) return ["unbounded", col]
@@ -629,16 +635,19 @@ const solution = <VarKey, ConKey>(
   tabmod: TableauModel<VarKey, ConKey>,
   status: SolutionStatus,
   result: number,
-  precision: number
+  precision: number,
+  includeZeroVariables: boolean
 ): Solution<VarKey> => {
   if (status === "optimal" || (status === "timedout" && !Number.isNaN(result))) {
     const variables: [VarKey, number][] = []
     for (let i = 0; i < tabmod.variables.length; i++) {
+      const variable = tabmod.variables[i][0]
       const row = tabmod.tableau.positionOfVariable[i + 1] - tabmod.tableau.width
-      if (row < 0) continue // variable is not in the solution
-      const value = index(tabmod.tableau, row, 0)
+      const value = row >= 0 ? index(tabmod.tableau, row, 0) : 0
       if (value > precision) {
-        variables.push([tabmod.variables[i][0], roundToPrecision(value, precision)])
+        variables.push([variable, roundToPrecision(value, precision)])
+      } else if (includeZeroVariables) {
+        variables.push([variable, 0])
       }
     }
     return {
@@ -755,7 +764,7 @@ const branchAndCut = <VarKey, ConKey>(
   const [initVariable, initValue, initFrac] = mostFractionalVar(tabmod.tableau, tabmod.integers)
   if (initFrac <= options.precision) {
     // Wow, the initial solution is integer
-    return solution(tabmod, "optimal", initResult, options.precision)
+    return solution(tabmod, "optimal", initResult, options.precision, options.includeZeroVariables)
   }
 
   const branches = new heap<Branch>((x, y) => x[0] - y[0])
@@ -822,7 +831,7 @@ const branchAndCut = <VarKey, ConKey>(
       }
     }
     // Otherwise, this branch's result is worse than the current best solution.
-    // This could be because result is NaN (this branch is infeasible or cycled).
+    // This could be because this branch is infeasible or cycled.
     // Either way, skip this branch and see if any other branches have a valid, better solution.
     timedout = Date.now() >= timeout
     iter++
@@ -840,7 +849,8 @@ const branchAndCut = <VarKey, ConKey>(
     : !solutionFound ? "infeasible"
     : "optimal",
     solutionFound ? bestEval : NaN,
-    options.precision
+    options.precision,
+    options.includeZeroVariables
   )
 }
 
@@ -855,7 +865,8 @@ export const backupDefaultOptions: Required<Options> = Object.freeze({
   maxPivots: 8192,
   tolerance: 0,
   timeout: Infinity,
-  maxIterations: 32768
+  maxIterations: 32768,
+  includeZeroVariables: false
 })
 
 /**
@@ -882,7 +893,7 @@ export const solve = <VarKey = string, ConKey = string>(
   const [status, result] = phase1(tabmod.tableau, opt)
   return (
     // Non-integer problem, return the simplex result.
-    tabmod.integers.length === 0 ? solution(tabmod, status, result, opt.precision)
+    tabmod.integers.length === 0 ? solution(tabmod, status, result, opt.precision, opt.includeZeroVariables)
 
     // Integer problem, run branchAndCut using the valid simplex result.
     : status === "optimal" ? branchAndCut(tabmod, result, opt)
@@ -890,6 +901,6 @@ export const solve = <VarKey = string, ConKey = string>(
     // The problem has integer variables, but the initial solution is either:
     // 1) unbounded | infeasible => all branches will also be unbounded | infeasible
     // 2) cycled => cannot get an initial solution, return invalid solution
-    : solution(tabmod, status, result, opt.precision)
+    : solution(tabmod, status, result, opt.precision, opt.includeZeroVariables)
   )
 }

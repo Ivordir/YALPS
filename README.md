@@ -115,7 +115,7 @@ const greaterEq: (value: number) => Constraint
 const equalTo: (value: number) => Constraint
 
 /**
- * Specifies something should be between `lower` and `upper` (inclusive).
+ * Specifies something should be between `lower` and `upper` (both inclusive).
  * Equivalent to `{ min: lower, max: upper }`.
  */
 const inRange: (lower: number, upper: number) => Constraint
@@ -123,20 +123,19 @@ const inRange: (lower: number, upper: number) => Constraint
 /**
  * The coefficients of a variable represented as either an object or an `Iterable`.
  * `ConstraintKey` should extend `string` if this is an object.
- * If it is an `Iterable` and has duplicate keys,
+ * If this is an `Iterable` and has duplicate keys,
  * then the last entry is used for each set of duplicate keys.
  */
 type Coefficients<ConstraintKey = string> =
-    | Iterable<[constraint: ConstraintKey, coef: number]> // an iterable
+    | Iterable<[ConstraintKey, number]> // an iterable
     | (ConstraintKey extends string // or an object, but ConstraintKey must extend string
         ? { [constraint in ConstraintKey]?: number }
         : never)
 
 /**
  * The model representing a LP problem.
- * `constraints`, `variables`, and each variable's `Coefficients` in `variables`
- * can be either an object or an `Iterable`.
- * If there are objects present, their corresponding type parameter(s) for the keys must extend string.
+ * `constraints`, `variables`, and each variable's `Coefficients` can be either an object or an `Iterable`.
+ * If there are objects present, the corresponding type parameter(s) for their keys must extend string.
  * The model is treated as readonly (recursively) by the solver.
  */
 interface Model<VariableKey = string, ConstraintKey = string> {
@@ -167,7 +166,7 @@ interface Model<VariableKey = string, ConstraintKey = string> {
      * An object or `Iterable` representing the variables of the problem.
      * In the case `variables` is an `Iterable`, duplicate keys are not ignored.
      * The order of variables is preserved in the solution,
-     * but variables with a value of `0` are not included in the solution.
+     * but variables with a value of `0` are not included in the solution by default.
      */
     variables:
         | Iterable<[key: VariableKey, variable: Coefficients<ConstraintKey>]>
@@ -178,7 +177,7 @@ interface Model<VariableKey = string, ConstraintKey = string> {
     /**
      * An `Iterable` of variable keys that indicates these variables are integer.
      * It can also be a `boolean`, indicating whether all variables are integer or not.
-     * All variables are treated as not integer if this is left blank.
+     * If this is left blank, then all variables are treated as not integer.
      */
     integers?: boolean | Iterable<VariableKey>
 
@@ -186,7 +185,7 @@ interface Model<VariableKey = string, ConstraintKey = string> {
      * An `Iterable` of variable keys that indicates these variables are binary
      * (can only be 0 or 1 in the solution).
      * It can also be a `boolean`, indicating whether all variables are binary or not.
-     * All variables are treated as not binary if this is left blank.
+     * If this is left blank, then all variables are treated as not binary.
      */
     binaries?: boolean | Iterable<VariableKey>
 }
@@ -221,7 +220,7 @@ type Solution<VariableKey = string> = {
     /**
      * An array of variables and their coefficients that add up to `result`
      * while satisfying the constraints of the problem.
-     * Variables with a coefficient of `0` are not included in this.
+     * Variables with a coefficient of `0` are not included in this by default.
      * In the case that `status` is `"unbounded"`,
      * `variables` may contain one variable which is (one of) the unbounded variable(s).
      */
@@ -283,6 +282,13 @@ interface Options {
      * The default value is `32768`.
      */
     maxIterations?: number
+
+    /**
+     * Controls whether variables that end up having a value of `0`
+     * should be included in `variables` in the resulting `Solution`.
+     * The default value is `false`.
+     */
+    includeZeroVariables?: boolean
 }
 
 /**
