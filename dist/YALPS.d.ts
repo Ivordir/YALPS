@@ -18,23 +18,25 @@ export interface Constraint {
     readonly max?: number;
 }
 /**
- * The coefficients of a variable represented as either an object or an `Iterable<[ConstraintKey, number]>`.
+ * The coefficients of a variable represented as either an object or an `Iterable`.
  * `ConstraintKey` should extend `string` if this is an object.
- * If it is an `Iterable` and has duplicate keys, then the last entry is used for each set of duplicate keys.
+ * If this is an `Iterable` and has duplicate keys,
+ * then the last entry is used for each set of duplicate keys.
  */
-export declare type Coefficients<ConstraintKey = string> = Iterable<readonly [constraint: ConstraintKey, coef: number]> | (ConstraintKey extends string ? {
+export declare type Coefficients<ConstraintKey = string> = Iterable<readonly [ConstraintKey, number]> | (ConstraintKey extends string ? {
     readonly [constraint in ConstraintKey]?: number;
 } : never);
 /**
  * The model representing a LP problem.
- * `constraints`, `variables`, and each variable's `Coefficients` in `variables` can be either an object or an `Iterable`.
+ * `constraints`, `variables`, and each variable's `Coefficients` can be either an object or an `Iterable`.
  * The model is treated as readonly (recursively) by the solver, so nothing on it is mutated.
  *
  * @typeparam `VariableKey` - the type of the key used to distinguish variables.
  * It should extend `string` if `variables` is an object (`VariableKey` is `string` by default).
  * In the case `variables` is an `Iterable`, duplicate keys are not ignored.
- * The order of variables is preserved in the solution, but variables with a value of `0` are not included in the solution.
- * As such, it may be hard to tell what the corresponding variable is for a duplicate key in the solution.
+ * The order of variables is preserved in the solution,
+ * but variables that end up having a value of `0`
+ * are not included in the solution by default.
  *
  * @typeparam `ConstraintKey` - the type of the key used to distinguish constraints,
  * the objective, and the coefficients on each variable.
@@ -54,7 +56,8 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
     * The name of the value to optimize. Can be omitted,
     * in which case the solver gives some solution (if any) that satisfies the constraints.
     * @example
-    * Note that constraints can be placed upon the objective itself. Maximize up to a certain point:
+    * Note that constraints can be placed upon the objective itself.
+    * Maximize up to a certain point:
     * ```
     * {
     *   direction: "maximize",
@@ -66,7 +69,7 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
     */
     readonly objective?: ConstraintKey;
     /**
-     * An object or an `Iterable<[ConstraintKey, Constraint]>` representing the constraints of the problem.
+     * An object or an `Iterable` representing the constraints of the problem.
      * @see `Constraint` for valid bounds.
      * @example
      * Constraints as an object:
@@ -87,11 +90,11 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
      * constraints.set("c", { max: 5 })
      * ```
      */
-    readonly constraints: Iterable<readonly [key: ConstraintKey, constraint: Constraint]> | (ConstraintKey extends string ? {
+    readonly constraints: Iterable<readonly [ConstraintKey, Constraint]> | (ConstraintKey extends string ? {
         readonly [constraint in ConstraintKey]: Constraint;
     } : never);
     /**
-     * An object or `Iterable<[VariableKey, Coefficients<ConstraintKey>]>` representing the variables of the problem.
+     * An object or `Iterable` representing the variables of the problem.
      * @example
      * Variables as an object:
      * ```
@@ -122,20 +125,20 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
      * }
      * ```
      */
-    readonly variables: Iterable<readonly [key: VariableKey, variable: Coefficients<ConstraintKey>]> | (VariableKey extends string ? {
+    readonly variables: Iterable<readonly [VariableKey, Coefficients<ConstraintKey>]> | (VariableKey extends string ? {
         readonly [variable in VariableKey]: Coefficients<ConstraintKey>;
     } : never);
     /**
      * An `Iterable` of variable keys that indicates these variables are integer.
      * It can also be a `boolean`, indicating whether all variables are integer or not.
-     * All variables are treated as not integer if this is left blank.
+     * If this is left blank, then all variables are treated as not integer.
      */
     readonly integers?: boolean | Iterable<VariableKey>;
     /**
      * An `Iterable` of variable keys that indicates these variables are binary
      * (can only be 0 or 1 in the solution).
      * It can also be a `boolean`, indicating whether all variables are binary or not.
-     * All variables are treated as not binary if this is left blank.
+     * If this is left blank, then all variables are treated as not binary.
      */
     readonly binaries?: boolean | Iterable<VariableKey>;
 }
@@ -185,7 +188,7 @@ export declare type Solution<VariableKey = string> = {
     /**
      * An array of variables and their coefficients that add up to `result`
      * while satisfying the constraints of the problem.
-     * Variables with a coefficient of `0` are not included in this.
+     * Variables with a coefficient of `0` are not included in this by default.
      * In the case that `status` is `"unbounded"`,
      * `variables` may contain one variable which is (one of) the unbounded variable(s).
      */
@@ -247,6 +250,12 @@ export interface Options {
      * The default value is `32768`.
      */
     readonly maxIterations?: number;
+    /**
+     * Controls whether variables that end up having a value of `0`
+     * should be included in `variables` in the resulting `Solution`.
+     * The default value is `false`.
+     */
+    readonly includeZeroVariables?: boolean;
 }
 /**
  * Returns a `Constraint` that specifies something should be less than or equal to `value`.
@@ -264,7 +273,7 @@ export declare const greaterEq: (value: number) => Constraint;
  */
 export declare const equalTo: (value: number) => Constraint;
 /**
- * Returns a `Constraint` that specifies something should be between `lower` and `upper` (inclusive).
+ * Returns a `Constraint` that specifies something should be between `lower` and `upper` (both inclusive).
  * Equivalent to `{ min: lower, max: upper }`.
  */
 export declare const inRange: (lower: number, upper: number) => Constraint;
@@ -279,7 +288,7 @@ declare type Tableau = {
 export declare const index: (tableau: Tableau, row: number, col: number) => number;
 /** Intended to be called internally. It overwrites the element at the row and col of the tableau. */
 export declare const update: (tableau: Tableau, row: number, col: number, value: number) => void;
-declare type Variables<VarKey, ConKey> = readonly (readonly [key: VarKey, coefs: Coefficients<ConKey>])[];
+declare type Variables<VarKey, ConKey> = readonly (readonly [VarKey, Coefficients<ConKey>])[];
 declare type TableauModel<VariableKey, ConstraintKey> = {
     readonly tableau: Tableau;
     readonly sign: number;
@@ -306,6 +315,7 @@ export declare let defaultOptions: {
     tolerance: number;
     timeout: number;
     maxIterations: number;
+    includeZeroVariables: boolean;
 };
 /**
  * Runs the solver on the given model and using the given options (if any).
@@ -313,5 +323,5 @@ export declare let defaultOptions: {
  * @see `Options` for the kinds of options available.
  * @see `Solution` as well for more detailed information on what is returned.
  */
-export declare const solve: <VarKey = string, ConKey = string>(model: Model<VarKey, ConKey>, options?: Options | undefined) => Solution<VarKey>;
+export declare const solve: <VarKey = string, ConKey = string>(model: Model<VarKey, ConKey>, options?: Options) => Solution<VarKey>;
 export {};
