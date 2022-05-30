@@ -578,8 +578,8 @@ const phase2 = (tableau: Tableau, options: Required<Options>): [SolutionStatus, 
       const ratio = rhs / value
       if (ratio < minRatio) {
         row = r
-        if (minRatio <= precision) break // ratio is 0, lowest possible
         minRatio = ratio
+        if (ratio <= precision) break // ratio is 0, lowest possible
       }
     }
     if (row === 0) return ["unbounded", col]
