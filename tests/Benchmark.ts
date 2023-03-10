@@ -204,14 +204,26 @@ ${run1.name}: (n=${s1.n}, mean=${s1.mean.toFixed(2)}, stdErr=${Math.sqrt(mse1).t
   console.log("max samples reached: equivalent performance")
 }
 
+const validate = (bench: Benchmark, run: Runner) => {
+  const input = run.convert(bench.model, bench.options)
+  const solution = run.solve(input)
+  const result = run.value(solution)
+  assertResultOptimal(result, bench)
+}
+
 const benchmark = (
   benchmarks: readonly Benchmark[],
   run1: Runner,
   run2: Runner,
   warmup = 0,
-  maxSamples = 100
+  maxSamples = 100,
+  runValidation = true
 ) => {
   for (const bench of benchmarks) {
+    if (runValidation) {
+      validate(bench, run1)
+      validate(bench, run2)
+    }
     console.log(`${bench.file}: ${bench.constraints.length} constraints, ${bench.variables.length} variables, ${bench.model.integers?.length ?? 0} integers:`)
     welch(bench, run1, run2, warmup, maxSamples)
     console.log("")
