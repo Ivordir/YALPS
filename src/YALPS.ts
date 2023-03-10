@@ -35,6 +35,11 @@ export type Coefficients<ConstraintKey = string> =
       : never)
 
 /**
+ * Indicates whether to `"maximize"` or `"minimize"` the objective.
+ */
+export type OptimizationDirection = "maximize" | "minimize"
+
+/**
  * The model representing a LP problem.
  * `constraints`, `variables`, and each variable's `Coefficients` can be either an object or an `Iterable`.
  * The model is treated as readonly (recursively) by the solver, so nothing on it is mutated.
@@ -59,7 +64,7 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
    * Indicates whether to `"maximize"` or `"minimize"` the objective.
    * Defaults to `"maximize"` if left blank.
    */
-  readonly direction?: "maximize" | "minimize"
+  readonly direction?: OptimizationDirection
 
   /**
   * The name of the value to optimize. Can be omitted,
