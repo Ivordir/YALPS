@@ -123,27 +123,13 @@ type Coefficients<ConstraintKey = string> =
 type OptimizationDirection = "maximize" | "minimize"
 
 interface Model<VariableKey = string, ConstraintKey = string> {
-    /**
-     * Indicates whether to `"maximize"` or `"minimize"` the objective.
-     * Defaults to `"maximize"` if left blank.
-     */
-    direction?: OptimizationDirection
+    direction?: OptimizationDirection // defaults to `"maximize"` if left blank
+    objective?: ConstraintKey // the value to optimize
 
-    /**
-     * The key of the value to optimize.
-     */
-    objective?: ConstraintKey
-
-    /**
-     * An object or `Iterable` representing the constraints of the problem.
-     */
     constraints:
         | Iterable<[ConstraintKey, Constraint]>
         | (ConstraintKey extends string ? { [key in ConstraintKey]: Constraint } : never)
 
-    /**
-     * An object or `Iterable` representing the variables of the problem.
-     */
     variables:
         | Iterable<[VariableKey, Coefficients<ConstraintKey>]>
         | (VariableKey extends string ? { [key in VariableKey]: Coefficients<ConstraintKey> } : never)
@@ -250,9 +236,6 @@ interface Options {
 
 const defaultOptions: Required<Options>
 
-/**
- * Runs the solver on the given model and using the given options (if any).
- */
 const solve: <VarKey = string, ConKey = string>(model: Model<VarKey, ConKey>, options?: Options) => Solution<VarKey>
 ```
 
