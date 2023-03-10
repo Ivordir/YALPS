@@ -3,14 +3,27 @@ import { TestCase, readCases, assertResultOptimal } from "./Common.js"
 import { performance } from "perf_hooks"
 // @ts-ignore
 import jsLP from "javascript-lp-solver"
-// @ts-ignore
-import glpk from "glpk.js"
+import GLPK from "glpk.js"
 
-const GLPK: any = (glpk as any)()
+const glpk = (GLPK as any)() as any
 
 type Benchmark = TestCase
 
 const benchmarks: readonly Benchmark[] = readCases().filter(bench => bench.constraints.length > 10 && bench.variables.length > 10)
+
+type Runner = {
+  name: string
+  convert: (model: Model, options?: Options) => any
+  solve: (input: any) => any
+  value: (solution: any) => number
+}
+
+const yalpsRunner: Runner = {
+  name: "YALPS",
+  convert: (model, options) => ({ model, options }),
+  solve: ({ model, options }) => solve(model, options),
+  value: solution => solution.result
+}
 
 const objectSet = (set: boolean | Iterable<string> | undefined) => {
   if (set === true || set === false) throw "Not Implemented"
@@ -22,8 +35,6 @@ const objectSet = (set: boolean | Iterable<string> | undefined) => {
   }
   return obj
 }
-
-const yalpsTimer = (bench: Benchmark) => () => solve(bench.model, bench.options)
 
 const jsLPModel = (model: Model, options?: Options) => ({
   optimize: model.objective,
@@ -42,11 +53,14 @@ const jsLPOptions = (options?: Options) =>
     exitOnCycles: options?.checkCycles ?? false
   }
 
-const jsLPSolve = (model: any, precision?: number) => jsLP.Solve(model, precision)
-
-const jsLPTimer = (bench: Benchmark) => {
-  const model = jsLPModel(bench.model, bench.options)
-  return () => jsLPSolve(model, bench.options?.precision)
+const jsLPRunner: Runner = {
+  name: "jsLPSolver",
+  convert: (model, options) => ({
+    model: jsLPModel(model, options),
+    precision: options?.precision
+  }),
+  solve: ({ model, precision }) => jsLP.Solve(model, precision),
+  value: solution => solution.result
 }
 
 const glpkModel = (model: Model) => {
@@ -56,19 +70,19 @@ const glpkModel = (model: Model) => {
 
   const constraints = new Map<string, Constraint>()
   for (const [name, constraint] of Object.entries(model.constraints)) {
-    let bounds: Bounds
+    let bnds: Bounds
     if (constraint.equal == null) {
       const min = constraint.min != null
       const max = constraint.max != null
-      bounds =
-        min && max ? { type: GLPK.GLP_DB, ub: constraint.max, lb: constraint.min }
-        : min && !max ? { type: GLPK.GLP_LO, ub: 0, lb: constraint.min }
-        : !min && max ? { type: GLPK.GLP_UP, ub: constraint.max, lb: 0 }
-        : { type: GLPK.GLP_FR, ub: 0, lb: 0 }
+      bnds =
+        min && max ? { type: glpk.GLP_DB, ub: constraint.max, lb: constraint.min }
+        : min && !max ? { type: glpk.GLP_LO, ub: 0, lb: constraint.min }
+        : !min && max ? { type: glpk.GLP_UP, ub: constraint.max, lb: 0 }
+        : { type: glpk.GLP_FR, ub: 0, lb: 0 }
     } else {
-      bounds = { type: GLPK.GLP_FX, ub: 0, lb: constraint.equal }
+      bnds = { type: glpk.GLP_FX, ub: 0, lb: constraint.equal }
     }
-    constraints.set(name, { name: name, vars: [], bnds: bounds })
+    constraints.set(name, { name, vars: [], bnds })
   }
 
   const objective: Coefs = []
@@ -77,11 +91,11 @@ const glpkModel = (model: Model) => {
     for (const [key, val] of Object.entries(variable)) {
       const coef = val as number
       if (hasObjective && model.objective === key) {
-        objective.push({ name: name, coef: coef })
+        objective.push({ name, coef })
       }
       const constraint = constraints.get(key)
       if (constraint != null) {
-        constraint.vars.push({ name: name, coef: coef })
+        constraint.vars.push({ name, coef })
       }
     }
   }
@@ -89,7 +103,7 @@ const glpkModel = (model: Model) => {
   return {
     name: "GLPK",
     objective: {
-      direction: model.direction === "minimize" ? GLPK.GLP_MIN : GLPK.GLP_MAX,
+      direction: model.direction === "minimize" ? glpk.GLP_MIN : glpk.GLP_MAX,
       name: model.objective,
       vars: objective
     },
@@ -103,26 +117,28 @@ const glpkOptions = (options?: Options) => ({
   mipgap: options?.tolerance ?? 0
 })
 
-const glpkSolve = (model: any, options?: any) => GLPK.solve(model, options)
-
-const glpkTimer = (bench: Benchmark) => {
-  const model = glpkModel(bench.model)
-  const options = glpkOptions(bench.options)
-  return () => glpkSolve(model, options)
+const glpkRunner: Runner = {
+  name: "glpk.js",
+  convert: (model, options) => ({
+    model: glpkModel(model),
+    options: glpkOptions(options)
+  }),
+  solve: ({ model, options }) => glpk.solve(model, options),
+  value: solution => solution.result.z
 }
 
-const time = (f: () => any) => {
+const time = (runner: Runner, input: any) => {
   const start = performance.now()
-  f()
+  runner.solve(input)
   const fin = performance.now()
   return fin - start
 }
 
 // The following Welch t-test code was adapted from Expecto: https://github.com/haf/expecto
 
-/// Student's t-distribution inverse for 0.01% probability by degrees of freedom.
+// Student's t-distribution inverse for 0.01% probability by degrees of freedom.
 const tInv01 = [ 6366.198, 99.992, 28.000, 15.544, 11.178, 9.082, 7.885, 7.120, 6.594, 6.211, 5.921, 5.694, 5.513, 5.363, 5.239, 5.134, 5.044, 4.966, 4.897, 4.837, 4.784, 4.736, 4.693, 4.654, 4.619, 4.587, 4.558, 4.530, 4.506, 4.482, 4.461, 4.441, 4.422, 4.405, 4.389, 4.374, 4.359, 4.346, 4.333, 4.321, 4.309, 4.298, 4.288, 4.278, 4.269, 4.260, 4.252, 4.243, 4.236, 4.228, 4.221, 4.214, 4.208, 4.202, 4.196, 4.190, 4.184, 4.179, 4.174, 4.169, 4.164, 4.159, 4.155, 4.150, 4.146, 4.142, 4.138, 4.134, 4.130, 4.127, 4.123, 4.120, 4.117, 4.113, 4.110, 4.107, 4.104, 4.101, 4.099, 4.096, 4.093, 4.091, 4.088, 4.086, 4.083, 4.081, 4.079, 4.076, 4.074, 4.072, 4.070, 4.068, 4.066, 4.064, 4.062, 4.060, 4.059, 4.057, 4.055, 4.053 ]
-/// Student's t-distribution inverse for 99.99% probability by degrees of freedom.
+// Student's t-distribution inverse for 99.99% probability by degrees of freedom.
 const tInv99 = [ 1.571E-04, 1.414E-04, 1.360E-04, 1.333E-04, 1.317E-04, 1.306E-04, 1.299E-04, 1.293E-04, 1.289E-04, 1.285E-04, 1.282E-04, 1.280E-04, 1.278E-04, 1.276E-04, 1.274E-04, 1.273E-04, 1.272E-04, 1.271E-04, 1.270E-04, 1.269E-04, 1.268E-04, 1.268E-04, 1.267E-04, 1.266E-04, 1.266E-04, 1.265E-04, 1.265E-04, 1.265E-04, 1.264E-04, 1.264E-04, 1.263E-04, 1.263E-04, 1.263E-04, 1.263E-04, 1.262E-04, 1.262E-04, 1.262E-04, 1.262E-04, 1.261E-04, 1.261E-04, 1.261E-04, 1.261E-04, 1.261E-04, 1.260E-04, 1.260E-04, 1.260E-04, 1.260E-04, 1.260E-04, 1.260E-04, 1.260E-04, 1.259E-04, 1.259E-04, 1.259E-04, 1.259E-04, 1.259E-04, 1.259E-04, 1.259E-04, 1.259E-04, 1.259E-04, 1.259E-04, 1.258E-04, 1.258E-04, 1.258E-04, 1.258E-04, 1.258E-04, 1.258E-04, 1.258E-04, 1.258E-04, 1.258E-04, 1.258E-04, 1.258E-04, 1.258E-04, 1.258E-04, 1.258E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.257E-04, 1.256E-04, 1.256E-04 ]
 
 type Stats = {
@@ -138,7 +154,7 @@ const addSample = (s: Stats, x: number) => {
   const sqrErr = s.sqrErr + (x - s.mean) * (x - mean)
   // Reject outlier samples
   if (square(x - mean) * s.n <= square(3.890591886) * sqrErr) {
-    s.n++
+    s.n += 1;
     s.mean = mean
     s.sqrErr = sqrErr
   }
@@ -148,60 +164,56 @@ const variance = (s: Stats) => s.sqrErr / (s.n - 1)
 
 // Welch's t-test
 const welch = (
-  name1: string,
-  f1: () => any,
-  name2: string,
-  f2: () => any,
+  bench: Benchmark,
+  run1: Runner,
+  run2: Runner,
   warmup: number,
   maxSamples: number
 ) => {
+  const input1 = run1.convert(bench.model, bench.options)
+  const input2 = run2.convert(bench.model, bench.options)
   for (let i = 0; i < warmup; i++) {
-    f1()
-    f2()
+    run1.solve(input1)
+    run2.solve(input2)
   }
   const s1 = { n: 0, mean: 0, sqrErr: 0 }
   const s2 = { n: 0, mean: 0, sqrErr: 0 }
-  for (let i = 0; i < 3; i++) {
-    addSample(s1, time(f1))
-    addSample(s2, time(f2))
-  }
   for (let i = 0; i < maxSamples; i++) {
-    addSample(s1, time(f1))
-    addSample(s2, time(f2))
+    addSample(s1, time(run1, input1))
+    addSample(s2, time(run2, input2))
     // variance / N = mean squared error?
     const mse1 = variance(s1) / s1.n
     const mse2 = variance(s2) / s2.n
-    const t = (s2.mean - s1.mean) / Math.sqrt(mse1 + mse2)
+    const t = Math.abs(s2.mean - s1.mean) / Math.sqrt(mse1 + mse2)
     const df =
       mse1 === 0 && mse2 === 0 ? 1
       : Math.floor((square(mse1 + mse2) / (square(mse1) / (s1.n - 1) + square(mse2) / (s2.n - 1))))
 
     const result =
-      Math.abs(t) > tInv01[Math.min(tInv01.length - 1, df)] ? t
-      : Math.abs(t) < tInv99[Math.min(tInv99.length - 1, df)] ? 0
+      t > tInv01[Math.min(tInv01.length - 1, df)] ? t
+      : t < tInv99[Math.min(tInv99.length - 1, df)] ? 0
       : NaN
 
     if (!Number.isNaN(result)) {
-      console.log(`t=${result.toFixed(2)}, ${name2} took ${((s2.mean / s1.mean - 1) * 100).toFixed(2)}% more time on average compared to ${name1}
-${name2}: (n=${s2.n}, mean=${s2.mean.toFixed(2)}, stdErr=${Math.sqrt(mse2).toFixed(2)})
-${name1}: (n=${s1.n}, mean=${s1.mean.toFixed(2)}, stdErr=${Math.sqrt(mse1).toFixed(2)})`)
+      console.log(`t=${result.toFixed(2)}, ${run2.name} took ${((s2.mean / s1.mean - 1) * 100).toFixed(2)}% more time on average compared to ${run1.name}
+${run2.name}: (n=${s2.n}, mean=${s2.mean.toFixed(2)}, stdErr=${Math.sqrt(mse2).toFixed(2)})
+${run1.name}: (n=${s1.n}, mean=${s1.mean.toFixed(2)}, stdErr=${Math.sqrt(mse1).toFixed(2)})`)
       return
     }
   }
-  console.log("maxSamples reached: equivalent performance")
+  console.log("max samples reached: equivalent performance")
 }
 
 const benchmark = (
   benchmarks: readonly Benchmark[],
-  name1: string,
-  f1: (bench: Benchmark) => (() => any),
-  name2: string,
-  f2: (bench: Benchmark) => (() => any),
+  run1: Runner,
+  run2: Runner,
   warmup = 0,
-  maxSamples = 100) => {
+  maxSamples = 100
+) => {
   for (const bench of benchmarks) {
     console.log(`${bench.file}: ${bench.constraints.length} constraints, ${bench.variables.length} variables, ${bench.model.integers?.length ?? 0} integers:`)
-    welch(name1, f1(bench), name2, f2(bench), warmup, maxSamples)
+    welch(bench, run1, run2, warmup, maxSamples)
     console.log("")
   }
 }
@@ -217,16 +229,17 @@ May I recommend: https://youtu.be/r-TLSBdHe1A?t=428
 const benchmarkCheckCycles = () =>
   // Only Monster 2 seems to be affected when benchmarking all largeProblems,
   // but benchmarking Monster 2 by itself gives no performance difference?
-  benchmark(benchmarks, "YALPS", yalpsTimer, "CheckCycles", bench => {
-    const options = { ...bench.options, checkCycles: true }
-    return () => solve(bench.model, options)
-  }, 0, 30)
+  benchmark(benchmarks, yalpsRunner, {
+    ...yalpsRunner,
+    name: "Check Cycles",
+    convert: (model, options) => ({ model, options: { ...options, checkCycles: true } })
+  })
 
 // @ts-ignore
-const benchamrkjsLP = () => benchmark(benchmarks, "YALPS", yalpsTimer, "jsLPSolver", jsLPTimer)
+const benchamrkjsLP = () => benchmark(benchmarks, yalpsRunner, jsLPRunner)
 
 // @ts-ignore
-const benchamrkGLPK = () => benchmark(benchmarks, "YALPS", yalpsTimer, "GLPK", glpkTimer)
+const benchamrkGLPK = () => benchmark(benchmarks, yalpsRunner, glpkRunner)
 
 // benchmarkCheckCycles()
 
