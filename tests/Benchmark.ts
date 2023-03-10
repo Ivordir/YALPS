@@ -248,7 +248,8 @@ const benchmark = (
       validate(bench, run1)
       validate(bench, run2)
     }
-    console.log(`${bench.file}: ${bench.constraints.length} constraints, ${bench.variables.length} variables, ${bench.model.integers?.length ?? 0} integers:`)
+    const numInteger = (bench.model.integers?.length ?? 0) + (bench.model.binaries?.length ?? 0)
+    console.log(`${bench.file}: ${bench.constraints.length} constraints, ${bench.variables.length} variables, ${numInteger} integers:`)
     welch(bench, run1, run2, warmup, minSamples, maxSamples)
     console.log("")
   }
