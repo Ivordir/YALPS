@@ -6,28 +6,27 @@
   "configurations": [
     {
       "name": "Debug/Run TS",
-      "type": "pwa-node",
+      "type": "node",
       "request": "launch",
-      "runtimeExecutable": "ts-node", // the runtime/debugger program
-      "runtimeArgs": [], // arguements to the debugger
-      "program": "${relativeFile}", // the program/file being debugged
-      "args": [], // arguements to the program being debugged
+      "runtimeExecutable": "ts-node",
+      "runtimeArgs": [
+        "${relativeFile}"
+      ],
+      "args": [],
       "skipFiles": [
         "<node_internals>/**"
       ]
     },
-    // in the command line, becomes something like =>
-    // {runtimeExecutable} {runtimeArgs} (--run | -c | --whatever) {program} {args}
     {
       "name": "Test via Mocha",
-      "type": "pwa-node",
+      "type": "node",
       "request": "launch",
-      "runtimeExecutable": "ts-node",
-      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-      "args": [
-        "--color",
-        "./tests/Tests.ts"
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "test"
       ],
+      "args": [],
       "skipFiles": [
         "<node_internals>/**"
       ]

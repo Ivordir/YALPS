@@ -1,0 +1,7 @@
+{
+  "require": "ts-node/register",
+  "loader": "ts-node/esm",
+  "extensions": ["ts"],
+  "timeout": "60000",
+  "color": true
+}
