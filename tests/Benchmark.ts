@@ -239,7 +239,7 @@ const benchmark = (
   run1: Runner,
   run2: Runner,
   warmup = 0,
-  minSamples = 10,
+  minSamples = 30,
   maxSamples = 100,
   runValidation = true
 ) => {
