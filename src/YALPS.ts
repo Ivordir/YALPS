@@ -394,8 +394,8 @@ export const tableauModel = <VarKey = string, ConKey = string>(model: Model<VarK
     : null
   if (variables === null) throw "variables was not an object or iterable."
 
-  const binaryConstraintCol = []
-  const intVars = []
+  const binaryConstraintCol: number[] = []
+  const integers: number[] = []
   if (model.integers || model.binaries) {
     const binaryVariables = convertToSet(model.binaries)
     const integerVariables = binaryVariables === true ? true : convertToSet(model.integers)
@@ -403,9 +403,9 @@ export const tableauModel = <VarKey = string, ConKey = string>(model: Model<VarK
       const [key, ] = variables[i - 1]
       if (binaryVariables === true || binaryVariables.has(key)) {
         binaryConstraintCol.push(i)
-        intVars.push(i)
+        integers.push(i)
       } else if (integerVariables === true || integerVariables.has(key)) {
-        intVars.push(i)
+        integers.push(i)
       }
     }
   }
@@ -432,8 +432,8 @@ export const tableauModel = <VarKey = string, ConKey = string>(model: Model<VarK
   const numVars = width + height
   const tableau = {
     matrix: new Float64Array(width * height),
-    width: width,
-    height: height,
+    width,
+    height,
     positionOfVariable: new Int32Array(numVars),
     variableAtPosition: new Int32Array(numVars)
   }
@@ -480,12 +480,7 @@ export const tableauModel = <VarKey = string, ConKey = string>(model: Model<VarK
     update(tableau, row, binaryConstraintCol[b], 1)
   }
 
-  return {
-    tableau: tableau,
-    sign: sign,
-    variables: variables,
-    integers: intVars
-  }
+  return { tableau, sign, variables, integers }
 }
 
 const pivot = (tableau: Tableau, row: number, col: number) => {
@@ -497,7 +492,7 @@ const pivot = (tableau: Tableau, row: number, col: number) => {
   tableau.positionOfVariable[leaving] = col
   tableau.positionOfVariable[entering] = tableau.width + row
 
-  const nonZeroColumns = []
+  const nonZeroColumns: number[] = []
   // (1 / quotient) * R_pivot -> R_pivot
   for (let c = 0; c < tableau.width; c++) {
     const value = index(tableau, row, c)
@@ -656,9 +651,9 @@ const solution = <VarKey, ConKey>(
       }
     }
     return {
-      status: status,
+      status,
       result: -tabmod.sign * result,
-      variables: variables
+      variables
     }
   } else if (status === "unbounded") {
     const variable = tabmod.tableau.variableAtPosition[result] - 1
@@ -673,7 +668,7 @@ const solution = <VarKey, ConKey>(
   } else {
     // infeasible | cycled | (timedout and result is NaN)
     return {
-      status: status,
+      status,
       result: NaN,
       variables: []
     }
