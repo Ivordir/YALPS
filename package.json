@@ -35,6 +35,7 @@
     "require": "./dist/YALPS.cjs.js",
     "default": "./dist/YALPS.js"
   },
+  "sideEffects": false,
   "type": "module",
   "types": "./dist/YALPS.d.ts",
   "scripts": {
