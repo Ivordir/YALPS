@@ -44,8 +44,8 @@
     "start": "tsc -w",
     "build:esm": "tsc",
     "build:cjs": "tsc -m commonjs && mv ./dist/YALPS.js ./dist/YALPS.cjs.js",
-    "build": "npm run build:cjs && npm run build:esm",
-    "prepare": "npm run build",
+    "build": "pnpm build:cjs && pnpm build:esm",
+    "prepare": "pnpm build",
     "release": "np"
   },
   "dependencies": {
