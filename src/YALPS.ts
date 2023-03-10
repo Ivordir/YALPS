@@ -162,7 +162,6 @@ export type SolutionStatus =
 
 /**
  * The solution object returned by the solver.
- * It includes a status, the final objective result, and the variable amounts.
  */
 export type Solution<VariableKey = string> = {
   /**
@@ -180,7 +179,7 @@ export type Solution<VariableKey = string> = {
    *
    * `"timedout"` indicates that the solver exited early for an integer problem.
    * This may happen if the solver takes too long and exceeds the `timeout` option.
-   * Similarly, the number of branch and cut iterations may exceeed `maxIterations` as set in the options.
+   * Similarly, the number of branch and cut iterations may exceed `maxIterations` as set in the options.
    * In both of these cases, the current sub-optimal solution, if any, is returned.
    * If `result` is `NaN`, then this means no integer solutions were found before the solver timed out.
    *
