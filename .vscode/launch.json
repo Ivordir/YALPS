@@ -21,9 +21,8 @@
       "name": "Test via Mocha",
       "type": "node",
       "request": "launch",
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "pnpm",
       "runtimeArgs": [
-        "run",
         "test"
       ],
       "args": [],
