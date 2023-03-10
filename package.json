@@ -46,7 +46,7 @@
     "build:cjs": "tsc -m commonjs && mv ./dist/YALPS.js ./dist/YALPS.cjs.js",
     "build": "pnpm build:cjs && pnpm build:esm",
     "prepare": "pnpm build",
-    "release": "np"
+    "release": "np --no-cleanup"
   },
   "dependencies": {
     "heap": "^0.2.7"
