@@ -1,18 +1,19 @@
 {
   "name": "yalps",
   "version": "0.3.0",
-  "author": "Ivordir <Ivordir@pm.me>",
+  "author": {
+    "name": "Ivordir",
+    "email": "ivordir@pm.me"
+  },
   "description": "Yet another linear programming solver. (A rewrite of javascript-lp-solver.) Aims to be decently fast.",
   "keywords": [
     "Linear Programming",
     "Integer Programming",
-    "Mixed Integer Programming",
     "Mixed Integer Linear Programming",
     "LP",
-    "MIP",
+    "ILP",
     "MILP",
-    "solver",
-    "Simplex",
+    "Solver",
     "Linear Optimization"
   ],
   "homepage": "https://github.com/Ivordir/YALPS",
