@@ -4,8 +4,7 @@ import heap from "heap"
 export interface Constraint {
   /**
    * The total should be equal to this number.
-   * In the case that `min` or `max` are also defined,
-   * this is used instead.
+   * In the case that `min` or `max` are also defined, this is used instead.
    */
   readonly equal?: number
 
@@ -25,17 +24,14 @@ export interface Constraint {
 /**
  * The coefficients of a variable represented as either an object or an `Iterable`.
  * `ConstraintKey` should extend `string` if this is an object.
- * If this is an `Iterable` and has duplicate keys,
- * then the last entry is used for each set of duplicate keys.
+ * If this is an `Iterable` and has duplicate keys, then the last entry is used for each set of duplicate keys.
  */
 export type Coefficients<ConstraintKey = string> =
   | Iterable<readonly [ConstraintKey, number]>
-  | (ConstraintKey extends string
-      ? { readonly [constraint in ConstraintKey]?: number }
-      : never)
+  | (ConstraintKey extends string ? { readonly [key in ConstraintKey]?: number } : never)
 
 /**
- * Indicates whether to `"maximize"` or `"minimize"` the objective.
+ * Indicates whether to maximize or minimize the objective.
  */
 export type OptimizationDirection = "maximize" | "minimize"
 
@@ -45,16 +41,14 @@ export type OptimizationDirection = "maximize" | "minimize"
  * The model is treated as readonly (recursively) by the solver, so nothing on it is mutated.
  *
  * @typeparam `VariableKey` - the type of the key used to distinguish variables.
- * It should extend `string` if `variables` is an object (`VariableKey` is `string` by default).
+ * It should extend `string` if `variables` is an object.
  * In the case `variables` is an `Iterable`, duplicate keys are not ignored.
  * The order of variables is preserved in the solution,
- * but variables that end up having a value of `0`
- * are not included in the solution by default.
+ * but variables that end up having a value of `0` are not included in the solution by default.
  *
  * @typeparam `ConstraintKey` - the type of the key used to distinguish constraints,
  * the objective, and the coefficients on each variable.
- * It should extend `string` if `constraints` or any variable's `Coefficients`
- * is an object (`ConstraintKey` is `string` by default).
+ * It should extend `string` if `constraints` or any variable's `Coefficients` is an object.
  * In the case `constraints` is an `Iterable`, duplicate keys are not ignored.
  * Rather, the bounds on the constraints are merged to become the most restrictive.
  * However, for duplicate keys in the `Coefficients` of each variable, the last entry is used.
@@ -67,7 +61,7 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
   readonly direction?: OptimizationDirection
 
   /**
-  * The name of the value to optimize. Can be omitted,
+  * The key of the value to optimize. Can be omitted,
   * in which case the solver gives some solution (if any) that satisfies the constraints.
   * @example
   * Note that constraints can be placed upon the objective itself.
@@ -84,32 +78,30 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
   readonly objective?: ConstraintKey
 
   /**
-   * An object or an `Iterable` representing the constraints of the problem.
-   * @see `Constraint` for valid bounds.
+   * An object or `Iterable` representing the constraints of the problem.
+   * @see `Constraint`
    * @example
    * Constraints as an object:
    * ```
    * const constraints = {
    *   a: { max: 7 },
    *   b: { equal: 22 },
-   *   c: { max: 5 }
+   *   c: { min: 5 }
    * }
    * ```
    * @example
    * Constraints as an `Iterable`:
    * ```
-   * type ConstraintKey = string // can be whatever you like
-   * const constraints = new Map<ConstraintKey, Constraint>()
-   * constraints.set("a", { max: 7 })
-   * constraints.set("b", { equal: 22 })
-   * constraints.set("c", { max: 5 })
+   * const constraints =
+   *   new Map<string, Constraint>()
+   *     .set("a", { max: 7 })
+   *     .set("b", { equal: 22 })
+   *     .set("c", { min: 5 })
    * ```
    */
   readonly constraints:
     | Iterable<readonly [ConstraintKey, Constraint]>
-    | (ConstraintKey extends string
-        ? { readonly [constraint in ConstraintKey]: Constraint }
-        : never)
+    | (ConstraintKey extends string ? { readonly [key in ConstraintKey]: Constraint } : never)
 
   /**
    * An object or `Iterable` representing the variables of the problem.
@@ -124,40 +116,33 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
    * @example
    * Variables as an `Iterable`:
    * ```
-   * type VariableKey = string // can be whatever you like
-   * type ConstraintKey = string // same here
-   * const variables = new Map<VariableKey, Coefficients<ConstraintKey>>()
-   * variables.set("x", { a: 2, b: 11 })
-   * variables.set("y", { a: 3, c: 22 })
+   * const variables =
+   *   new Map<string, Coefficients>()
+   *     .set("x", { a: 2, b: 11 })
+   *     .set("y", { a: 3, c: 22 })
    * ```
    * @example
    * Mixing objects and `Iterable`s:
    * ```
-   * type ConstraintKey = string
-   * const yCoef = new Map<ConstraintKey, number>()
-   * yCoef.set("a", 3)
-   * yCoef.set("c", 22)
    * const variables = {
    *   x: { a: 2, b: 11 },
-   *   y: yCoef
+   *   y: [["a", 3], ["c", 22]]
    * }
    * ```
    */
   readonly variables:
     | Iterable<readonly [VariableKey, Coefficients<ConstraintKey>]>
-    | (VariableKey extends string
-        ? { readonly [variable in VariableKey]: Coefficients<ConstraintKey> }
-        : never)
+    | (VariableKey extends string ? { readonly [key in VariableKey]: Coefficients<ConstraintKey> } : never)
 
   /**
-   * An `Iterable` of variable keys that indicates these variables are integer.
+   * An `Iterable` of variable keys that indicate the corresponding variables are integer.
    * It can also be a `boolean`, indicating whether all variables are integer or not.
    * If this is left blank, then all variables are treated as not integer.
    */
   readonly integers?: boolean | Iterable<VariableKey>
 
    /**
-    * An `Iterable` of variable keys that indicates these variables are binary
+    * An `Iterable` of variable keys that indicate the corresponding variables are binary
     * (can only be 0 or 1 in the solution).
     * It can also be a `boolean`, indicating whether all variables are binary or not.
     * If this is left blank, then all variables are treated as not binary.
@@ -192,17 +177,16 @@ export type Solution<VariableKey = string> = {
    * `"unbounded"` indicates a variable, or combination of variables, are not sufficiently constrained.
    * As such, the `result` of the solution will be +-`Infinity`.
    * `variables` in the solution might contain a variable,
-   * in which case it is the variable that the solver happened to finish on.
-   * This may be the unbounded variable or one of the combination of variables that are unbounded.
+   * in which case it is the unbounded variable that the solver happened to finish on.
    *
    * `"timedout"` indicates that the solver exited early for an integer problem.
    * This may happen if the solver takes too long and exceeds the `timeout` option.
    * Similarly, the number of branch and cut iterations may exceeed `maxIterations` as set in the options.
-   * In both of these cases, the current sub-optimal solution/result, if any, is returned.
+   * In both of these cases, the current sub-optimal solution, if any, is returned.
    * If `result` is `NaN`, then this means no integer solutions were found before the solver timed out.
    *
    * `"cycled"` indicates that the simplex method cycled and exited.
-   * This case is rare, but `checkCycles` can be set to `true` in the options to check for it.
+   * This case is rare, but `checkCycles` can be set to `true` in the options to check for cycles and stop early if one is found.
    * Otherwise, if `maxPivots` (as set in the options) is reached by the simplex method,
    * then it is assumed that a cycle was encountered.
    * `result` will be `NaN` in this case.
@@ -217,11 +201,9 @@ export type Solution<VariableKey = string> = {
   result: number
 
   /**
-   * An array of variables and their coefficients that add up to `result`
-   * while satisfying the constraints of the problem.
+   * An array of variables and their coefficients that add up to `result` while satisfying the constraints of the problem.
    * Variables with a coefficient of `0` are not included in this by default.
-   * In the case that `status` is `"unbounded"`,
-   * `variables` may contain one variable which is (one of) the unbounded variable(s).
+   * In the case that `status` is `"unbounded"`, `variables` may consist of one variable which is (one of) the unbounded variable(s).
    */
   variables: [VariableKey, number][]
 }
@@ -229,7 +211,7 @@ export type Solution<VariableKey = string> = {
 /** An object specifying the options for the solver. */
 export interface Options {
   /**
-   * Numbers equal to or less than the provided precision are treated as zero.
+   * Numbers with magnitude equal to or less than the provided precision are treated as zero.
    * Similarly, the precision determines whether a number is sufficiently integer.
    * The default value is `1E-8`.
   */
@@ -237,10 +219,9 @@ export interface Options {
 
   /**
    * In rare cases, the solver can cycle.
-   * This is usually the case when the number of pivots exceeds `maxPivots`.
-   * Alternatively, setting this to `true` will cause
-   * the solver to explicitly check for cycles.
-   * (The solution will have the `"cycled"` status if a cycle is detected.)
+   * This is assumed to be the case when the number of pivots exceeds `maxPivots`.
+   * Setting this to `true` will cause the solver to explicitly check for cycles and stop early if one is found.
+   * Note that checking for cycles may incur a small performance overhead.
    * The default value is `false`.
    */
   readonly checkCycles?: boolean
@@ -249,41 +230,37 @@ export interface Options {
    * This determines the maximum number of pivots allowed within the simplex method.
    * If this is exceeded, then it assumed that the simplex method cycled,
    * and the returned solution will have the `"cycled"` status.
-   * If your problem is *very* large, you *may* have to set this option higher.
+   * If your problem is very large, you may have to set this option higher.
    * The default value is `8192`.
    */
   readonly maxPivots?: number
 
   /**
-   * This setting applies to integer problems only.
-   * If an integer solution is found within `(1 +- tolerance) *
-   * {the problem's non-integer solution}`,
+   * This option applies to integer problems only.
+   * If an integer solution is found within
+   * `(1 +- tolerance) * {the problem's non-integer solution}`,
    * then this approximate integer solution is returned.
-   * This is helpful for large integer problems where
-   * the most optimal solution becomes harder to find,
-   * but other solutions that are relatively close to
-   * the optimal one may be much easier to find.
+   * For example, a tolereance of `0.05` allows integer solutions found within 5% of the non-integer solution to be returned.
+   * This option is helpful for large integer problems where the most optimal solution becomes harder to find,
+   * but other solutions that are relatively close to the optimal one may be much easier to find.
    * The default value is `0` (only find the most optimal solution).
    */
   readonly tolerance?: number
 
   /**
-   * This setting applies to integer problems only.
+   * This option applies to integer problems only.
    * It specifies, in milliseconds, the maximum amount of time
    * the main branch and cut portion of the solver may take before timing out.
-   * In the case the solver does time out,
-   * the returned solution will have the `"timedout"` status.
-   * The current sub-optimal solution, if any, is returned as well in this case.
+   * If a time out occurs, the returned solution will have the `"timedout"` status.
+   * Also, if any sub-optimal solution was found before the time out, then it is returned as well.
    * The default value is `Infinity` (no timeout).
    */
   readonly timeout?: number
 
   /**
-   * This setting applies to integer problems only.
-   * It determines the maximum number of iterations
-   * for the main branch and cut algorithm.
-   * It can be used alongside or instead of `timeout`
-   * to prevent the algorithm from taking too long.
+   * This option applies to integer problems only.
+   * It determines the maximum number of iterations for the main branch and cut algorithm.
+   * It can be used alongside or instead of `timeout` to prevent the solver from taking too long.
    * The default value is `32768`.
    */
   readonly maxIterations?: number
@@ -862,7 +839,7 @@ export const defaultOptions = { ...defaultOptionValues } as const
  * Runs the solver on the given model and using the given options (if any).
  * @see `Model` on how to specify/create the model.
  * @see `Options` for the kinds of options available.
- * @see `Solution` as well for more detailed information on what is returned.
+ * @see `Solution` for more detailed information on what is returned.
  */
 export const solve = <VarKey = string, ConKey = string>(
   model: Model<VarKey, ConKey>,
