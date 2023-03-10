@@ -9,6 +9,9 @@ const test = it
 
 const testData = readCases()
 
+const randomIndex = (array: readonly any[]) => Math.floor(Math.random() * array.length)
+const randomElement = <T>(array: readonly T[]) => array[randomIndex(array)]
+
 section("Tableau Tests", () => {
   test("Empty model", () => {
     const result = tableauModel({ variables: {}, constraints: {} })
@@ -48,9 +51,10 @@ section("Tableau Tests", () => {
   })
 
   testProperty("Objective row and sign are negated for opposite optimization direction", data => {
-    const flipped = { ...data.model }
-    flipped.direction = data.model.direction === "minimize" ? "maximize" : "minimize"
-    const result = tableauModel(flipped)
+    const result = tableauModel({
+      ...data.model,
+      direction: data.model.direction === "minimize" ? "maximize": "minimize"
+    })
 
     const expected = tableauModel(data.model)
     for (let c = 0; c < expected.tableau.width; c++) {
@@ -67,7 +71,7 @@ section("Tableau Tests", () => {
 
   const numRows = (constraint: Constraint) =>
     constraint.equal == null
-    ? (constraint.max != null ? 1 : 0) + (constraint.min != null ? 1 : 0)
+    ? (constraint.max == null ? 0 : 1) + (constraint.min == null ? 0 : 1)
     : 2
 
   const rowOfConstraint = (constraints: readonly (readonly [string, Constraint])[], index: number) =>
@@ -77,7 +81,7 @@ section("Tableau Tests", () => {
 
   testProperty("Objective can share the same key as a constraint", data => {
     if (data.constraints.length === 0) return // model not applicable
-    const conIndex = Math.floor(Math.random() * data.constraints.length)
+    const conIndex = randomIndex(data.constraints)
     const [key, constraint] = data.constraints[conIndex]
     const sign =
       constraint.equal || constraint.max ? 1
@@ -85,9 +89,7 @@ section("Tableau Tests", () => {
       : 0
     if (sign === 0) return // not valid contraint for this test
 
-    const objAsKey = { ...data.model }
-    objAsKey.objective = key
-    const result = tableauModel(objAsKey)
+    const result = tableauModel({ ...data.model, objective: key })
     // I swear to god why is: deepStrictEquals(0, -0) === false
     for (let c = 0; c < result.tableau.width; c++) {
       if (result.tableau.matrix[c] === 0) {
@@ -144,15 +146,15 @@ section("Tableau Tests", () => {
       assert.deepStrictEqual(boolNone, setNone)
       assert.deepStrictEqual(iterNone, setNone)
 
+      if (data.variables.length === 0) return // model not applicable
       const varKeys = data.variables.map(([k, ]) => k)
-      if (varKeys.length === 0) return // model not applicable
-      const boolTrue = tableauModel({ ...data.model, integers: true })
+      const boolAll = tableauModel({ ...data.model, integers: true })
       const setAll = tableauModel({ ...data.model, integers: new Set(varKeys) })
       const iterAll = tableauModel({ ...data.model, integers: varKeys })
-      assert.deepStrictEqual(boolTrue, setAll)
+      assert.deepStrictEqual(boolAll, setAll)
       assert.deepStrictEqual(iterAll, setAll)
 
-      const sub = sample(varKeys, Math.floor(Math.random() * varKeys.length))
+      const sub = sample(varKeys, randomIndex(varKeys))
       const set = tableauModel({ ...data.model, integers: new Set(sub) })
       const iter = tableauModel({ ...data.model, integers: sub })
       assert.deepStrictEqual(iter, set)
@@ -173,7 +175,7 @@ section("Tableau Tests", () => {
       assert.deepStrictEqual(boolTrue, setAll)
       assert.deepStrictEqual(iterAll, setAll)
 
-      const sub = sample(varKeys, Math.floor(Math.random() * varKeys.length))
+      const sub = sample(varKeys, randomIndex(varKeys))
       const set = tableauModel({ ...data.model, binaries: new Set(sub) })
       const iter = tableauModel({ ...data.model, binaries: sub })
       assert.deepStrictEqual(iter, set)
@@ -193,7 +195,7 @@ section("Tableau Tests", () => {
         && (con.max == null) !== (con.min == null))
     if (constraints.length === 0) return // model not applicable
 
-    const [key, constraint] = constraints[Math.floor(Math.random() * constraints.length)]
+    const [key, constraint] = randomElement(constraints)
     const conIndex = data.constraints.findIndex(([k, ]) => k === key)
     const row = rowOfConstraint(data.constraints, conIndex)
 
@@ -226,7 +228,7 @@ section("Tableau Tests", () => {
 
   testProperty("Constraints with the same key are merged", data => {
     if (data.constraints.length === 0) return // model not applicable
-    const index = Math.floor(Math.random() * data.constraints.length)
+    const index = randomIndex(data.constraints)
     const [key, constraint] = data.constraints[index]
     const other = {
       max: Math.random() * 100 - 50,
@@ -243,19 +245,19 @@ section("Tableau Tests", () => {
     }
     const constraints = data.constraints.slice()
     constraints[index] = [key, merged]
-    const expected = tableauModel({ ...data.model, constraints: constraints })
+    const expected = tableauModel({ ...data.model, constraints })
 
     assert.deepStrictEqual(result, expected)
   })
 
   testProperty("Removing a constraint", data => {
     if (data.constraints.length === 0) return // model not applicable
-    const index = Math.floor(Math.random() * data.constraints.length)
+    const index = randomIndex(data.constraints)
     const removed = { ...data.model, constraints: removeIndex(data.constraints, index) }
     const result = tableauModel(removed)
 
     const row = rowOfConstraint(data.constraints, index)
-    const { tableau, ...temp } = tableauModel(data.model)
+    const { tableau, ...tableauRest } = tableauModel(data.model)
     const removedRows = numRows(data.constraints[index][1])
     const removedLength = removedRows * tableau.width
     const matrix = new Float64Array(tableau.matrix.length - removedLength)
@@ -264,13 +266,13 @@ section("Tableau Tests", () => {
     matrix.set(tableau.matrix.subarray(beforeRemoved + removedLength), beforeRemoved)
     const expected = {
       tableau: {
-        matrix: matrix,
+        matrix,
         width: tableau.width,
         height: tableau.height - removedRows,
         positionOfVariable: tableau.positionOfVariable.subarray(0, tableau.positionOfVariable.length - removedRows),
         variableAtPosition: tableau.variableAtPosition.subarray(0, tableau.variableAtPosition.length - removedRows)
       },
-      ...temp
+      ...tableauRest
     }
 
     assert.deepStrictEqual(result, expected)
@@ -278,11 +280,11 @@ section("Tableau Tests", () => {
 
   testProperty("Removing a variable", data => {
     if (data.variables.length === 0) return // model not applicable
-    const index = Math.floor(Math.random() * data.variables.length)
+    const index = randomIndex(data.variables)
     const removed = { ...data.model, variables: removeIndex(data.variables, index) }
     const result = tableauModel(removed)
 
-    const { tableau, ...temp } = tableauModel({ ...data.model, variables: data.variables })
+    const { tableau, ...tableauRest } = tableauModel({ ...data.model, variables: data.variables })
     // remove the variable's column
     let matrix = new Float64Array(tableau.matrix.length - tableau.height)
     matrix.set(tableau.matrix.subarray(0, index + 1))
@@ -308,15 +310,15 @@ section("Tableau Tests", () => {
     const b = binary ? 1 : 0
     const expected = {
       tableau: {
-        matrix: matrix,
+        matrix,
         width: tableau.width - 1,
         height: tableau.height - b,
         positionOfVariable: tableau.positionOfVariable.subarray(0, tableau.positionOfVariable.length - 1 - b),
         variableAtPosition: tableau.variableAtPosition.subarray(0, tableau.variableAtPosition.length - 1 - b)
       },
-      sign: temp.sign,
-      variables: removeIndex(temp.variables, index),
-      integers: temp.integers.filter(x => x != index + 1).map(x => x <= index ? x : (x - 1))
+      sign: tableauRest.sign,
+      variables: removeIndex(tableauRest.variables, index),
+      integers: tableauRest.integers.filter(x => x != index + 1).map(x => x <= index ? x : (x - 1))
     }
 
     assert.deepStrictEqual(result, expected)
@@ -325,7 +327,7 @@ section("Tableau Tests", () => {
   testProperty("Binary has higher precedence than integer", data => {
     // I.e., variable is added as binary if indicated as both integer and binary
     if (data.variables.length === 0) return // model not applicable
-    const [key, ] = data.variables[Math.floor(Math.random() * data.variables.length)]
+    const [key, ] = randomElement(data.variables)
     const both = tableauModel({ ...data.model, integers: [key], binaries: [key] })
     const expected = tableauModel({ ...data.model, integers: [], binaries: [key] })
     assert.deepStrictEqual(both, expected)
@@ -378,7 +380,7 @@ section("Solver Tests", () => {
     for (const data of testData) {
       test(data.file, () => {
         const solution = solve(data.model, data.options)
-        solutionData.push({ solution: solution, constraintSums: solutionOptimal(data, solution) })
+        solutionData.push({ solution, constraintSums: solutionOptimal(data, solution) })
       })
     }
   })
@@ -407,7 +409,7 @@ section("Solver Tests", () => {
       }
     })
 
-    testProperty("Variable order is preserved in solution (zero variables included)", (data, {}) => {
+    testProperty("Variable order is preserved in solution (zero variables included)", data => {
       const solution = solve(data.model, { ...data.options, includeZeroVariables: true })
       if (solution.status == "optimal") {
         assert.deepStrictEqual(solution.variables.map(([key,]) => key), data.variables.map(([key,]) => key))
@@ -433,7 +435,7 @@ section("Solver Tests", () => {
         }
       }
 
-      const removed = solve({ ...data.model, variables: variables }, data.options)
+      const removed = solve({ ...data.model, variables }, data.options)
 
       solutionOptimal(data, removed)
     })
@@ -442,8 +444,8 @@ section("Solver Tests", () => {
       const binaries = new Set(data.model.binaries)
       const variables = data.variables.filter(([k, ]) => !binaries.has(k))
       if (variables.length === 0) return // model not applicable
-      variables.push(data.variables[Math.floor(Math.random() * data.variables.length)])
-      const duplicate = solve({ ...data.model, variables: variables }, data.options)
+      variables.push(randomElement(data.variables))
+      const duplicate = solve({ ...data.model, variables }, data.options)
       solutionOptimal(data, duplicate)
     })
 
@@ -453,16 +455,16 @@ section("Solver Tests", () => {
         if (data.options.tolerance !== 0 || solution.status === "cycled") return
 
         const constraints = data.constraints.slice()
-        const selection = constraints.filter(([, con]) => con.equal == null)
-        if (selection.length === 0) return // model not applicable
-        const [key, constraint] = selection[Math.floor(Math.random() * selection.length)]
+        const nonEqual = constraints.filter(([, con]) => con.equal == null)
+        if (nonEqual.length === 0) return // model not applicable
+        const [key, constraint] = randomElement(nonEqual)
         const sum = constraintSums.get(key) ?? 0
         const lower = Math.max(constraint.min == null ? -Infinity : constraint.min, sum / 2)
         const upper = Math.min(constraint.max == null ? Infinity : constraint.max, sum * 1.5)
         const min = Math.random() * (sum - lower) + lower
         const max = Math.random() * (upper - sum) + sum
-        constraints.push([key, { min: min, max: max }])
-        const restricted = solve({ ...data.model, constraints: constraints }, data.options)
+        constraints.push([key, { min, max }])
+        const restricted = solve({ ...data.model, constraints }, data.options)
         solutionOptimal(data, restricted, true)
     })
   })
