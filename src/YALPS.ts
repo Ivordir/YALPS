@@ -854,12 +854,7 @@ const branchAndCut = <VarKey, ConKey>(
   )
 }
 
-/**
- * The initial, default options for the solver.
- * Can be used to reset `defaultOptions`.
- * Do not try to mutate this object - it is frozen.
-*/
-export const backupDefaultOptions: Required<Options> = Object.freeze({
+const defaultOptionValues: Required<Options> = {
   precision: 1E-08,
   checkCycles: false,
   maxPivots: 8192,
@@ -867,14 +862,12 @@ export const backupDefaultOptions: Required<Options> = Object.freeze({
   timeout: Infinity,
   maxIterations: 32768,
   includeZeroVariables: false
-})
+}
 
 /**
  * The default options used by the solver.
- * You may change these so that you do not have to
- * pass a custom `Options` object every time you call `solve`.
  */
-export let defaultOptions = { ...backupDefaultOptions }
+export const defaultOptions = { ...defaultOptionValues } as const
 
 /**
  * Runs the solver on the given model and using the given options (if any).
@@ -889,7 +882,7 @@ export const solve = <VarKey = string, ConKey = string>(
   if (model == null) throw "model was null or undefined."
 
   const tabmod = tableauModel(model)
-  const opt = { ...backupDefaultOptions, ...defaultOptions, ...options }
+  const opt = { ...defaultOptionValues, ...options }
   const [status, result] = phase1(tabmod.tableau, opt)
   return (
     // Non-integer problem, return the simplex result.
