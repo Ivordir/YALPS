@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.solve = exports.defaultOptions = exports.backupDefaultOptions = exports.tableauModel = exports.update = exports.index = exports.inRange = exports.equalTo = exports.greaterEq = exports.lessEq = void 0;
+exports.solve = exports.defaultOptions = exports.tableauModel = exports.update = exports.index = exports.inRange = exports.equalTo = exports.greaterEq = exports.lessEq = void 0;
 const heap_1 = __importDefault(require("heap"));
 // Actual code starts here.
 /**
@@ -41,38 +41,25 @@ const update = (tableau, row, col, value) => {
     tableau.matrix[row * tableau.width + col] = value;
 };
 exports.update = update;
-const convertToIterable = (msg, seq) => {
-    if (seq == null)
-        throw `${msg} was null or undefined.`;
-    if (typeof seq[Symbol.iterator] === "function")
-        return seq;
-    if (typeof seq === "object")
-        return Object.entries(seq);
-    throw `${msg} was not an object or iterable.`;
-};
+const convertToIterable = (seq) => typeof seq[Symbol.iterator] === "function"
+    ? seq
+    : Object.entries(seq);
 const convertToSet = (set) => set === true ? true
     : set === false ? new Set()
         : set instanceof Set ? set
             : new Set(set);
 /** Intended to be called internally. It constructs a Tableau from a `Model`. */
 const tableauModel = (model) => {
-    if (model.variables == null)
-        throw "variables was null or undefined.";
-    if (model.constraints == null)
-        throw "constraints was null or undefined.";
     const sign = model.direction === "maximize" || model.direction == null ? 1
         : model.direction === "minimize" ? -1
             : 0;
     if (sign === 0)
         throw `'${model.direction}' is not a valid optimization direction. Should be 'maximize', 'minimize', or left blank.`;
-    const variables = Array.isArray(model.variables) ? model.variables
-        : typeof model.variables[Symbol.iterator] === "function" ? Array.from(model.variables)
-            : typeof model.variables === "object" ? Object.entries(model.variables)
-                : null;
-    if (variables === null)
-        throw "variables was not an object or iterable.";
+    const constraintsIter = convertToIterable(model.constraints);
+    const variablesIter = convertToIterable(model.variables);
+    const variables = Array.isArray(variablesIter) ? variablesIter : Array.from(variablesIter);
     const binaryConstraintCol = [];
-    const intVars = [];
+    const integers = [];
     if (model.integers || model.binaries) {
         const binaryVariables = convertToSet(model.binaries);
         const integerVariables = binaryVariables === true ? true : convertToSet(model.integers);
@@ -80,21 +67,19 @@ const tableauModel = (model) => {
             const [key,] = variables[i - 1];
             if (binaryVariables === true || binaryVariables.has(key)) {
                 binaryConstraintCol.push(i);
-                intVars.push(i);
+                integers.push(i);
             }
             else if (integerVariables === true || integerVariables.has(key)) {
-                intVars.push(i);
+                integers.push(i);
             }
         }
     }
     const constraints = new Map();
-    for (const [key, constraint] of convertToIterable("constraints", model.constraints)) {
-        if (constraint == null)
-            throw "A constraint was null or undefined.";
+    for (const [key, constraint] of constraintsIter) {
         const bounds = constraints.get(key) ?? { row: NaN, lower: -Infinity, upper: Infinity };
         bounds.lower = Math.max(bounds.lower, constraint.equal ?? constraint.min ?? -Infinity);
         bounds.upper = Math.min(bounds.upper, constraint.equal ?? constraint.max ?? Infinity);
-        //if (rows.lower > rows.upper) return ["infeasible", NaN]
+        // if (rows.lower > rows.upper) return ["infeasible", NaN]
         if (!constraints.has(key))
             constraints.set(key, bounds);
     }
@@ -110,8 +95,8 @@ const tableauModel = (model) => {
     const numVars = width + height;
     const tableau = {
         matrix: new Float64Array(width * height),
-        width: width,
-        height: height,
+        width,
+        height,
         positionOfVariable: new Int32Array(numVars),
         variableAtPosition: new Int32Array(numVars)
     };
@@ -121,7 +106,7 @@ const tableauModel = (model) => {
     }
     const hasObjective = "objective" in model;
     for (let c = 1; c < width; c++) {
-        for (const [constraint, coef] of convertToIterable("A variable", variables[c - 1][1])) {
+        for (const [constraint, coef] of convertToIterable(variables[c - 1][1])) {
             if (hasObjective && constraint === model.objective) {
                 (0, exports.update)(tableau, 0, c, sign * coef);
             }
@@ -155,12 +140,7 @@ const tableauModel = (model) => {
         (0, exports.update)(tableau, row, 0, 1);
         (0, exports.update)(tableau, row, binaryConstraintCol[b], 1);
     }
-    return {
-        tableau: tableau,
-        sign: sign,
-        variables: variables,
-        integers: intVars
-    };
+    return { tableau, sign, variables, integers };
 };
 exports.tableauModel = tableauModel;
 const pivot = (tableau, row, col) => {
@@ -252,9 +232,9 @@ const phase2 = (tableau, options) => {
             const ratio = rhs / value;
             if (ratio < minRatio) {
                 row = r;
-                if (minRatio <= precision)
-                    break; // ratio is 0, lowest possible
                 minRatio = ratio;
+                if (ratio <= precision)
+                    break; // ratio is 0, lowest possible
             }
         }
         if (row === 0)
@@ -319,9 +299,9 @@ const solution = (tabmod, status, result, precision, includeZeroVariables) => {
             }
         }
         return {
-            status: status,
+            status,
             result: -tabmod.sign * result,
-            variables: variables
+            variables
         };
     }
     else if (status === "unbounded") {
@@ -337,7 +317,7 @@ const solution = (tabmod, status, result, precision, includeZeroVariables) => {
     else {
         // infeasible | cycled | (timedout and result is NaN)
         return {
-            status: status,
+            status,
             result: NaN,
             variables: []
         };
@@ -478,19 +458,15 @@ const branchAndCut = (tabmod, initResult, options) => {
         iter++;
     }
     // Did the solver "timeout"?
-    const unfinished = !branches.empty()
-        && bestEval < optimalThreshold
-        && (timedout || iter === options.maxIterations);
-    return solution({ ...tabmod, tableau: bestTableau }, unfinished ? "timedout"
+    const unfinished = (timedout || iter >= options.maxIterations)
+        && !branches.empty()
+        && bestEval >= optimalThreshold;
+    const status = unfinished ? "timedout"
         : !solutionFound ? "infeasible"
-            : "optimal", solutionFound ? bestEval : NaN, options.precision, options.includeZeroVariables);
+            : "optimal";
+    return solution({ ...tabmod, tableau: bestTableau }, status, solutionFound ? bestEval : NaN, options.precision, options.includeZeroVariables);
 };
-/**
- * The initial, default options for the solver.
- * Can be used to reset `defaultOptions`.
- * Do not try to mutate this object - it is frozen.
-*/
-exports.backupDefaultOptions = Object.freeze({
+const defaultOptionValues = {
     precision: 1E-08,
     checkCycles: false,
     maxPivots: 8192,
@@ -498,24 +474,22 @@ exports.backupDefaultOptions = Object.freeze({
     timeout: Infinity,
     maxIterations: 32768,
     includeZeroVariables: false
-});
+};
 /**
  * The default options used by the solver.
- * You may change these so that you do not have to
- * pass a custom `Options` object every time you call `solve`.
  */
-exports.defaultOptions = { ...exports.backupDefaultOptions };
+exports.defaultOptions = { ...defaultOptionValues };
 /**
  * Runs the solver on the given model and using the given options (if any).
  * @see `Model` on how to specify/create the model.
  * @see `Options` for the kinds of options available.
- * @see `Solution` as well for more detailed information on what is returned.
+ * @see `Solution` for more detailed information on what is returned.
  */
 const solve = (model, options) => {
     if (model == null)
         throw "model was null or undefined.";
     const tabmod = (0, exports.tableauModel)(model);
-    const opt = { ...exports.backupDefaultOptions, ...exports.defaultOptions, ...options };
+    const opt = { ...defaultOptionValues, ...options };
     const [status, result] = phase1(tabmod.tableau, opt);
     return (
     // Non-integer problem, return the simplex result.
