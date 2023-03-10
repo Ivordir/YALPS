@@ -168,6 +168,7 @@ const welch = (
   run1: Runner,
   run2: Runner,
   warmup: number,
+  minSamples: number,
   maxSamples: number
 ) => {
   const input1 = run1.convert(bench.model, bench.options)
@@ -178,7 +179,7 @@ const welch = (
   }
   const s1 = { n: 0, mean: 0, sqrErr: 0 }
   const s2 = { n: 0, mean: 0, sqrErr: 0 }
-  for (let i = 0; i < maxSamples; i++) {
+  for (let i = 1; i <= maxSamples; i++) {
     addSample(s1, time(run1, input1))
     addSample(s2, time(run2, input2))
     // variance / N = mean squared error?
@@ -194,15 +195,37 @@ const welch = (
       : t < tInv99[Math.min(tInv99.length - 1, df)] ? 0
       : NaN
 
-    if (!Number.isNaN(result)) {
-      console.log(`t=${result.toFixed(2)}, ${run2.name} took ${((s2.mean / s1.mean - 1) * 100).toFixed(2)}% more time on average compared to ${run1.name}
-${run2.name}: (n=${s2.n}, mean=${s2.mean.toFixed(2)}, stdErr=${Math.sqrt(mse2).toFixed(2)})
-${run1.name}: (n=${s1.n}, mean=${s1.mean.toFixed(2)}, stdErr=${Math.sqrt(mse1).toFixed(2)})`)
+    if (i >= minSamples && !Number.isNaN(result)) {
+      const firstGreater = s1.mean >= s2.mean
+
+      const [name1, name2] =
+        firstGreater
+        ? [run1.name, run2.name]
+        : [run2.name, run1.name]
+
+      const [mean1, mean2] =
+        firstGreater
+        ? [s1.mean, s2.mean]
+        : [s2.mean, s1.mean]
+
+      const percentFaster = (mean1 - mean2) / mean1 * 100.0
+
+      console.log(`${name2} is ${percentFaster.toFixed(2)}% faster on average compared to ${name1} (t=${result.toFixed(2)}).`)
+      console.table({
+        [run1.name]: outputTable(s1, mse1),
+        [run2.name]: outputTable(s2, mse2)
+      })
       return
     }
   }
   console.log("max samples reached: equivalent performance")
 }
+
+const outputTable = (stats: Stats, mse: number) => ({
+  n: stats.n,
+  mean: parseFloat(stats.mean.toFixed(2)),
+  stdErr: parseFloat(Math.sqrt(mse).toFixed(2))
+})
 
 const validate = (bench: Benchmark, run: Runner) => {
   const input = run.convert(bench.model, bench.options)
@@ -216,6 +239,7 @@ const benchmark = (
   run1: Runner,
   run2: Runner,
   warmup = 0,
+  minSamples = 10,
   maxSamples = 100,
   runValidation = true
 ) => {
@@ -225,7 +249,7 @@ const benchmark = (
       validate(bench, run2)
     }
     console.log(`${bench.file}: ${bench.constraints.length} constraints, ${bench.variables.length} variables, ${bench.model.integers?.length ?? 0} integers:`)
-    welch(bench, run1, run2, warmup, maxSamples)
+    welch(bench, run1, run2, warmup, minSamples, maxSamples)
     console.log("")
   }
 }
