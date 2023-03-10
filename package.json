@@ -25,14 +25,13 @@
   },
   "license": "MIT",
   "files": [
-    "dist",
-    "README.md",
-    "LICENSE"
+    "dist"
   ],
-  "main": "./dist/YALPS.cjs",
+  "main": "./dist/YALPS.cjs.js",
+  "module": "./dist/YALPS.js",
   "exports": {
     "import": "./dist/YALPS.js",
-    "require": "./dist/YALPS.cjs",
+    "require": "./dist/YALPS.cjs.js",
     "default": "./dist/YALPS.js"
   },
   "type": "module",
@@ -42,7 +41,7 @@
     "benchmark": "ts-node tests/Benchmark.ts",
     "start": "tsc -w",
     "build:esm": "tsc",
-    "build:cjs": "tsc -m commonjs && mv ./dist/YALPS.js ./dist/YALPS.cjs",
+    "build:cjs": "tsc -m commonjs && mv ./dist/YALPS.js ./dist/YALPS.cjs.js",
     "build": "npm run build:cjs && npm run build:esm",
     "prepare": "npm run build",
     "release": "np"
