@@ -358,17 +358,10 @@ type TableauModel<VariableKey, ConstraintKey> = {
   readonly integers: readonly number[]
 }
 
-const convertToIterable = <K, V>(
-  msg: string,
-  seq:
-    | Iterable<readonly [K, V]>
-    | (K extends string ? { readonly [key in K]?: V } : never)
-) => {
-  if (seq == null) throw `${msg} was null or undefined.`
-  if (typeof (seq as any)[Symbol.iterator] === "function") return seq as Iterable<readonly [K, V]>
-  if (typeof seq === "object") return Object.entries(seq) as Iterable<readonly [K, V]>
-  throw `${msg} was not an object or iterable.`
-}
+const convertToIterable = <K, V>(seq: Iterable<readonly [K, V]> | (K extends string ? { readonly [key in K]?: V } : never)) =>
+  typeof (seq as any)[Symbol.iterator] === "function"
+  ? seq as Iterable<readonly [K, V]>
+  : Object.entries(seq) as Iterable<readonly [K, V]>
 
 const convertToSet = <T>(set: boolean | Iterable<T> | undefined): true | Set<T> =>
   set === true ? true
@@ -378,21 +371,15 @@ const convertToSet = <T>(set: boolean | Iterable<T> | undefined): true | Set<T> 
 
 /** Intended to be called internally. It constructs a Tableau from a `Model`. */
 export const tableauModel = <VarKey = string, ConKey = string>(model: Model<VarKey, ConKey>): TableauModel<VarKey, ConKey> => {
-  if (model.variables == null) throw "variables was null or undefined."
-  if (model.constraints == null) throw "constraints was null or undefined."
-
   const sign =
     model.direction === "maximize" || model.direction == null ? 1
     : model.direction === "minimize" ? -1
     : 0
   if (sign === 0) throw `'${model.direction}' is not a valid optimization direction. Should be 'maximize', 'minimize', or left blank.`
 
-  const variables: Variables<VarKey, ConKey> | null =
-    Array.isArray(model.variables) ? model.variables
-    : typeof (model.variables as any)[Symbol.iterator] === "function" ? Array.from(model.variables as any)
-    : typeof model.variables === "object" ? Object.entries(model.variables) as any
-    : null
-  if (variables === null) throw "variables was not an object or iterable."
+  const constraintsIter = convertToIterable(model.constraints)
+  const variablesIter = convertToIterable(model.variables)
+  const variables: Variables<VarKey, ConKey> = Array.isArray(variablesIter) ? variablesIter : Array.from(variablesIter)
 
   const binaryConstraintCol: number[] = []
   const integers: number[] = []
@@ -411,12 +398,11 @@ export const tableauModel = <VarKey = string, ConKey = string>(model: Model<VarK
   }
 
   const constraints = new Map<ConKey, { row: number, lower: number, upper: number }>()
-  for (const [key, constraint] of convertToIterable("constraints", model.constraints)) {
-    if (constraint == null) throw "A constraint was null or undefined."
+  for (const [key, constraint] of constraintsIter) {
     const bounds = constraints.get(key) ?? { row: NaN, lower: -Infinity, upper: Infinity }
     bounds.lower = Math.max(bounds.lower, constraint.equal ?? constraint.min ?? -Infinity)
     bounds.upper = Math.min(bounds.upper, constraint.equal ?? constraint.max ?? Infinity)
-    //if (rows.lower > rows.upper) return ["infeasible", NaN]
+    // if (rows.lower > rows.upper) return ["infeasible", NaN]
     if (!constraints.has(key)) constraints.set(key, bounds)
   }
 
@@ -445,7 +431,7 @@ export const tableauModel = <VarKey = string, ConKey = string>(model: Model<VarK
 
   const hasObjective = "objective" in model
   for (let c = 1; c < width; c++) {
-    for (const [constraint, coef] of convertToIterable("A variable", variables[c - 1][1])) {
+    for (const [constraint, coef] of convertToIterable(variables[c - 1][1])) {
       if (hasObjective && constraint === model.objective) {
         update(tableau, 0, c, sign * coef)
       }
