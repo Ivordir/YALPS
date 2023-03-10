@@ -839,15 +839,18 @@ const branchAndCut = <VarKey, ConKey>(
 
   // Did the solver "timeout"?
   const unfinished =
-    !branches.empty()
-    && bestEval < optimalThreshold
-    && (timedout || iter === options.maxIterations)
+    (timedout || iter >= options.maxIterations)
+    && !branches.empty()
+    && bestEval >= optimalThreshold
+
+  const status =
+    unfinished ? "timedout"
+    : !solutionFound ? "infeasible"
+    : "optimal"
 
   return solution(
     { ...tabmod, tableau: bestTableau },
-    unfinished ? "timedout"
-    : !solutionFound ? "infeasible"
-    : "optimal",
+    status,
     solutionFound ? bestEval : NaN,
     options.precision,
     options.includeZeroVariables
