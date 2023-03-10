@@ -1,7 +1,16 @@
-# What is this?
-This is **Yet Another Linear Programming Solver (YALPS)**. It is intended as a performant, lightweight linear programming (LP) solver geared towards medium and small LP problems. It can solve non-integer, integer, and mixed integer LP problems. The outputed JS has only ~500 lines and is ~20kB in size (not minified).
+# YALPS ![](https://badgen.net/npm/v/yalps) ![](https://badgen.net/npm/license/yalps)
 
-YALPS is a rewrite of [jsLPSolver](https://www.npmjs.com/package/javascript-lp-solver). The people there have made a great and easy to use solver. However, the API was limited to objects only, and I saw other areas that could have been improved. You can check out [jsLPSolver](https://www.npmjs.com/package/javascript-lp-solver) for more background and information regarding LP problems.
+## What is This (For)?
+
+This is **Yet Another Linear Programming Solver (YALPS)**.
+It is intended as a performant, lightweight linear programming (LP) solver geared towards small and medium LP problems.
+It can solve non-integer, integer, and mixed integer LP problems.
+While webassembly ports of existing solvers perform well, they tend to have larger bundle sizes and may be overkill for your use case.
+YALPS is the alternative for the browser featuring a small [bundle size](https://bundlephobia.com/package/yalps).
+
+YALPS is a rewrite of [jsLPSolver](https://www.npmjs.com/package/javascript-lp-solver).
+The people there have made a great and easy to use solver. However, the API was limited to objects only, and I saw other areas that could have been improved.
+You can check out [jsLPSolver](https://www.npmjs.com/package/javascript-lp-solver) for more background and information regarding LP problems.
 
 Compared to jsLPSolver, YALPS has the following differences:
 - More flexible API (e.g., support for Iterables alongside objects)
@@ -9,30 +18,32 @@ Compared to jsLPSolver, YALPS has the following differences:
 - Good Typescript support (YALPS is written in Typescript)
 
 On the other hand, these features from jsLPSolver were dropped:
-- Unrestricted variables (*might* be added later)
+- Unrestricted variables (might be added later)
 - Multiobjective optimization
 - External solvers
 
 # Usage
+
 ## Installation
 ```
 npm i yalps
 ```
 
 ## Import
+
 The main solve function:
 ```typescript
 import { solve } from "yalps"
 ```
 
-Types, as necessary:
-```typescript
-import { Model, Constraint, Coefficients, Options, Solution } from "yalps"
-```
-
 Alternate helper functions:
 ```typescript
 import { lessEq, equalTo, greaterEq, inRange } from "yalps"
+```
+
+Types, as necessary:
+```typescript
+import { Model, Constraint, Coefficients, Options, Solution } from "yalps"
 ```
 
 ## Examples
@@ -42,17 +53,18 @@ Using objects:
 const model: Model = {
     direction: "maximize",
     objective: "profit",
-    constraints: { // each key is the constraint's name, the value is its bounds
+    constraints: {
         wood: { max: 300 },
         labor: { max: 110 }, // labor should be <= 110
         storage: lessEq(400) // you can use the helper functions instead
     },
-    variables: { // each key is the variable's name, the value is its coefficients
-        table: { wood: 30, labor: 5, proft: 1200, storage: 30 },
+    variables: {
+        table: { wood: 30, labor: 5, profit: 1200, storage: 30 },
         dresser: { wood: 20, labor: 10, profit: 1600, storage: 50 }
     },
     integers: [ "table", "dresser" ] // these variables must have an integer value in the solution
 }
+
 const solution = solve(model)
 // { status: "optimal", result: 14400, variables: [ ["table", 8], ["dresser", 3] ] }
 ```
@@ -60,35 +72,38 @@ const solution = solve(model)
 Iterables and objects can be mixed and matched for the `constraints` and `variables` fields.
 Additionally, each variable's coefficients can be an object or an iterable. E.g.:
 ```typescript
-const constraints = new Map<string, Constraint>()
-constraints.set("wood", { max: 300 })
-constraints.set("labor", lessEq(110))
-constraints.set("storage", lessEq(400))
-const dresser = new Map<string, number>()
-dresser.set("wood", 20) // this is intended to be created programatically
-dresser.set("labor", 10)
-dresser.set("profit", 1600)
-dresser.set("storage", 50)
+const constraints =
+    new Map<string, Constraint>()
+        .set("wood", { max: 300 })
+        .set("labor", lessEq(110))
+        .set("storage", lessEq(400))
+
+const dresser = // this is intended to be created programatically
+    new Map<string, number>()
+        .set("wood", 20)
+        .set("labor", 10)
+        .set("profit", 1600)
+        .set("storage", 50)
+
 const model: Model<string, string> = {
     direction: "maximize",
     objective: "profit",
     constraints: constraints, // is an iterable
     variables: { // kept as an object
-        table: { wood: 30, labor: 5, proft: 1200, storage: 30 }, // an object
+        table: { wood: 30, labor: 5, profit: 1200, storage: 30 }, // an object
         dresser: dresser // an iterable
     },
     integers: true // all variables are indicated as integer
 }
+
 const solution: Solution<string> = solve(model)
 // { status: "optimal", result: 14400, variables: [ ["table", 8], ["dresser", 3] ] }
 ```
 
-Using iterables allows the keys for `constraints` and `variables` to be something besides string.
-Equality between keys is tested using `===`, `Map.get`, and `Set.has` (all essentially use strict equality).
-
 ## API
-This is `dist/YALPS.d.ts` but with the essential parts picked out.
-See `dist/YALPS.d.ts` for more extensive documentation if necessary.
+
+This is a stripped down version `YALPS.d.ts`.
+Use the JSDoc annotations / hover information in your editor for more extensive documentation.
 ```typescript
 interface Constraint {
     equal?: number
@@ -96,93 +111,52 @@ interface Constraint {
     max?: number
 }
 
-/**
- * Specifies something should be less than or equal to `value`.
- * Equivalent to `{ max: value }`.
- */
 const lessEq: (value: number) => Constraint
-
-/**
- * Specifies something should be greater than or equal to `value`.
- * Equivalent to `{ min: value }`.
- */
 const greaterEq: (value: number) => Constraint
-
-/**
- * Specifies something should be exactly equal to `value`.
- * Equivalent to `{ equal: value }`.
- */
 const equalTo: (value: number) => Constraint
-
-/**
- * Specifies something should be between `lower` and `upper` (both inclusive).
- * Equivalent to `{ min: lower, max: upper }`.
- */
 const inRange: (lower: number, upper: number) => Constraint
 
-/**
- * The coefficients of a variable represented as either an object or an `Iterable`.
- * `ConstraintKey` should extend `string` if this is an object.
- * If this is an `Iterable` and has duplicate keys,
- * then the last entry is used for each set of duplicate keys.
- */
 type Coefficients<ConstraintKey = string> =
-    | Iterable<[ConstraintKey, number]> // an iterable
-    | (ConstraintKey extends string // or an object, but ConstraintKey must extend string
-        ? { [constraint in ConstraintKey]?: number }
-        : never)
+    | Iterable<[ConstraintKey, number]>
+    | (ConstraintKey extends string ? { [key in ConstraintKey]?: number } : never)
 
-/**
- * The model representing a LP problem.
- * `constraints`, `variables`, and each variable's `Coefficients` can be either an object or an `Iterable`.
- * If there are objects present, the corresponding type parameter(s) for their keys must extend string.
- * The model is treated as readonly (recursively) by the solver.
- */
+type OptimizationDirection = "maximize" | "minimize"
+
 interface Model<VariableKey = string, ConstraintKey = string> {
     /**
      * Indicates whether to `"maximize"` or `"minimize"` the objective.
      * Defaults to `"maximize"` if left blank.
      */
-    direction?: "maximize" | "minimize"
+    direction?: OptimizationDirection
 
     /**
-     * The name of the value to optimize. Can be omitted,
-     * in which case the solver gives some solution (if any) that satisfies the constraints.
+     * The key of the value to optimize.
      */
     objective?: ConstraintKey
 
     /**
-     * An object or an `Iterable` representing the constraints of the problem.
-     * In the case `constraints` is an `Iterable`, duplicate keys are not ignored.
-     * Rather, the bounds on the constraints are merged to become the most restrictive.
+     * An object or `Iterable` representing the constraints of the problem.
      */
     constraints:
-        | Iterable<[key: ConstraintKey, constraint: Constraint]>
-        | (ConstraintKey extends string
-            ? { [constraint in ConstraintKey]: Constraint }
-            : never)
+        | Iterable<[ConstraintKey, Constraint]>
+        | (ConstraintKey extends string ? { [key in ConstraintKey]: Constraint } : never)
 
     /**
      * An object or `Iterable` representing the variables of the problem.
-     * In the case `variables` is an `Iterable`, duplicate keys are not ignored.
-     * The order of variables is preserved in the solution,
-     * but variables with a value of `0` are not included in the solution by default.
      */
     variables:
-        | Iterable<[key: VariableKey, variable: Coefficients<ConstraintKey>]>
-        | (VariableKey extends string
-            ? { [variable in VariableKey]: Coefficients<ConstraintKey> }
-            : never)
+        | Iterable<[VariableKey, Coefficients<ConstraintKey>]>
+        | (VariableKey extends string ? { [key in VariableKey]: Coefficients<ConstraintKey> } : never)
 
     /**
-     * An `Iterable` of variable keys that indicates these variables are integer.
+     * An `Iterable` of variable keys that indicate the corresponding variables are integer.
      * It can also be a `boolean`, indicating whether all variables are integer or not.
      * If this is left blank, then all variables are treated as not integer.
      */
     integers?: boolean | Iterable<VariableKey>
 
     /**
-     * An `Iterable` of variable keys that indicates these variables are binary
+     * An `Iterable` of variable keys that indicate the corresponding variables are binary
      * (can only be 0 or 1 in the solution).
      * It can also be a `boolean`, indicating whether all variables are binary or not.
      * If this is left blank, then all variables are treated as not binary.
@@ -192,21 +166,15 @@ interface Model<VariableKey = string, ConstraintKey = string> {
 
 type SolutionStatus = "optimal" | "infeasible" | "unbounded" | "timedout" | "cycled"
 
-/** The solution object returned by the solver. */
 type Solution<VariableKey = string> = {
     /**
      * `status` indicates what type of solution, if any, the solver was able to find.
      *
      * `"optimal"` indicates everything went ok, and the solver found an optimal solution.
-     *
      * `"infeasible"` indicates that the problem has no possible solutions.
-     *
      * `"unbounded"` indicates a variable, or combination of variables, are not sufficiently constrained.
-     *
-     * `"timedout"` indicates that the solver exited early for an integer problem
-     * (either due to `timeout` or `maxIterations` in the options).
-     *
-     * `"cycled"` indicates that the simplex method cycled, and the solver exited as a result (this is rare).
+     * `"timedout"` indicates that the solver exited early for an integer problem.
+     * `"cycled"` indicates that the simplex method cycled and exited (this is rare).
      */
     status: SolutionStatus
 
@@ -218,19 +186,15 @@ type Solution<VariableKey = string> = {
     result: number
 
     /**
-     * An array of variables and their coefficients that add up to `result`
-     * while satisfying the constraints of the problem.
+     * An array of variables and their coefficients that add up to `result` while satisfying the constraints of the problem.
      * Variables with a coefficient of `0` are not included in this by default.
-     * In the case that `status` is `"unbounded"`,
-     * `variables` may contain one variable which is (one of) the unbounded variable(s).
      */
     variables: [VariableKey, number][]
 }
 
-/** An object specifying the options for the solver. */
 interface Options {
     /**
-     * Numbers equal to or less than precision are treated as zero.
+     * Numbers with magnitude equal to or less than the provided precision are treated as zero.
      * Similarly, the precision determines whether a number is sufficiently integer.
      * The default value is `1E-8`.
     */
@@ -238,9 +202,8 @@ interface Options {
 
     /**
      * In rare cases, the solver can cycle.
-     * This is usually the case when the number of pivots exceeds `maxPivots`.
-     * Alternatively, setting this to `true` will cause
-     * the solver to explicitly check for cycles.
+     * This is assumed to be the case when the number of pivots exceeds `maxPivots`.
+     * Setting this to `true` will cause the solver to explicitly check for cycles and stop early if one is found.
      * The default value is `false`.
      */
     checkCycles?: boolean
@@ -253,32 +216,26 @@ interface Options {
     maxPivots?: number
 
     /**
-     * This setting applies to integer problems only.
-     * If an integer solution is found within `(1 +- tolerance) *
-     * {the problem's non-integer solution}`,
+     * This option applies to integer problems only.
+     * If an integer solution is found within
+     * `(1 +- tolerance) * {the problem's non-integer solution}`,
      * then this approximate integer solution is returned.
-     * This is helpful for large integer problems where
-     * the most optimal solution becomes harder to find,
-     * but other solutions that are relatively close to
-     * the optimal one may be much easier to find.
+     * For example, a tolereance of `0.05` allows integer solutions found within 5% of the non-integer solution to be returned.
      * The default value is `0` (only find the most optimal solution).
      */
     tolerance?: number
 
     /**
-     * This setting applies to integer problems only.
+     * This option applies to integer problems only.
      * It specifies, in milliseconds, the maximum amount of time the solver may take.
-     * The current sub-optimal solution, if any, is returned in the case of a timeout.
      * The default value is `Infinity` (no timeout).
      */
     timeout?: number
 
     /**
-     * This setting applies to integer problems only.
-     * It determines the maximum number of iterations
-     * for the main branch and cut algorithm.
-     * It can be used alongside or instead of `timeout`
-     * to prevent the algorithm from taking too long.
+     * This option applies to integer problems only.
+     * It determines the maximum number of iterations for the main branch and cut algorithm.
+     * It can be used alongside or instead of `timeout` to prevent the solver from taking too long.
      * The default value is `32768`.
      */
     maxIterations?: number
@@ -291,76 +248,116 @@ interface Options {
     includeZeroVariables?: boolean
 }
 
-/**
- * The default options used by the solver.
- * You may change these so that you do not have to
- * pass a custom `Options` object every time you call `solve`.
- */
-let defaultOptions: Options
+const defaultOptions: Required<Options>
 
-/** Runs the solver on the given model and using the given options (if any). */
+/**
+ * Runs the solver on the given model and using the given options (if any).
+ */
 const solve: <VarKey = string, ConKey = string>(model: Model<VarKey, ConKey>, options?: Options) => Solution<VarKey>
 ```
 
 # Performance
+
 While YALPS generally performs better than javascript-lp-solver, this solver is still geared towards small-ish problems. For example, the solver keeps the full representation of the matrix in memory as an array. I.e., there are currently no sparse matrix optimizations. As a general rule, the number of variables and constraints should probably be a few thousand or less, and the number of integer variables should be a few hundred at the most. If your use case has large-ish problems, it is recommended that you first benchmark and test the solver on your own before committing to using it. For very large and/or integral problems, a more professional solver is recommended, e.g. [glpk.js](https://www.npmjs.com/package/glpk.js).
 
-Nevertheless, here are the results from some benchmarks of medium/large problems comparing YALPS to other solvers (all times are in milliseconds):
+Nevertheless, below are the results from some benchmarks comparing YALPS to other solvers (all times are in milliseconds).
+The benchmarks were run on ts-node v10.9.1 and node v19.7.0.
 
 ## YALPS vs jsLPSolver
 ```
 Large Farm MIP.json: 35 constraints, 100 variables, 100 integers:
-t=5.65, jsLPSolver took 59.04% more time on average compared to YALPS
-jsLPSolver: (n=10, mean=67.77, stdErr=3.81)
-YALPS: (n=10, mean=42.61, stdErr=2.30)
+YALPS is 37.37% faster on average compared to jsLPSolver (t=35.24).
+┌────────────┬────┬───────┬────────┐
+│  (index)   │ n  │ mean  │ stdErr │
+├────────────┼────┼───────┼────────┤
+│   YALPS    │ 30 │ 35.83 │  0.33  │
+│ jsLPSolver │ 30 │ 57.22 │  0.51  │
+└────────────┴────┴───────┴────────┘
 
 Monster 2.json: 888 constraints, 924 variables, 112 integers:
-t=14.19, jsLPSolver took 150.36% more time on average compared to YALPS
-jsLPSolver: (n=5, mean=196.74, stdErr=3.02)
-YALPS: (n=5, mean=78.58, stdErr=7.76)
+YALPS is 68.54% faster on average compared to jsLPSolver (t=81.82).
+┌────────────┬────┬────────┬────────┐
+│  (index)   │ n  │  mean  │ stdErr │
+├────────────┼────┼────────┼────────┤
+│   YALPS    │ 30 │ 55.37  │  0.65  │
+│ jsLPSolver │ 30 │ 175.98 │  1.32  │
+└────────────┴────┴────────┴────────┘
 
 Monster Problem.json: 600 constraints, 552 variables, 0 integers:
-t=8.74, jsLPSolver took 208.00% more time on average compared to YALPS
-jsLPSolver: (n=6, mean=6.31, stdErr=0.46)
-YALPS: (n=6, mean=2.05, stdErr=0.16)
+YALPS is 73.55% faster on average compared to jsLPSolver (t=14.57).
+┌────────────┬────┬──────┬────────┐
+│  (index)   │ n  │ mean │ stdErr │
+├────────────┼────┼──────┼────────┤
+│   YALPS    │ 30 │ 1.61 │  0.17  │
+│ jsLPSolver │ 30 │ 6.09 │  0.26  │
+└────────────┴────┴──────┴────────┘
 
 Sudoku 4x4.json: 64 constraints, 64 variables, 64 integers:
-t=4.46, jsLPSolver took 126.71% more time on average compared to YALPS
-jsLPSolver: (n=32, mean=3.86, stdErr=0.47)
-YALPS: (n=32, mean=1.70, stdErr=0.10)
+YALPS is 27.42% faster on average compared to jsLPSolver (t=4.41).
+┌────────────┬────┬──────┬────────┐
+│  (index)   │ n  │ mean │ stdErr │
+├────────────┼────┼──────┼────────┤
+│   YALPS    │ 37 │ 1.23 │  0.01  │
+│ jsLPSolver │ 37 │ 1.7  │  0.1   │
+└────────────┴────┴──────┴────────┘
 
 Vendor Selection.json: 1641 constraints, 1640 variables, 40 integers:
-t=11.01, jsLPSolver took 25.55% more time on average compared to YALPS
-jsLPSolver: (n=5, mean=522.75, stdErr=7.20)
-YALPS: (n=5, mean=416.37, stdErr=6.44)
+YALPS is 6.94% faster on average compared to jsLPSolver (t=17.70).
+┌────────────┬────┬────────┬────────┐
+│  (index)   │ n  │  mean  │ stdErr │
+├────────────┼────┼────────┼────────┤
+│   YALPS    │ 30 │ 350.51 │  0.61  │
+│ jsLPSolver │ 30 │ 376.65 │  1.34  │
+└────────────┴────┴────────┴────────┘
+
 ```
 
 ## YALPS vs glpk.js
 ```
 Large Farm MIP.json: 35 constraints, 100 variables, 100 integers:
-t=-8.58, GLPK took -73.82% more time on average compared to YALPS
-GLPK: (n=7, mean=11.76, stdErr=0.42)
-YALPS: (n=7, mean=44.91, stdErr=3.84)
+glpk.js is 71.72% faster on average compared to YALPS (t=65.31).
+┌─────────┬────┬───────┬────────┐
+│ (index) │ n  │ mean  │ stdErr │
+├─────────┼────┼───────┼────────┤
+│  YALPS  │ 30 │ 35.79 │  0.38  │
+│ glpk.js │ 30 │ 10.12 │  0.09  │
+└─────────┴────┴───────┴────────┘
 
 Monster 2.json: 888 constraints, 924 variables, 112 integers:
-t=18.41, GLPK took 187.38% more time on average compared to YALPS
-GLPK: (n=4, mean=217.21, stdErr=5.25)
-YALPS: (n=4, mean=75.58, stdErr=5.62)
+YALPS is 65.70% faster on average compared to glpk.js (t=63.94).
+┌─────────┬────┬────────┬────────┐
+│ (index) │ n  │  mean  │ stdErr │
+├─────────┼────┼────────┼────────┤
+│  YALPS  │ 30 │ 64.71  │  1.92  │
+│ glpk.js │ 30 │ 188.65 │  0.28  │
+└─────────┴────┴────────┴────────┘
 
 Monster Problem.json: 600 constraints, 552 variables, 0 integers:
-t=7.49, GLPK took 249.37% more time on average compared to YALPS
-GLPK: (n=6, mean=9.08, stdErr=0.70)
-YALPS: (n=6, mean=2.60, stdErr=0.51)
+YALPS is 76.62% faster on average compared to glpk.js (t=40.67).
+┌─────────┬────┬──────┬────────┐
+│ (index) │ n  │ mean │ stdErr │
+├─────────┼────┼──────┼────────┤
+│  YALPS  │ 30 │ 1.46 │  0.08  │
+│ glpk.js │ 30 │ 6.26 │  0.09  │
+└─────────┴────┴──────┴────────┘
 
 Sudoku 4x4.json: 64 constraints, 64 variables, 64 integers:
-t=-19.27, GLPK took -56.64% more time on average compared to YALPS
-GLPK: (n=4, mean=0.69, stdErr=0.05)
-YALPS: (n=4, mean=1.59, stdErr=0.01)
+glpk.js is 55.50% faster on average compared to YALPS (t=25.51).
+┌─────────┬────┬──────┬────────┐
+│ (index) │ n  │ mean │ stdErr │
+├─────────┼────┼──────┼────────┤
+│  YALPS  │ 30 │ 1.29 │  0.01  │
+│ glpk.js │ 30 │ 0.57 │  0.03  │
+└─────────┴────┴──────┴────────┘
 
 Vendor Selection.json: 1641 constraints, 1640 variables, 40 integers:
-t=-26.49, GLPK took -70.50% more time on average compared to YALPS
-GLPK: (n=4, mean=127.70, stdErr=2.64)
-YALPS: (n=4, mean=432.85, stdErr=11.22)
+glpk.js is 67.99% faster on average compared to YALPS (t=356.17).
+┌─────────┬────┬────────┬────────┐
+│ (index) │ n  │  mean  │ stdErr │
+├─────────┼────┼────────┼────────┤
+│  YALPS  │ 30 │ 345.96 │  0.65  │
+│ glpk.js │ 30 │ 110.75 │  0.14  │
+└─────────┴────┴────────┴────────┘
 ```
 
 The code used for these benchmarks is available under `tests/Bechmark.ts`. Measuring performance isn't always straightforward, so take these synthetic benchmarks with a grain of salt. It is always recommended to benchmark for your use case. Then again, if your problems are typically of small or medium size, then this solver should have no issue (and may be much faster!).
