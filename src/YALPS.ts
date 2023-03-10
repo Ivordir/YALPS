@@ -42,16 +42,10 @@ export type OptimizationDirection = "maximize" | "minimize"
  *
  * @typeparam `VariableKey` - the type of the key used to distinguish variables.
  * It should extend `string` if `variables` is an object.
- * In the case `variables` is an `Iterable`, duplicate keys are not ignored.
- * The order of variables is preserved in the solution,
- * but variables that end up having a value of `0` are not included in the solution by default.
  *
  * @typeparam `ConstraintKey` - the type of the key used to distinguish constraints,
  * the objective, and the coefficients on each variable.
  * It should extend `string` if `constraints` or any variable's `Coefficients` is an object.
- * In the case `constraints` is an `Iterable`, duplicate keys are not ignored.
- * Rather, the bounds on the constraints are merged to become the most restrictive.
- * However, for duplicate keys in the `Coefficients` of each variable, the last entry is used.
  */
 export interface Model<VariableKey = string, ConstraintKey = string> {
   /**
@@ -79,6 +73,8 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
 
   /**
    * An object or `Iterable` representing the constraints of the problem.
+   * In the case `constraints` is an `Iterable`, duplicate keys are not ignored.
+   * Rather, the bounds on the constraints are merged to become the most restrictive.
    * @see `Constraint`
    * @example
    * Constraints as an object:
@@ -105,6 +101,9 @@ export interface Model<VariableKey = string, ConstraintKey = string> {
 
   /**
    * An object or `Iterable` representing the variables of the problem.
+   * In the case `variables` is an `Iterable`, duplicate keys are not ignored.
+   * The order of variables is preserved in the solution,
+   * but variables that end up having a value of `0` are not included in the solution by default.
    * @example
    * Variables as an object:
    * ```
