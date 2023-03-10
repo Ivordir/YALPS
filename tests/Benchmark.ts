@@ -1,6 +1,6 @@
+import { Model, Options, solve } from "../src/YALPS.js"
+import { TestCase, readCases, assertResultOptimal } from "./Common.js"
 import { performance } from "perf_hooks"
-import * as File from "fs"
-import { Model, Options, Solution, solve } from "../src/YALPS.js"
 // @ts-ignore
 import jsLP from "javascript-lp-solver"
 // @ts-ignore
@@ -8,27 +8,9 @@ import glpk from "glpk.js"
 
 const GLPK: any = (glpk as any)()
 
-type Benchmark = {
-  readonly file: string
-  readonly model: Model
-  readonly options?: Options
-  readonly expected: Solution
-  readonly numConstraints: number
-  readonly numVariables: number
-  readonly numIntegers: number
-}
+type Benchmark = TestCase
 
-const benchmarks: Benchmark[] =
-  File.readdirSync("tests/cases").map(file => {
-    const json = File.readFileSync("tests/cases/" + file) as any as string
-    const data = JSON.parse(json)
-    data.file = file
-    data.options = data.options
-    data.numConstraints = Object.entries(data.model.constraints).length
-    data.numVariables = Object.entries(data.model.variables).length
-    data.numIntegers = (data.model?.integers?.length ?? 0) + (data.model?.binaries?.length ?? 0)
-    return data
-  })
+const benchmarks: readonly Benchmark[] = readCases().filter(bench => bench.constraints.length > 10 && bench.variables.length > 10)
 
 const objectSet = (set: boolean | Iterable<string> | undefined) => {
   if (set === true || set === false) throw "Not Implemented"
@@ -69,8 +51,9 @@ const jsLPTimer = (bench: Benchmark) => {
 
 const glpkModel = (model: Model) => {
   type Bounds = { type: number, ub: number, lb: number }
-  type Coefs =  { name: string, coef: number }[]
+  type Coefs = { name: string, coef: number }[]
   type Constraint = { name: string, vars: Coefs, bnds: Bounds }
+
   const constraints = new Map<string, Constraint>()
   for (const [name, constraint] of Object.entries(model.constraints)) {
     let bounds: Bounds
@@ -88,16 +71,17 @@ const glpkModel = (model: Model) => {
     constraints.set(name, { name: name, vars: [], bnds: bounds })
   }
 
-  const objective = []
+  const objective: Coefs = []
   const hasObjective = "objective" in model
   for (const [name, variable] of Object.entries(model.variables)) {
-    for (const [key, coef] of Object.entries(variable)) {
+    for (const [key, val] of Object.entries(variable)) {
+      const coef = val as number
       if (hasObjective && model.objective === key) {
         objective.push({ name: name, coef: coef })
       }
       const constraint = constraints.get(key)
       if (constraint != null) {
-        constraint.vars.push({ name: name, coef: coef as number })
+        constraint.vars.push({ name: name, coef: coef })
       }
     }
   }
@@ -216,7 +200,7 @@ const benchmark = (
   warmup = 0,
   maxSamples = 100) => {
   for (const bench of benchmarks) {
-    console.log(`${bench.file}: ${bench.numConstraints} constraints, ${bench.numVariables} variables, ${bench.numIntegers} integers:`)
+    console.log(`${bench.file}: ${bench.constraints.length} constraints, ${bench.variables.length} variables, ${bench.model.integers?.length ?? 0} integers:`)
     welch(name1, f1(bench), name2, f2(bench), warmup, maxSamples)
     console.log("")
   }
@@ -229,22 +213,20 @@ Many various factors can have varying degrees of impact.
 May I recommend: https://youtu.be/r-TLSBdHe1A?t=428
 */
 
-const largeProblems = benchmarks.filter(bench => bench.numConstraints > 10 && bench.numVariables > 10)
-
 // @ts-ignore
 const benchmarkCheckCycles = () =>
   // Only Monster 2 seems to be affected when benchmarking all largeProblems,
   // but benchmarking Monster 2 by itself gives no performance difference?
-  benchmark(largeProblems, "YALPS", yalpsTimer, "CheckCycles", bench => {
+  benchmark(benchmarks, "YALPS", yalpsTimer, "CheckCycles", bench => {
     const options = { ...bench.options, checkCycles: true }
     return () => solve(bench.model, options)
   }, 0, 30)
 
 // @ts-ignore
-const benchamrkjsLP = () => benchmark(largeProblems, "YALPS", yalpsTimer, "jsLPSolver", jsLPTimer)
+const benchamrkjsLP = () => benchmark(benchmarks, "YALPS", yalpsTimer, "jsLPSolver", jsLPTimer)
 
 // @ts-ignore
-const benchamrkGLPK = () => benchmark(largeProblems, "YALPS", yalpsTimer, "GLPK", glpkTimer)
+const benchamrkGLPK = () => benchmark(benchmarks, "YALPS", yalpsTimer, "GLPK", glpkTimer)
 
 // benchmarkCheckCycles()
 

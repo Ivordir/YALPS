@@ -1,33 +1,13 @@
-import { tableauModel, solve, Model, Solution, Options, Coefficients, Constraint, index, defaultOptions } from "../src/YALPS.js"
-import * as File from "fs"
+import { Coefficients, Constraint, Solution } from "../src/YALPS.js"
+import { tableauModel, index, solve } from "../src/YALPS.js"
+import { TestCase, Variable } from "./Common.js"
+import { readCases, assertResultOptimal, relaxPrecisionFactor } from "./Common.js"
 import assert from "assert"
 
 const section = describe
 const test = it
 
-type TestData = {
-  readonly file: string
-  readonly model: Model
-  readonly variables: readonly (readonly [string, object])[]
-  readonly constraints: readonly (readonly [string, Constraint])[]
-  readonly options: Required<Options>
-  readonly expected: Solution
-}
-
-const testData: readonly TestData[] =
-  File.readdirSync("tests/cases").map(file => {
-    const json = File.readFileSync("tests/cases/" + file) as any as string
-    const data = JSON.parse(json)
-    data.file = file
-    data.variables = Object.entries(data.model.variables)
-    data.constraints = Object.entries(data.model.constraints)
-    data.options = { ...defaultOptions, ...data.options }
-    data.expected.result =
-      data.expected.result === null ? NaN
-      : data.expected.result === "Infinity" ? Infinity
-      : data.expected.result
-    return data
-  })
+const testData = readCases()
 
 section("Tableau Tests", () => {
   test("Empty model", () => {
@@ -47,7 +27,7 @@ section("Tableau Tests", () => {
     assert.deepStrictEqual(result, expected)
   })
 
-  const testProperty = (desc: string, property: (data: TestData) => void) => {
+  const testProperty = (desc: string, property: (data: TestCase) => void) => {
     test(desc, () => {
       for (const data of testData) {
         try { property(data) }
@@ -312,10 +292,7 @@ section("Tableau Tests", () => {
       matrix.set(sub, start - 1 - i)
     }
 
-    const binary =
-      !data.model.binaries ? false
-      : data.model.binaries === true ? true
-      : Array.from(data.model.binaries).includes(data.variables[index][0])
+    const binary = data.model.binaries?.includes(data.variables[index][0])
     if (binary) {
       let binaryRow = tableau.height - 1
       for (; binaryRow >= 0; binaryRow--) {
@@ -355,36 +332,24 @@ section("Tableau Tests", () => {
   })
 })
 
-const solutionOptimal = (data: TestData, solution: Solution) => {
+const solutionOptimal = (data: TestCase, { status, result, variables }: Solution, relaxPrecison: boolean = false) => {
   const sums = new Map<string, number>()
-  if (solution.status === "infeasible" || solution.status === "cycled") {
-    assert(Number.isNaN(solution.result))
-    assert.deepStrictEqual(solution.variables, [])
-  } else if (solution.status === "unbounded") {
-    assert.equal(solution.result, Infinity)
+  if (status === "infeasible" || status === "cycled") {
+    assert(Number.isNaN(result))
+    assert.deepStrictEqual(variables, [])
+  } else if (status === "unbounded") {
+    assert.strictEqual(result, Infinity)
   } else {
-    let precision = data.options.precision
-    if (data.model.integers || data.model.binaries) {
-      const tolerance = data.options.tolerance
-      if (data.model.direction === "minimize") {
-        assert(data.expected.result / (1 + tolerance) - solution.result <= precision
-          && solution.result - data.expected.result * (1 + tolerance) <= precision)
-      } else {
-        assert(data.expected.result * (1 - tolerance) - solution.result <= precision
-          && solution.result - data.expected.result / (1 - tolerance) <= precision)
-      }
-    } else {
-      assert(Math.abs(solution.result - data.expected.result) <= precision)
-    }
-    precision *= 1e3
-    for (const [key, num] of solution.variables) {
+    assertResultOptimal(result, data, relaxPrecison)
+    const precision = data.options.precision * relaxPrecisionFactor
+    for (const [key, num] of variables) {
       const variable = (data.model.variables as any)[key] as Coefficients
       for (const [constraint, coef] of Object.entries(variable)) {
         sums.set(constraint, num * coef + (sums.get(constraint) ?? 0))
       }
     }
     const objectiveSum = data.model.objective == null ? 0 : (sums.get(data.model.objective) ?? 0)
-    assert(Math.abs(objectiveSum - solution.result) <= precision)
+    assert(Math.abs(objectiveSum - result) <= precision)
     for (const [key, constraint] of data.constraints) {
       const sum = sums.get(key) ?? 0
       if (constraint.equal == null) {
@@ -419,7 +384,7 @@ section("Solver Tests", () => {
   })
 
   section("Properties", () => {
-    const testProperty = (desc: string, property: (data: TestData, solution: SolutionData) => void) => {
+    const testProperty = (desc: string, property: (data: TestCase, solution: SolutionData) => void) => {
       test(desc, () => {
         for (let i = 0; i < testData.length; i++) {
           const data = testData[i]
@@ -454,7 +419,7 @@ section("Solver Tests", () => {
       if (solution.status !== "optimal" || data.variables.length === solution.variables.length)
         return // model not applicable
 
-      const variables = []
+      const variables: (readonly [string, Variable])[] = []
       let i = 0
       for (const variable of data.variables) {
         // assume no duplicate keys
@@ -474,8 +439,7 @@ section("Solver Tests", () => {
     })
 
     testProperty("Duplicating non-binary variable gives optimal solution", data => {
-      if (data.model.binaries === true) return // model not applicable
-      const binaries = data.model.binaries === false ? new Set() : new Set(data.model.binaries)
+      const binaries = new Set(data.model.binaries)
       const variables = data.variables.filter(([k, ]) => !binaries.has(k))
       if (variables.length === 0) return // model not applicable
       variables.push(data.variables[Math.floor(Math.random() * data.variables.length)])
@@ -499,10 +463,7 @@ section("Solver Tests", () => {
         const max = Math.random() * (upper - sum) + sum
         constraints.push([key, { min: min, max: max }])
         const restricted = solve({ ...data.model, constraints: constraints }, data.options)
-        // reduce precision when checking valid solution,
-        // because this new constraint alters the tableau and subsequent calculations?
-        const options = { ...data.options, precision: data.options.precision * 1e3 }
-        solutionOptimal({ ...data, options: options }, restricted)
+        solutionOptimal(data, restricted, true)
     })
   })
 })
