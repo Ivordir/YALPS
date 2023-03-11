@@ -247,100 +247,97 @@ Nevertheless, below are the results from some benchmarks comparing YALPS to othe
 The benchmarks were run on ts-node v10.9.1 and node v19.7.0.
 
 ## YALPS vs jsLPSolver
-```
-Large Farm MIP.json: 35 constraints, 100 variables, 100 integers:
-YALPS is 37.37% faster on average compared to jsLPSolver (t=35.24).
-┌────────────┬────┬───────┬────────┐
-│  (index)   │ n  │ mean  │ stdErr │
-├────────────┼────┼───────┼────────┤
-│   YALPS    │ 30 │ 35.83 │  0.33  │
-│ jsLPSolver │ 30 │ 57.22 │  0.51  │
-└────────────┴────┴───────┴────────┘
 
-Monster 2.json: 888 constraints, 924 variables, 112 integers:
-YALPS is 68.54% faster on average compared to jsLPSolver (t=81.82).
-┌────────────┬────┬────────┬────────┐
-│  (index)   │ n  │  mean  │ stdErr │
-├────────────┼────┼────────┼────────┤
-│   YALPS    │ 30 │ 55.37  │  0.65  │
-│ jsLPSolver │ 30 │ 175.98 │  1.32  │
-└────────────┴────┴────────┴────────┘
+    Large Farm MIP.json: 35 constraints, 100 variables, 100 integers:
+    YALPS is 37.37% faster on average compared to jsLPSolver (t=35.24).
+    ┌────────────┬────┬───────┬────────┐
+    │  (index)   │ n  │ mean  │ stdErr │
+    ├────────────┼────┼───────┼────────┤
+    │   YALPS    │ 30 │ 35.83 │  0.33  │
+    │ jsLPSolver │ 30 │ 57.22 │  0.51  │
+    └────────────┴────┴───────┴────────┘
 
-Monster Problem.json: 600 constraints, 552 variables, 0 integers:
-YALPS is 73.55% faster on average compared to jsLPSolver (t=14.57).
-┌────────────┬────┬──────┬────────┐
-│  (index)   │ n  │ mean │ stdErr │
-├────────────┼────┼──────┼────────┤
-│   YALPS    │ 30 │ 1.61 │  0.17  │
-│ jsLPSolver │ 30 │ 6.09 │  0.26  │
-└────────────┴────┴──────┴────────┘
+    Monster 2.json: 888 constraints, 924 variables, 112 integers:
+    YALPS is 68.54% faster on average compared to jsLPSolver (t=81.82).
+    ┌────────────┬────┬────────┬────────┐
+    │  (index)   │ n  │  mean  │ stdErr │
+    ├────────────┼────┼────────┼────────┤
+    │   YALPS    │ 30 │ 55.37  │  0.65  │
+    │ jsLPSolver │ 30 │ 175.98 │  1.32  │
+    └────────────┴────┴────────┴────────┘
 
-Sudoku 4x4.json: 64 constraints, 64 variables, 64 integers:
-YALPS is 27.42% faster on average compared to jsLPSolver (t=4.41).
-┌────────────┬────┬──────┬────────┐
-│  (index)   │ n  │ mean │ stdErr │
-├────────────┼────┼──────┼────────┤
-│   YALPS    │ 37 │ 1.23 │  0.01  │
-│ jsLPSolver │ 37 │ 1.7  │  0.1   │
-└────────────┴────┴──────┴────────┘
+    Monster Problem.json: 600 constraints, 552 variables, 0 integers:
+    YALPS is 73.55% faster on average compared to jsLPSolver (t=14.57).
+    ┌────────────┬────┬──────┬────────┐
+    │  (index)   │ n  │ mean │ stdErr │
+    ├────────────┼────┼──────┼────────┤
+    │   YALPS    │ 30 │ 1.61 │  0.17  │
+    │ jsLPSolver │ 30 │ 6.09 │  0.26  │
+    └────────────┴────┴──────┴────────┘
 
-Vendor Selection.json: 1641 constraints, 1640 variables, 40 integers:
-YALPS is 6.94% faster on average compared to jsLPSolver (t=17.70).
-┌────────────┬────┬────────┬────────┐
-│  (index)   │ n  │  mean  │ stdErr │
-├────────────┼────┼────────┼────────┤
-│   YALPS    │ 30 │ 350.51 │  0.61  │
-│ jsLPSolver │ 30 │ 376.65 │  1.34  │
-└────────────┴────┴────────┴────────┘
+    Sudoku 4x4.json: 64 constraints, 64 variables, 64 integers:
+    YALPS is 27.42% faster on average compared to jsLPSolver (t=4.41).
+    ┌────────────┬────┬──────┬────────┐
+    │  (index)   │ n  │ mean │ stdErr │
+    ├────────────┼────┼──────┼────────┤
+    │   YALPS    │ 37 │ 1.23 │  0.01  │
+    │ jsLPSolver │ 37 │ 1.7  │  0.1   │
+    └────────────┴────┴──────┴────────┘
 
-```
+    Vendor Selection.json: 1641 constraints, 1640 variables, 40 integers:
+    YALPS is 6.94% faster on average compared to jsLPSolver (t=17.70).
+    ┌────────────┬────┬────────┬────────┐
+    │  (index)   │ n  │  mean  │ stdErr │
+    ├────────────┼────┼────────┼────────┤
+    │   YALPS    │ 30 │ 350.51 │  0.61  │
+    │ jsLPSolver │ 30 │ 376.65 │  1.34  │
+    └────────────┴────┴────────┴────────┘
 
 ## YALPS vs glpk.js
-```
-Large Farm MIP.json: 35 constraints, 100 variables, 100 integers:
-glpk.js is 71.72% faster on average compared to YALPS (t=65.31).
-┌─────────┬────┬───────┬────────┐
-│ (index) │ n  │ mean  │ stdErr │
-├─────────┼────┼───────┼────────┤
-│  YALPS  │ 30 │ 35.79 │  0.38  │
-│ glpk.js │ 30 │ 10.12 │  0.09  │
-└─────────┴────┴───────┴────────┘
 
-Monster 2.json: 888 constraints, 924 variables, 112 integers:
-YALPS is 65.70% faster on average compared to glpk.js (t=63.94).
-┌─────────┬────┬────────┬────────┐
-│ (index) │ n  │  mean  │ stdErr │
-├─────────┼────┼────────┼────────┤
-│  YALPS  │ 30 │ 64.71  │  1.92  │
-│ glpk.js │ 30 │ 188.65 │  0.28  │
-└─────────┴────┴────────┴────────┘
+    Large Farm MIP.json: 35 constraints, 100 variables, 100 integers:
+    glpk.js is 71.72% faster on average compared to YALPS (t=65.31).
+    ┌─────────┬────┬───────┬────────┐
+    │ (index) │ n  │ mean  │ stdErr │
+    ├─────────┼────┼───────┼────────┤
+    │  YALPS  │ 30 │ 35.79 │  0.38  │
+    │ glpk.js │ 30 │ 10.12 │  0.09  │
+    └─────────┴────┴───────┴────────┘
 
-Monster Problem.json: 600 constraints, 552 variables, 0 integers:
-YALPS is 76.62% faster on average compared to glpk.js (t=40.67).
-┌─────────┬────┬──────┬────────┐
-│ (index) │ n  │ mean │ stdErr │
-├─────────┼────┼──────┼────────┤
-│  YALPS  │ 30 │ 1.46 │  0.08  │
-│ glpk.js │ 30 │ 6.26 │  0.09  │
-└─────────┴────┴──────┴────────┘
+    Monster 2.json: 888 constraints, 924 variables, 112 integers:
+    YALPS is 65.70% faster on average compared to glpk.js (t=63.94).
+    ┌─────────┬────┬────────┬────────┐
+    │ (index) │ n  │  mean  │ stdErr │
+    ├─────────┼────┼────────┼────────┤
+    │  YALPS  │ 30 │ 64.71  │  1.92  │
+    │ glpk.js │ 30 │ 188.65 │  0.28  │
+    └─────────┴────┴────────┴────────┘
 
-Sudoku 4x4.json: 64 constraints, 64 variables, 64 integers:
-glpk.js is 55.50% faster on average compared to YALPS (t=25.51).
-┌─────────┬────┬──────┬────────┐
-│ (index) │ n  │ mean │ stdErr │
-├─────────┼────┼──────┼────────┤
-│  YALPS  │ 30 │ 1.29 │  0.01  │
-│ glpk.js │ 30 │ 0.57 │  0.03  │
-└─────────┴────┴──────┴────────┘
+    Monster Problem.json: 600 constraints, 552 variables, 0 integers:
+    YALPS is 76.62% faster on average compared to glpk.js (t=40.67).
+    ┌─────────┬────┬──────┬────────┐
+    │ (index) │ n  │ mean │ stdErr │
+    ├─────────┼────┼──────┼────────┤
+    │  YALPS  │ 30 │ 1.46 │  0.08  │
+    │ glpk.js │ 30 │ 6.26 │  0.09  │
+    └─────────┴────┴──────┴────────┘
 
-Vendor Selection.json: 1641 constraints, 1640 variables, 40 integers:
-glpk.js is 67.99% faster on average compared to YALPS (t=356.17).
-┌─────────┬────┬────────┬────────┐
-│ (index) │ n  │  mean  │ stdErr │
-├─────────┼────┼────────┼────────┤
-│  YALPS  │ 30 │ 345.96 │  0.65  │
-│ glpk.js │ 30 │ 110.75 │  0.14  │
-└─────────┴────┴────────┴────────┘
-```
+    Sudoku 4x4.json: 64 constraints, 64 variables, 64 integers:
+    glpk.js is 55.50% faster on average compared to YALPS (t=25.51).
+    ┌─────────┬────┬──────┬────────┐
+    │ (index) │ n  │ mean │ stdErr │
+    ├─────────┼────┼──────┼────────┤
+    │  YALPS  │ 30 │ 1.29 │  0.01  │
+    │ glpk.js │ 30 │ 0.57 │  0.03  │
+    └─────────┴────┴──────┴────────┘
+
+    Vendor Selection.json: 1641 constraints, 1640 variables, 40 integers:
+    glpk.js is 67.99% faster on average compared to YALPS (t=356.17).
+    ┌─────────┬────┬────────┬────────┐
+    │ (index) │ n  │  mean  │ stdErr │
+    ├─────────┼────┼────────┼────────┤
+    │  YALPS  │ 30 │ 345.96 │  0.65  │
+    │ glpk.js │ 30 │ 110.75 │  0.14  │
+    └─────────┴────┴────────┴────────┘
 
 The code used for these benchmarks is available under `tests/Bechmark.ts`. Measuring performance isn't always straightforward, so take these synthetic benchmarks with a grain of salt. It is always recommended to benchmark for your use case. Then again, if your problems are typically of small or medium size, then this solver should have no issue (and may be much faster!).
