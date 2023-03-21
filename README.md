@@ -3,7 +3,7 @@
 ## What is This (For)?
 
 This is **Yet Another Linear Programming Solver (YALPS)**.
-It is intended as a performant, lightweight linear programming (LP) solver geared towards small and medium LP problems.
+It is intended as a performant, lightweight linear programming (LP) solver geared towards small LP problems.
 It can solve non-integer, integer, and mixed integer LP problems.
 While webassembly ports of existing solvers perform well, they tend to have larger bundle sizes and may be overkill for your use case.
 YALPS is the alternative for the browser featuring a small [bundle size](https://bundlephobia.com/package/yalps).
@@ -241,7 +241,12 @@ const solve: <VarKey = string, ConKey = string>(model: Model<VarKey, ConKey>, op
 
 # Performance
 
-While YALPS generally performs better than javascript-lp-solver, this solver is still geared towards small-ish problems. For example, the solver keeps the full representation of the matrix in memory as an array. I.e., there are currently no sparse matrix optimizations. As a general rule, the number of variables and constraints should probably be a few thousand or less, and the number of integer variables should be a few hundred at the most. If your use case has large-ish problems, it is recommended that you first benchmark and test the solver on your own before committing to using it. For very large and/or integral problems, a more professional solver is recommended, e.g. [glpk.js](https://www.npmjs.com/package/glpk.js).
+While YALPS generally performs better than javascript-lp-solver, this solver is still geared towards small-ish problems.
+For example, the solver keeps the full representation of the matrix in memory as a dense array.
+As a general rule, the number of variables and constraints should probably be a few thousand or less,
+and the number of integer variables should be a few hundred at the most.
+If your use case has large-ish problems, it is recommended that you first benchmark and test the solver on your own before committing to using it.
+For very large and/or integral problems, a more professional solver is recommended, e.g. [glpk.js](https://www.npmjs.com/package/glpk.js).
 
 Nevertheless, below are the results from some benchmarks comparing YALPS to other solvers (all times are in milliseconds).
 The benchmarks were run on ts-node v10.9.1 and node v19.7.0.
