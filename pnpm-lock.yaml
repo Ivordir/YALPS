@@ -3,9 +3,9 @@ lockfileVersion: 5.4
 specifiers:
   '@types/heap': ^0.2.31
   '@types/mocha': ^9.1.1
-  '@types/node': ^18.7.6
+  '@types/node': ^18.15.5
   assert: ^2.0.0
-  fs: ^0.0.1-security
+  fs: 0.0.1-security
   glpk.js: ^4.0.1
   heap: ^0.2.7
   javascript-lp-solver: ^0.4.24
@@ -21,7 +21,7 @@ dependencies:
 devDependencies:
   '@types/heap': 0.2.31
   '@types/mocha': 9.1.1
-  '@types/node': 18.14.6
+  '@types/node': 18.15.5
   assert: 2.0.0
   fs: 0.0.1-security
   glpk.js: 4.0.1
@@ -29,7 +29,7 @@ devDependencies:
   mocha: 10.2.0
   perf_hooks: 0.0.1
   ts-mocha: 10.0.0_mocha@10.2.0
-  ts-node: 10.9.1_alpjt73dvgv6kni625hu7f2l4m
+  ts-node: 10.9.1_345kigqis4fipgyy5xb3ndshmq
   typescript: 4.9.5
 
 packages:
@@ -86,8 +86,8 @@ packages:
     resolution: {integrity: sha512-Z61JK7DKDtdKTWwLeElSEBcWGRLY8g95ic5FoQqI9CMx0ns/Ghep3B4DfcEimiKMvtamNVULVNKEsiwV3aQmXw==}
     dev: true
 
-  /@types/node/18.14.6:
-    resolution: {integrity: sha512-93+VvleD3mXwlLI/xASjw0FzKcwzl3OdTCzm1LaRfqgS21gfFtK3zDXM5Op9TeeMsJVOaJ2VRDpT9q4Y3d0AvA==}
+  /@types/node/18.15.5:
+    resolution: {integrity: sha512-Ark2WDjjZO7GmvsyFFf81MXuGTA/d6oP38anyxWOL6EREyBKAxKoFHwBhaZxCfLRLpO8JgVXwqOwSwa7jRcjew==}
     dev: true
 
   /acorn-walk/8.2.0:
@@ -794,7 +794,7 @@ packages:
       tsconfig-paths: 3.14.2
     dev: true
 
-  /ts-node/10.9.1_alpjt73dvgv6kni625hu7f2l4m:
+  /ts-node/10.9.1_345kigqis4fipgyy5xb3ndshmq:
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
     hasBin: true
     peerDependencies:
@@ -813,7 +813,7 @@ packages:
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.3
-      '@types/node': 18.14.6
+      '@types/node': 18.15.5
       acorn: 8.8.2
       acorn-walk: 8.2.0
       arg: 4.1.3
