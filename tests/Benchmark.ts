@@ -1,6 +1,7 @@
 import { Model, Options, solve } from "../src/YALPS.js"
-import { TestCase, readCases, assertResultOptimal } from "./Common.js"
+import { TestCase, readCases } from "./Common.js"
 import { performance } from "perf_hooks"
+import assert from "assert"
 // @ts-ignore
 import jsLP from "javascript-lp-solver"
 import GLPK from "glpk.js"
@@ -60,7 +61,7 @@ const jsLPRunner: Runner = {
     precision: options?.precision
   }),
   solve: ({ model, precision }) => jsLP.Solve(model, precision),
-  value: solution => solution.result
+  value: solution => solution.feasible ? solution.result : NaN
 }
 
 const glpkModel = (model: Model) => {
@@ -124,7 +125,10 @@ const glpkRunner: Runner = {
     options: glpkOptions(options)
   }),
   solve: ({ model, options }) => glpk.solve(model, options),
-  value: solution => solution.result.z
+  value: solution =>
+    solution.result.status === glpk.GLP_OPT || solution.result.status === glpk.GLP_FEAS
+    ? solution.result.z
+    : NaN
 }
 
 const time = (runner: Runner, input: any) => {
@@ -231,7 +235,17 @@ const validate = (bench: Benchmark, run: Runner) => {
   const input = run.convert(bench.model, bench.options)
   const solution = run.solve(input)
   const result = run.value(solution)
-  assertResultOptimal(result, bench)
+
+  const expected = bench.expected.result
+  if (Number.isNaN(expected)) {
+    assert(Number.isNaN(result))
+  } else if (!Number.isFinite(expected)) {
+    assert.strictEqual(expected, result)
+  } else {
+    assert(Number.isFinite(result))
+    const error = (Math.abs(result - expected) - bench.options.precision) / Math.max(Math.abs(expected), 1)
+    assert(error <= bench.options.tolerance)
+  }
 }
 
 const benchmark = (

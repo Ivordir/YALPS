@@ -1,7 +1,6 @@
 import { Constraint, OptimizationDirection, Options, Solution } from "../src/YALPS.js"
 import { defaultOptions } from "../src/YALPS.js"
 import * as File from "fs"
-import assert from "assert"
 
 export type Variable = { readonly [constraint: string]: number }
 
@@ -30,24 +29,9 @@ export const readCases = (): readonly TestCase[] => {
     data.constraints = Object.entries(data.model.constraints)
     data.options = { ...defaultOptions, ...data.options }
     data.expected.result =
-      data.expected.result === null ? NaN
-      : data.expected.result === "Infinity" ? Infinity
-      : data.expected.result
+      data.expected.status === "optimal" ? data.expected.result
+      : data.expected.status === "unbounded" ? Infinity * (data.model.direction === "minimize" ? -1 : 1)
+      : NaN
     return data
   })
-}
-
-export const relaxPrecisionFactor = 1E3
-
-export const assertResultOptimal = (result: number, data: TestCase, relaxPrecision: boolean = false) => {
-  const expected = data.expected.result
-  const precision = data.options.precision * (relaxPrecision ? relaxPrecisionFactor : 1.0)
-  const tolerance = data.options.tolerance
-  if (data.model.direction === "minimize") {
-    assert(expected / (1 + tolerance) - result <= precision
-      && result - expected * (1 + tolerance) <= precision)
-  } else {
-    assert(expected * (1 - tolerance) - result <= precision
-      && result - expected / (1 - tolerance) <= precision)
-  }
 }

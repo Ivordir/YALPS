@@ -1,7 +1,7 @@
 import { Coefficients, Constraint, Solution } from "../src/YALPS.js"
 import { tableauModel, index, solve } from "../src/YALPS.js"
 import { TestCase, Variable } from "./Common.js"
-import { readCases, assertResultOptimal, relaxPrecisionFactor } from "./Common.js"
+import { readCases } from "./Common.js"
 import assert from "assert"
 
 const section = describe
@@ -334,7 +334,7 @@ section("Tableau Tests", () => {
   })
 })
 
-const solutionOptimal = (data: TestCase, { status, result, variables }: Solution, relaxPrecison: boolean = false) => {
+const solutionOptimal = (data: TestCase, { status, result, variables }: Solution, relaxPrecision: boolean = false) => {
   const sums = new Map<string, number>()
   if (status === "infeasible" || status === "cycled") {
     assert(Number.isNaN(result))
@@ -342,8 +342,18 @@ const solutionOptimal = (data: TestCase, { status, result, variables }: Solution
   } else if (status === "unbounded") {
     assert.strictEqual(result, Infinity)
   } else {
-    assertResultOptimal(result, data, relaxPrecison)
-    const precision = data.options.precision * relaxPrecisionFactor
+    const expected = data.expected.result
+    let precision = data.options.precision * (relaxPrecision ? 1E3 : 1.0)
+    const tolerance = data.options.tolerance
+    if (data.model.direction === "minimize") {
+      assert(expected / (1 + tolerance) - result <= precision
+        && result - expected * (1 + tolerance) <= precision)
+    } else {
+      assert(expected * (1 - tolerance) - result <= precision
+        && result - expected / (1 - tolerance) <= precision)
+    }
+
+    precision = data.options.precision * 1E3
     for (const [key, num] of variables) {
       const variable = (data.model.variables as any)[key] as Coefficients
       for (const [constraint, coef] of Object.entries(variable)) {
