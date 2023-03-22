@@ -1,4 +1,4 @@
-import { Model, Options, solve } from "../src/YALPS.js"
+import { Options, solve } from "../src/YALPS.js"
 import { TestCase, readCases } from "./Common.js"
 import { performance } from "perf_hooks"
 import assert from "assert"
@@ -9,6 +9,7 @@ import GLPK from "glpk.js"
 const glpk = (GLPK as any)() as any
 
 type Benchmark = TestCase
+type Model = Benchmark["model"]
 
 const benchmarks: readonly Benchmark[] = readCases().filter(bench => bench.constraints.length > 10 && bench.variables.length > 10)
 
@@ -26,11 +27,10 @@ const yalpsRunner: Runner = {
   value: solution => solution.result
 }
 
-const objectSet = (set: boolean | Iterable<string> | undefined) => {
-  if (set === true || set === false) throw "Not Implemented"
+const objectSet = (items: string[] | undefined) => {
   const obj: any = {}
-  if (set != null) {
-    for (const key of set) {
+  if (items != null) {
+    for (const key of items) {
       obj[key] = 1
     }
   }
@@ -38,10 +38,8 @@ const objectSet = (set: boolean | Iterable<string> | undefined) => {
 }
 
 const jsLPModel = (model: Model, options?: Options) => ({
-  optimize: model.objective,
+  ...model,
   opType: model.direction === "minimize" ? "min" : "max",
-  constraints: model.constraints,
-  variables: model.variables,
   ints: objectSet(model.integers),
   binaries: objectSet(model.binaries),
   options: jsLPOptions(options)
@@ -77,8 +75,8 @@ const glpkModel = (model: Model) => {
       const max = constraint.max != null
       bnds =
         min && max ? { type: glpk.GLP_DB, ub: constraint.max, lb: constraint.min }
-        : min && !max ? { type: glpk.GLP_LO, ub: 0, lb: constraint.min }
-        : !min && max ? { type: glpk.GLP_UP, ub: constraint.max, lb: 0 }
+        : min ? { type: glpk.GLP_LO, ub: 0, lb: constraint.min }
+        : max ? { type: glpk.GLP_UP, ub: constraint.max, lb: 0 }
         : { type: glpk.GLP_FR, ub: 0, lb: 0 }
     } else {
       bnds = { type: glpk.GLP_FX, ub: 0, lb: constraint.equal }
@@ -94,10 +92,7 @@ const glpkModel = (model: Model) => {
       if (hasObjective && model.objective === key) {
         objective.push({ name, coef })
       }
-      const constraint = constraints.get(key)
-      if (constraint != null) {
-        constraint.vars.push({ name, coef })
-      }
+      constraints.get(key)?.vars.push({ name, coef })
     }
   }
 
@@ -278,8 +273,6 @@ May I recommend: https://youtu.be/r-TLSBdHe1A?t=428
 
 // @ts-ignore
 const benchmarkCheckCycles = () =>
-  // Only Monster 2 seems to be affected when benchmarking all largeProblems,
-  // but benchmarking Monster 2 by itself gives no performance difference?
   benchmark(benchmarks, yalpsRunner, {
     ...yalpsRunner,
     name: "Check Cycles",
