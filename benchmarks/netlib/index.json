@@ -1,0 +1,728 @@
+[
+  {
+    "name": "25FV47",
+    "rows": 822,
+    "cols": 1571,
+    "value": 5501.8458883
+  },
+  {
+    "name": "80BAU3B",
+    "rows": 2263,
+    "cols": 9799,
+    "value": 987232.16072
+  },
+  {
+    "name": "ADLITTLE",
+    "rows": 57,
+    "cols": 97,
+    "value": 225494.96316
+  },
+  {
+    "name": "AFIRO",
+    "rows": 28,
+    "cols": 32,
+    "value": -464.75314286
+  },
+  {
+    "name": "AGG",
+    "rows": 489,
+    "cols": 163,
+    "value": -35991767.287
+  },
+  {
+    "name": "AGG2",
+    "rows": 517,
+    "cols": 302,
+    "value": -20239252.356
+  },
+  {
+    "name": "AGG3",
+    "rows": 517,
+    "cols": 302,
+    "value": 10312115.935
+  },
+  {
+    "name": "BANDM",
+    "rows": 306,
+    "cols": 472,
+    "value": -158.62801845
+  },
+  {
+    "name": "BEACONFD",
+    "rows": 174,
+    "cols": 262,
+    "value": 33592.485807
+  },
+  {
+    "name": "BLEND",
+    "rows": 75,
+    "cols": 83,
+    "value": -30.812149846
+  },
+  {
+    "name": "BNL1",
+    "rows": 644,
+    "cols": 1175,
+    "value": 1977.6292856
+  },
+  {
+    "name": "BNL2",
+    "rows": 2325,
+    "cols": 3489,
+    "value": 1811.2365404
+  },
+  {
+    "name": "BOEING1",
+    "rows": 351,
+    "cols": 384,
+    "value": -335.21356751
+  },
+  {
+    "name": "BOEING2",
+    "rows": 167,
+    "cols": 143,
+    "value": -315.01872802
+  },
+  {
+    "name": "BORE3D",
+    "rows": 234,
+    "cols": 315,
+    "value": 1373.0803942
+  },
+  {
+    "name": "BRANDY",
+    "rows": 221,
+    "cols": 249,
+    "value": 1518.5098965
+  },
+  {
+    "name": "CAPRI",
+    "rows": 272,
+    "cols": 353,
+    "value": 2690.0129138
+  },
+  {
+    "name": "CYCLE",
+    "rows": 1904,
+    "cols": 2857,
+    "value": -5.2263930249
+  },
+  {
+    "name": "CZPROB",
+    "rows": 930,
+    "cols": 3523,
+    "value": 2185196.6989
+  },
+  {
+    "name": "D2Q06C",
+    "rows": 2172,
+    "cols": 5167,
+    "value": 122784.23615
+  },
+  {
+    "name": "D6CUBE",
+    "rows": 416,
+    "cols": 6184,
+    "value": 315.49166667
+  },
+  {
+    "name": "DEGEN2",
+    "rows": 445,
+    "cols": 534,
+    "value": -1435.178
+  },
+  {
+    "name": "DEGEN3",
+    "rows": 1504,
+    "cols": 1818,
+    "value": -987.294
+  },
+  {
+    "name": "DFL001",
+    "rows": 6072,
+    "cols": 12230,
+    "value": 11266400
+  },
+  {
+    "name": "E226",
+    "rows": 224,
+    "cols": 282,
+    "value": -18.751929066
+  },
+  {
+    "name": "ETAMACRO",
+    "rows": 401,
+    "cols": 688,
+    "value": -755.71521774
+  },
+  {
+    "name": "FFFFF800",
+    "rows": 525,
+    "cols": 854,
+    "value": 555679.61165
+  },
+  {
+    "name": "FINNIS",
+    "rows": 498,
+    "cols": 614,
+    "value": 172790.96547
+  },
+  {
+    "name": "FIT1D",
+    "rows": 25,
+    "cols": 1026,
+    "value": -9146.3780924
+  },
+  {
+    "name": "FIT1P",
+    "rows": 628,
+    "cols": 1677,
+    "value": 9146.3780924
+  },
+  {
+    "name": "FIT2D",
+    "rows": 26,
+    "cols": 10500,
+    "value": -68464.293294
+  },
+  {
+    "name": "FIT2P",
+    "rows": 3001,
+    "cols": 13525,
+    "value": 68464.293232
+  },
+  {
+    "name": "FORPLAN",
+    "rows": 162,
+    "cols": 421,
+    "value": -664.21873953
+  },
+  {
+    "name": "GANGES",
+    "rows": 1310,
+    "cols": 1681,
+    "value": -109586.36356
+  },
+  {
+    "name": "GFRD-PNC",
+    "rows": 617,
+    "cols": 1092,
+    "value": 6902235.9995
+  },
+  {
+    "name": "GREENBEA",
+    "rows": 2393,
+    "cols": 5405,
+    "value": -72462405.908
+  },
+  {
+    "name": "GREENBEB",
+    "rows": 2393,
+    "cols": 5405,
+    "value": -4302147.6065
+  },
+  {
+    "name": "GROW15",
+    "rows": 301,
+    "cols": 645,
+    "value": -106870941.29
+  },
+  {
+    "name": "GROW22",
+    "rows": 441,
+    "cols": 946,
+    "value": -160834336.48
+  },
+  {
+    "name": "GROW7",
+    "rows": 141,
+    "cols": 301,
+    "value": -47787811.815
+  },
+  {
+    "name": "ISRAEL",
+    "rows": 175,
+    "cols": 142,
+    "value": -896644.82186
+  },
+  {
+    "name": "KB2",
+    "rows": 44,
+    "cols": 41,
+    "value": -1749.9001299
+  },
+  {
+    "name": "LOTFI",
+    "rows": 154,
+    "cols": 308,
+    "value": -25.264706062
+  },
+  {
+    "name": "MAROS",
+    "rows": 847,
+    "cols": 1443,
+    "value": -58063.743701
+  },
+  {
+    "name": "MAROS-R7",
+    "rows": 3137,
+    "cols": 9408,
+    "value": 1497185.1665
+  },
+  {
+    "name": "MODSZK1",
+    "rows": 688,
+    "cols": 1620,
+    "value": 320.61972906
+  },
+  {
+    "name": "NESM",
+    "rows": 663,
+    "cols": 2923,
+    "value": 14076073.035
+  },
+  {
+    "name": "PEROLD",
+    "rows": 626,
+    "cols": 1376,
+    "value": -9380.7580773
+  },
+  {
+    "name": "PILOT",
+    "rows": 1442,
+    "cols": 3652,
+    "value": -557.40430007
+  },
+  {
+    "name": "PILOT.JA",
+    "rows": 941,
+    "cols": 1988,
+    "value": -6113.1344111
+  },
+  {
+    "name": "PILOT.WE",
+    "rows": 723,
+    "cols": 2789,
+    "value": -2720102.7439
+  },
+  {
+    "name": "PILOT4",
+    "rows": 411,
+    "cols": 1000,
+    "value": -2581.1392641
+  },
+  {
+    "name": "PILOT87",
+    "rows": 2031,
+    "cols": 4883,
+    "value": 301.71072827
+  },
+  {
+    "name": "PILOTNOV",
+    "rows": 976,
+    "cols": 2172,
+    "value": -4497.2761882
+  },
+  {
+    "name": "RECIPE",
+    "rows": 92,
+    "cols": 180,
+    "value": -266.616
+  },
+  {
+    "name": "SC105",
+    "rows": 106,
+    "cols": 103,
+    "value": -52.202061212
+  },
+  {
+    "name": "SC205",
+    "rows": 206,
+    "cols": 203,
+    "value": -52.202061212
+  },
+  {
+    "name": "SC50A",
+    "rows": 51,
+    "cols": 48,
+    "value": -64.575077059
+  },
+  {
+    "name": "SC50B",
+    "rows": 51,
+    "cols": 48,
+    "value": -70
+  },
+  {
+    "name": "SCAGR25",
+    "rows": 472,
+    "cols": 500,
+    "value": -14753433.061
+  },
+  {
+    "name": "SCAGR7",
+    "rows": 130,
+    "cols": 140,
+    "value": -2331389.2548
+  },
+  {
+    "name": "SCFXM1",
+    "rows": 331,
+    "cols": 457,
+    "value": 18416.759028
+  },
+  {
+    "name": "SCFXM2",
+    "rows": 661,
+    "cols": 914,
+    "value": 36660.261565
+  },
+  {
+    "name": "SCFXM3",
+    "rows": 991,
+    "cols": 1371,
+    "value": 54901.25455
+  },
+  {
+    "name": "SCORPION",
+    "rows": 389,
+    "cols": 358,
+    "value": 1878.1248227
+  },
+  {
+    "name": "SCRS8",
+    "rows": 491,
+    "cols": 1169,
+    "value": 904.29998619
+  },
+  {
+    "name": "SCSD1",
+    "rows": 78,
+    "cols": 760,
+    "value": 8.6666666743
+  },
+  {
+    "name": "SCSD6",
+    "rows": 148,
+    "cols": 1350,
+    "value": 50.500000078
+  },
+  {
+    "name": "SCSD8",
+    "rows": 398,
+    "cols": 2750,
+    "value": 904.99999993
+  },
+  {
+    "name": "SCTAP1",
+    "rows": 301,
+    "cols": 480,
+    "value": 1412.25
+  },
+  {
+    "name": "SCTAP2",
+    "rows": 1091,
+    "cols": 1880,
+    "value": 1724.8071429
+  },
+  {
+    "name": "SCTAP3",
+    "rows": 1481,
+    "cols": 2480,
+    "value": 1424
+  },
+  {
+    "name": "SEBA",
+    "rows": 516,
+    "cols": 1028,
+    "value": 15711.6
+  },
+  {
+    "name": "SHARE1B",
+    "rows": 118,
+    "cols": 225,
+    "value": -76589.318579
+  },
+  {
+    "name": "SHARE2B",
+    "rows": 97,
+    "cols": 79,
+    "value": -415.73224074
+  },
+  {
+    "name": "SHELL",
+    "rows": 537,
+    "cols": 1775,
+    "value": 1208825346
+  },
+  {
+    "name": "SHIP04L",
+    "rows": 403,
+    "cols": 2118,
+    "value": 1793324.538
+  },
+  {
+    "name": "SHIP04S",
+    "rows": 403,
+    "cols": 1458,
+    "value": 1798714.7004
+  },
+  {
+    "name": "SHIP08L",
+    "rows": 779,
+    "cols": 4283,
+    "value": 1909055.2114
+  },
+  {
+    "name": "SHIP08S",
+    "rows": 779,
+    "cols": 2387,
+    "value": 1920098.2105
+  },
+  {
+    "name": "SHIP12L",
+    "rows": 1152,
+    "cols": 5427,
+    "value": 1470187.9193
+  },
+  {
+    "name": "SHIP12S",
+    "rows": 1152,
+    "cols": 2763,
+    "value": 1489236.1344
+  },
+  {
+    "name": "SIERRA",
+    "rows": 1228,
+    "cols": 2036,
+    "value": 15394362.184
+  },
+  {
+    "name": "STAIR",
+    "rows": 357,
+    "cols": 467,
+    "value": -251.26695119
+  },
+  {
+    "name": "STANDATA",
+    "rows": 360,
+    "cols": 1075,
+    "value": 1257.6995
+  },
+  {
+    "name": "STANDMPS",
+    "rows": 468,
+    "cols": 1075,
+    "value": 1406.0175
+  },
+  {
+    "name": "STOCFOR1",
+    "rows": 118,
+    "cols": 111,
+    "value": -41131.976219
+  },
+  {
+    "name": "STOCFOR2",
+    "rows": 2158,
+    "cols": 2031,
+    "value": -39024.408538
+  },
+  {
+    "name": "TUFF",
+    "rows": 334,
+    "cols": 587,
+    "value": 0.29214776509
+  },
+  {
+    "name": "VTP.BASE",
+    "rows": 199,
+    "cols": 203,
+    "value": 129831.46246
+  },
+  {
+    "name": "WOOD1P",
+    "rows": 245,
+    "cols": 2594,
+    "value": 1.4429024116
+  },
+  {
+    "name": "WOODW",
+    "rows": 1099,
+    "cols": 8405,
+    "value": 1.3044763331
+  },
+  {
+    "name": "BGDBG1",
+    "rows": 349,
+    "cols": 407,
+    "value": null
+  },
+  {
+    "name": "BGETAM",
+    "rows": 401,
+    "cols": 688,
+    "value": null
+  },
+  {
+    "name": "BGINDY",
+    "rows": 2672,
+    "cols": 10116,
+    "value": null
+  },
+  {
+    "name": "BGPRTR",
+    "rows": 21,
+    "cols": 34,
+    "value": null
+  },
+  {
+    "name": "BOX1",
+    "rows": 232,
+    "cols": 261,
+    "value": null
+  },
+  {
+    "name": "CERIA3D",
+    "rows": 3577,
+    "cols": 824,
+    "value": null
+  },
+  {
+    "name": "CHEMCOM",
+    "rows": 289,
+    "cols": 720,
+    "value": null
+  },
+  {
+    "name": "CPLEX1",
+    "rows": 3006,
+    "cols": 3221,
+    "value": null
+  },
+  {
+    "name": "CPLEX2",
+    "rows": 225,
+    "cols": 221,
+    "value": null
+  },
+  {
+    "name": "EX72A",
+    "rows": 198,
+    "cols": 215,
+    "value": null
+  },
+  {
+    "name": "EX73A",
+    "rows": 194,
+    "cols": 211,
+    "value": null
+  },
+  {
+    "name": "FOREST",
+    "rows": 67,
+    "cols": 95,
+    "value": null
+  },
+  {
+    "name": "GALENET",
+    "rows": 9,
+    "cols": 8,
+    "value": null
+  },
+  {
+    "name": "GOSH",
+    "rows": 3793,
+    "cols": 10733,
+    "value": null
+  },
+  {
+    "name": "GRAN",
+    "rows": 2569,
+    "cols": 2520,
+    "value": null
+  },
+  {
+    "name": "GREENBEAINFE",
+    "rows": 2505,
+    "cols": 5405,
+    "value": null
+  },
+  {
+    "name": "ITEST2",
+    "rows": 10,
+    "cols": 4,
+    "value": null
+  },
+  {
+    "name": "ITEST6",
+    "rows": 12,
+    "cols": 8,
+    "value": null
+  },
+  {
+    "name": "KLEIN1",
+    "rows": 55,
+    "cols": 54,
+    "value": null
+  },
+  {
+    "name": "KLEIN2",
+    "rows": 478,
+    "cols": 54,
+    "value": null
+  },
+  {
+    "name": "KLEIN3",
+    "rows": 995,
+    "cols": 88,
+    "value": null
+  },
+  {
+    "name": "MONDOU2",
+    "rows": 313,
+    "cols": 604,
+    "value": null
+  },
+  {
+    "name": "PANG",
+    "rows": 362,
+    "cols": 460,
+    "value": null
+  },
+  {
+    "name": "PILOT4I",
+    "rows": 411,
+    "cols": 1000,
+    "value": null
+  },
+  {
+    "name": "QUAL",
+    "rows": 324,
+    "cols": 464,
+    "value": null
+  },
+  {
+    "name": "REACTOR",
+    "rows": 319,
+    "cols": 637,
+    "value": null
+  },
+  {
+    "name": "REFINERY",
+    "rows": 324,
+    "cols": 464,
+    "value": null
+  },
+  {
+    "name": "VOL1",
+    "rows": 324,
+    "cols": 464,
+    "value": null
+  },
+  {
+    "name": "WOODINFE",
+    "rows": 36,
+    "cols": 89,
+    "value": null
+  }
+]
