@@ -469,8 +469,8 @@ section("Solver Tests", () => {
         if (nonEqual.length === 0) return // model not applicable
         const [key, constraint] = randomElement(nonEqual)
         const sum = constraintSums.get(key) ?? 0
-        const lower = Math.max(constraint.min == null ? -Infinity : constraint.min, sum / 2)
-        const upper = Math.min(constraint.max == null ? Infinity : constraint.max, sum * 1.5)
+        const lower = Math.max(constraint.min ?? -Infinity, sum / 2)
+        const upper = Math.min(constraint.max ?? Infinity, sum * 2)
         const min = Math.random() * (sum - lower) + lower
         const max = Math.random() * (upper - sum) + sum
         constraints.push([key, { min, max }])
