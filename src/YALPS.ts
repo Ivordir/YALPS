@@ -342,29 +342,32 @@ const convertToSet = <T>(set: boolean | Iterable<T> | undefined): true | Set<T> 
   : new Set(set)
 
 /** Intended to be called internally. It constructs a Tableau from a `Model`. */
-export const tableauModel = <VarKey = string, ConKey = string>(model: Model<VarKey, ConKey>): TableauModel<VarKey, ConKey> => {
+export const tableauModel = <VarKey = string, ConKey = string>(
+  model: Model<VarKey, ConKey>
+): TableauModel<VarKey, ConKey> => {
+  const { direction, objective, integers, binaries } = model
   const sign =
-    model.direction === "maximize" || model.direction == null ? 1
-    : model.direction === "minimize" ? -1
+    direction === "maximize" || direction == null ? 1
+    : direction === "minimize" ? -1
     : 0
-  if (sign === 0) throw `'${model.direction}' is not a valid optimization direction. Should be 'maximize', 'minimize', or left blank.`
+  if (sign === 0) throw `'${direction}' is not a valid optimization direction. Should be 'maximize', 'minimize', or left blank.`
 
   const constraintsIter = convertToIterable(model.constraints)
   const variablesIter = convertToIterable(model.variables)
   const variables: Variables<VarKey, ConKey> = Array.isArray(variablesIter) ? variablesIter : Array.from(variablesIter)
 
   const binaryConstraintCol: number[] = []
-  const integers: number[] = []
-  if (model.integers || model.binaries) {
-    const binaryVariables = convertToSet(model.binaries)
-    const integerVariables = binaryVariables === true ? true : convertToSet(model.integers)
+  const ints: number[] = []
+  if (integers || binaries) {
+    const binaryVariables = convertToSet(binaries)
+    const integerVariables = binaryVariables === true ? true : convertToSet(integers)
     for (let i = 1; i <= variables.length; i++) {
       const [key, ] = variables[i - 1]
       if (binaryVariables === true || binaryVariables.has(key)) {
         binaryConstraintCol.push(i)
-        integers.push(i)
+        ints.push(i)
       } else if (integerVariables === true || integerVariables.has(key)) {
-        integers.push(i)
+        ints.push(i)
       }
     }
   }
@@ -388,23 +391,19 @@ export const tableauModel = <VarKey = string, ConKey = string>(model: Model<VarK
   const width = variables.length + 1
   const height = numConstraints + binaryConstraintCol.length
   const numVars = width + height
-  const tableau = {
-    matrix: new Float64Array(width * height),
-    width,
-    height,
-    positionOfVariable: new Int32Array(numVars),
-    variableAtPosition: new Int32Array(numVars)
-  }
+  const matrix = new Float64Array(width * height)
+  const positionOfVariable = new Int32Array(numVars)
+  const variableAtPosition = new Int32Array(numVars)
+  const tableau = { matrix, width, height, positionOfVariable, variableAtPosition }
 
   for (let i = 0; i < numVars; i++) {
-    tableau.positionOfVariable[i] = i
-    tableau.variableAtPosition[i] = i
+    positionOfVariable[i] = i
+    variableAtPosition[i] = i
   }
 
-  const hasObjective = "objective" in model
   for (let c = 1; c < width; c++) {
     for (const [constraint, coef] of convertToIterable(variables[c - 1][1])) {
-      if (hasObjective && constraint === model.objective) {
+      if (constraint === objective) {
         update(tableau, 0, c, sign * coef)
       }
       const bounds = constraints.get(constraint)
@@ -438,7 +437,7 @@ export const tableauModel = <VarKey = string, ConKey = string>(model: Model<VarK
     update(tableau, row, binaryConstraintCol[b], 1)
   }
 
-  return { tableau, sign, variables, integers }
+  return { tableau, sign, variables, integers: ints }
 }
 
 const pivot = (tableau: Tableau, row: number, col: number) => {
@@ -590,7 +589,7 @@ const phase1 = (tableau: Tableau, options: Required<Options>): [SolutionStatus, 
 
 // Creates a solution object representing the optimal solution (if any).
 const solution = <VarKey, ConKey>(
-  tabmod: TableauModel<VarKey, ConKey>,
+  { tableau, sign, variables: vars }: TableauModel<VarKey, ConKey>,
   status: SolutionStatus,
   result: number,
   precision: number,
@@ -598,10 +597,10 @@ const solution = <VarKey, ConKey>(
 ): Solution<VarKey> => {
   if (status === "optimal" || (status === "timedout" && !Number.isNaN(result))) {
     const variables: [VarKey, number][] = []
-    for (let i = 0; i < tabmod.variables.length; i++) {
-      const variable = tabmod.variables[i][0]
-      const row = tabmod.tableau.positionOfVariable[i + 1] - tabmod.tableau.width
-      const value = row >= 0 ? index(tabmod.tableau, row, 0) : 0
+    for (let i = 0; i < vars.length; i++) {
+      const variable = vars[i][0]
+      const row = tableau.positionOfVariable[i + 1] - tableau.width
+      const value = row >= 0 ? index(tableau, row, 0) : 0
       if (value > precision) {
         variables.push([variable, roundToPrecision(value, precision)])
       } else if (includeZeroVariables) {
@@ -610,17 +609,17 @@ const solution = <VarKey, ConKey>(
     }
     return {
       status,
-      result: -tabmod.sign * result,
+      result: -sign * result,
       variables
     }
   } else if (status === "unbounded") {
-    const variable = tabmod.tableau.variableAtPosition[result] - 1
+    const variable = tableau.variableAtPosition[result] - 1
     return {
       status: "unbounded",
-      result: tabmod.sign * Infinity,
+      result: sign * Infinity,
       variables:
-        0 <= variable && variable < tabmod.variables.length
-        ? [[tabmod.variables[variable][0], Infinity]]
+        0 <= variable && variable < vars.length
+        ? [[vars[variable][0], Infinity]]
         : []
     }
   } else {
@@ -654,19 +653,20 @@ const applyCuts = (
   { matrix, positionOfVariable, variableAtPosition }: Buffer,
   cuts: readonly Cut[]
 ) => {
+  const { width, height } = tableau
   matrix.set(tableau.matrix)
   for (let i = 0; i < cuts.length; i++) {
     const [sign, variable, value] = cuts[i]
-    const r = (tableau.height + i) * tableau.width
+    const r = (height + i) * width
     const pos = tableau.positionOfVariable[variable]
-    if (pos < tableau.width) {
+    if (pos < width) {
       matrix[r] = sign * value
-      matrix.fill(0, r + 1, r + tableau.width)
+      matrix.fill(0, r + 1, r + width)
       matrix[r + pos] = sign
     } else {
-      const row = (pos - tableau.width) * tableau.width
+      const row = (pos - width) * width
       matrix[r] = sign * (value - matrix[row])
-      for (let c = 1; c < tableau.width; c++) {
+      for (let c = 1; c < width; c++) {
         matrix[r + c] = -sign * matrix[row + c]
       }
     }
@@ -674,16 +674,16 @@ const applyCuts = (
 
   positionOfVariable.set(tableau.positionOfVariable)
   variableAtPosition.set(tableau.variableAtPosition)
-  const length = tableau.width + tableau.height + cuts.length
-  for (let i = tableau.width + tableau.height; i < length; i++) {
+  const length = width + height + cuts.length
+  for (let i = width + height; i < length; i++) {
     positionOfVariable[i] = i
     variableAtPosition[i] = i
   }
 
   return {
-    matrix: matrix.subarray(0, tableau.matrix.length + tableau.width * cuts.length),
-    width: tableau.width,
-    height: tableau.height + cuts.length,
+    matrix: matrix.subarray(0, tableau.matrix.length + width * cuts.length),
+    width,
+    height: height + cuts.length,
     positionOfVariable: positionOfVariable.subarray(0, length),
     variableAtPosition: variableAtPosition.subarray(0, length)
   }
@@ -719,10 +719,12 @@ const branchAndCut = <VarKey, ConKey>(
   initResult: number,
   options: Required<Options>
 ): Solution<VarKey> => {
-  const [initVariable, initValue, initFrac] = mostFractionalVar(tabmod.tableau, tabmod.integers)
-  if (initFrac <= options.precision) {
+  const { tableau, sign, integers } = tabmod
+  const { precision, includeZeroVariables, maxIterations, tolerance, timeout } = options
+  const [initVariable, initValue, initFrac] = mostFractionalVar(tableau, integers)
+  if (initFrac <= precision) {
     // Wow, the initial solution is integer
-    return solution(tabmod, "optimal", initResult, options.precision, options.includeZeroVariables)
+    return solution(tabmod, "optimal", initResult, precision, includeZeroVariables)
   }
 
   const branches = new heap<Branch>((x, y) => x[0] - y[0])
@@ -733,23 +735,23 @@ const branchAndCut = <VarKey, ConKey>(
   // One set of buffers stores the state of the currrent best solution.
   // The other is used to solve the current candidate solution.
   // The two buffers are "swapped" once a new best solution is found.
-  const maxExtraRows = tabmod.integers.length * 2
-  const matrixLength = tabmod.tableau.matrix.length + maxExtraRows * tabmod.tableau.width
-  const posVarLength = tabmod.tableau.positionOfVariable.length + maxExtraRows
+  const maxExtraRows = integers.length * 2
+  const matrixLength = tableau.matrix.length + maxExtraRows * tableau.width
+  const posVarLength = tableau.positionOfVariable.length + maxExtraRows
   const bufferA = buffer(matrixLength, posVarLength)
   const bufferB = buffer(matrixLength, posVarLength)
   let currentBuffer = true
 
-  const optimalThreshold = initResult * (1 - tabmod.sign * options.tolerance)
-  const timeout = options.timeout + Date.now()
-  let timedout = Date.now() >= timeout // in case options.timeout <= 0
+  const optimalThreshold = initResult * (1 - sign * tolerance)
+  const stopTime = timeout + Date.now()
+  let timedout = Date.now() >= stopTime // in case options.timeout <= 0
   let solutionFound = false
   let bestEval = Infinity
-  let bestTableau = tabmod.tableau
+  let bestTableau = tableau
   let iter = 0
 
   while (
-    iter < options.maxIterations
+    iter < maxIterations
     && !branches.empty()
     && bestEval >= optimalThreshold
     && !timedout
@@ -757,17 +759,17 @@ const branchAndCut = <VarKey, ConKey>(
     const [relaxedEval, cuts] = branches.pop() as Branch
     if (relaxedEval > bestEval) break // the remaining branches are worse than the current best solution
 
-    const tableau = applyCuts(tabmod.tableau, currentBuffer ? bufferA : bufferB, cuts)
-    const [status, result] = phase1(tableau, options)
+    const currentTableau = applyCuts(tableau, currentBuffer ? bufferA : bufferB, cuts)
+    const [status, result] = phase1(currentTableau, options)
     // The initial tableau is not unbounded and adding more cuts/constraints cannot make it become unbounded
     // assert(status !== "unbounded")
     if (status === "optimal" && result < bestEval) {
-      const [variable, value, frac] = mostFractionalVar(tableau, tabmod.integers)
-      if (frac <= options.precision) {
+      const [variable, value, frac] = mostFractionalVar(currentTableau, integers)
+      if (frac <= precision) {
         // The solution is integer
         solutionFound = true
         bestEval = result
-        bestTableau = tableau
+        bestTableau = currentTableau
         currentBuffer = !currentBuffer
       } else {
         const cutsUpper: Cut[] = []
@@ -791,13 +793,13 @@ const branchAndCut = <VarKey, ConKey>(
     // Otherwise, this branch's result is worse than the current best solution.
     // This could be because this branch is infeasible or cycled.
     // Either way, skip this branch and see if any other branches have a valid, better solution.
-    timedout = Date.now() >= timeout
+    timedout = Date.now() >= stopTime
     iter++
   }
 
   // Did the solver "timeout"?
   const unfinished =
-    (timedout || iter >= options.maxIterations)
+    (timedout || iter >= maxIterations)
     && !branches.empty()
     && bestEval >= optimalThreshold
 
@@ -810,8 +812,8 @@ const branchAndCut = <VarKey, ConKey>(
     { ...tabmod, tableau: bestTableau },
     status,
     solutionFound ? bestEval : NaN,
-    options.precision,
-    options.includeZeroVariables
+    precision,
+    includeZeroVariables
   )
 }
 
@@ -828,7 +830,7 @@ const defaultOptionValues: Required<Options> = {
 /**
  * The default options used by the solver.
  */
-export const defaultOptions = { ...defaultOptionValues } as const
+export const defaultOptions: Required<Options> = { ...defaultOptionValues }
 
 /**
  * Runs the solver on the given model and using the given options (if any).
