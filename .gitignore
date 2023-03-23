@@ -1,6 +1,6 @@
-node_modules/
-
-temp/
+/node_modules
+/coverage
+/temp
 
 # Visual Studio Code
 .vscode/*

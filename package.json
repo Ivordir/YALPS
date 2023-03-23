@@ -39,7 +39,9 @@
   "type": "module",
   "types": "./dist/YALPS.d.ts",
   "scripts": {
-    "test": "ts-mocha tests/Tests.ts",
+    "test:main": "ts-mocha tests/Tests.ts",
+    "coverage": "c8 --check-coverage --lines 95 pnpm test:main",
+    "test": "pnpm coverage",
     "benchmark": "ts-node tests/Benchmark.ts",
     "start": "tsc -w",
     "build:esm": "tsc",
@@ -54,9 +56,10 @@
   "devDependencies": {
     "@types/heap": "^0.2.31",
     "@types/mocha": "^9.1.1",
-    "@types/node": "^18.7.6",
+    "@types/node": "^18.15.5",
     "assert": "^2.0.0",
-    "fs": "^0.0.1-security",
+    "c8": "^7.13.0",
+    "fs": "0.0.1-security",
     "glpk.js": "^4.0.1",
     "javascript-lp-solver": "^0.4.24",
     "mocha": "^10.2.0",

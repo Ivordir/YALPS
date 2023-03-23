@@ -23,7 +23,7 @@
       "request": "launch",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [
-        "test"
+        "test:main"
       ],
       "args": [],
       "skipFiles": [
