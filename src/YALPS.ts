@@ -295,10 +295,7 @@ export const equalTo = (value: number): Constraint => ({ equal: value })
  * Returns a `Constraint` that specifies something should be between `lower` and `upper` (both inclusive).
  * Equivalent to `{ min: lower, max: upper }`.
  */
-export const inRange = (lower: number, upper: number): Constraint => ({
-  max: upper,
-  min: lower
-})
+export const inRange = (lower: number, upper: number): Constraint => ({ min: lower, max: upper })
 
 // The tableau representing the problem.
 // matrix is a 2D matrix (duh) represented as a 1D array.
