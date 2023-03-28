@@ -350,7 +350,7 @@ export const tableauModel = <VarKey = string, ConKey = string>(
     direction === "maximize" || direction == null ? 1.0
     : direction === "minimize" ? -1.0
     : 0.0
-  if (sign === 0.0) throw `'${direction}' is not a valid optimization direction. Should be 'maximize', 'minimize', or left blank.`
+  if (sign === 0.0) throw new Error(`'${direction}' is not a valid optimization direction. Should be 'maximize', 'minimize', or left blank.`)
 
   const constraintsIter = convertToIterable(model.constraints)
   const variablesIter = convertToIterable(model.variables)
@@ -837,12 +837,13 @@ export const defaultOptions: Required<Options> = { ...defaultOptionValues }
  * @see `Model` on how to specify/create the model.
  * @see `Options` for the kinds of options available.
  * @see `Solution` for more detailed information on what is returned.
+ * @throws `Error` if `model` is null or undefined or `model.direction` is invalid
  */
 export const solve = <VarKey = string, ConKey = string>(
   model: Model<VarKey, ConKey>,
   options?: Options
 ): Solution<VarKey> => {
-  if (model == null) throw "model was null or undefined."
+  if (model == null) throw new Error("model was null or undefined")
 
   const tabmod = tableauModel(model)
   const opt = { ...defaultOptionValues, ...options }
