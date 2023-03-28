@@ -2,7 +2,7 @@ import { Coefficients, Constraint, Solution } from "../src/YALPS.js"
 import { tableauModel, index, solve } from "../src/YALPS.js"
 import { TestCase, Variable } from "./Common.js"
 import { readCases } from "./Common.js"
-import assert from "assert"
+import { strict as assert } from "node:assert"
 
 const section = describe
 const test = it
@@ -27,7 +27,7 @@ section("Tableau Tests", () => {
       variables: [],
       integers: []
     }
-    assert.deepStrictEqual(result, expected)
+    assert.deepEqual(result, expected)
   })
 
   const testProperty = (desc: string, property: (data: TestCase) => void) => {
@@ -47,7 +47,7 @@ section("Tableau Tests", () => {
     const expected = tableauModel(data.model)
     expected.tableau.matrix.fill(0, 0, expected.tableau.width)
 
-    assert.deepStrictEqual(result, expected)
+    assert.deepEqual(result, expected)
   })
 
   testProperty("Objective row and sign are negated for opposite optimization direction", data => {
@@ -59,14 +59,14 @@ section("Tableau Tests", () => {
     const expected = tableauModel(data.model)
     for (let c = 0; c < expected.tableau.width; c++) {
       const v = expected.tableau.matrix[c]
-      // for some reason: deepStrictEquals(0, -0) === false
+      // for some reason: deepEquals(0, -0) === false
       // even though: 0 === -0
       // negate first row except for any zeros
       expected.tableau.matrix[c] = v === 0 ? 0 : -v
     }
     (expected as any).sign = -expected.sign
 
-    assert.deepStrictEqual(result, expected)
+    assert.deepEqual(result, expected)
   })
 
   const numRows = (constraint: Constraint) =>
@@ -90,7 +90,7 @@ section("Tableau Tests", () => {
     if (sign === 0) return // not valid contraint for this test
 
     const result = tableauModel({ ...data.model, objective: key })
-    // I swear to god why is: deepStrictEquals(0, -0) === false
+    // I swear to god why is: deepEquals(0, -0) === false
     for (let c = 0; c < result.tableau.width; c++) {
       if (result.tableau.matrix[c] === 0) {
         result.tableau.matrix[c] = 0
@@ -105,7 +105,7 @@ section("Tableau Tests", () => {
       expected.tableau.matrix[c] = value === 0 ? 0 : (expected.sign * sign * value)
     }
 
-    assert.deepStrictEqual(result, expected)
+    assert.deepEqual(result, expected)
   })
 
   section("Flexible API", () => {
@@ -114,8 +114,8 @@ section("Tableau Tests", () => {
       const iterable = tableauModel({ ...data.model, constraints: new Map(data.constraints) })
       // using the object tableau as the expected
       const object = tableauModel(data.model)
-      assert.deepStrictEqual(array, object)
-      assert.deepStrictEqual(iterable, object)
+      assert.deepEqual(array, object)
+      assert.deepEqual(iterable, object)
     })
 
     testProperty("Variables an an object, array, and iterable (map)", data => {
@@ -123,8 +123,8 @@ section("Tableau Tests", () => {
       const iterable = tableauModel({ ...data.model, variables: new Map(data.variables) })
       // using the object tableau as the expected
       const object = tableauModel(data.model)
-      assert.deepStrictEqual(array, object)
-      assert.deepStrictEqual(iterable, object)
+      assert.deepEqual(array, object)
+      assert.deepEqual(iterable, object)
     })
 
     // Fisher-Yates shuffle
@@ -143,42 +143,42 @@ section("Tableau Tests", () => {
       const boolNone = tableauModel({ ...data.model, integers: false })
       const setNone = tableauModel({ ...data.model, integers: new Set<string>() })
       const iterNone = tableauModel({ ...data.model, integers: [] })
-      assert.deepStrictEqual(boolNone, setNone)
-      assert.deepStrictEqual(iterNone, setNone)
+      assert.deepEqual(boolNone, setNone)
+      assert.deepEqual(iterNone, setNone)
 
       if (data.variables.length === 0) return // model not applicable
       const varKeys = data.variables.map(([k, ]) => k)
       const boolAll = tableauModel({ ...data.model, integers: true })
       const setAll = tableauModel({ ...data.model, integers: new Set(varKeys) })
       const iterAll = tableauModel({ ...data.model, integers: varKeys })
-      assert.deepStrictEqual(boolAll, setAll)
-      assert.deepStrictEqual(iterAll, setAll)
+      assert.deepEqual(boolAll, setAll)
+      assert.deepEqual(iterAll, setAll)
 
       const sub = sample(varKeys, randomIndex(varKeys))
       const set = tableauModel({ ...data.model, integers: new Set(sub) })
       const iter = tableauModel({ ...data.model, integers: sub })
-      assert.deepStrictEqual(iter, set)
+      assert.deepEqual(iter, set)
     })
 
     testProperty("Binaries as a boolean, set, and iterable (array)", data => {
       const boolNone = tableauModel({ ...data.model, binaries: false })
       const setNone = tableauModel({ ...data.model, binaries: new Set<string>() })
       const iterNone = tableauModel({ ...data.model, binaries: [] })
-      assert.deepStrictEqual(boolNone, setNone)
-      assert.deepStrictEqual(iterNone, setNone)
+      assert.deepEqual(boolNone, setNone)
+      assert.deepEqual(iterNone, setNone)
 
       const varKeys = data.variables.map(([k, ]) => k)
       if (varKeys.length === 0) return // model not applicable
       const boolTrue = tableauModel({ ...data.model, binaries: true })
       const setAll = tableauModel({ ...data.model, binaries: new Set(varKeys) })
       const iterAll = tableauModel({ ...data.model, binaries: varKeys })
-      assert.deepStrictEqual(boolTrue, setAll)
-      assert.deepStrictEqual(iterAll, setAll)
+      assert.deepEqual(boolTrue, setAll)
+      assert.deepEqual(iterAll, setAll)
 
       const sub = sample(varKeys, randomIndex(varKeys))
       const set = tableauModel({ ...data.model, binaries: new Set(sub) })
       const iter = tableauModel({ ...data.model, binaries: sub })
-      assert.deepStrictEqual(iter, set)
+      assert.deepEqual(iter, set)
     })
   })
 
@@ -213,7 +213,7 @@ section("Tableau Tests", () => {
       : { max: constraint.min }
     swapped[conIndex] = [key, con]
     const result = tableauModel({ ...data.model, constraints: swapped })
-    // deepStrictEquals(0, -0) === false
+    // deepEquals(0, -0) === false
     for (let c = 0; c < result.tableau.width; c++) {
       const i = row * result.tableau.width + c
       if (result.tableau.matrix[i] === 0) {
@@ -223,7 +223,7 @@ section("Tableau Tests", () => {
       }
     }
 
-    assert.deepStrictEqual(result, expected)
+    assert.deepEqual(result, expected)
   })
 
   testProperty("Constraints with the same key are merged", data => {
@@ -247,7 +247,7 @@ section("Tableau Tests", () => {
     constraints[index] = [key, merged]
     const expected = tableauModel({ ...data.model, constraints })
 
-    assert.deepStrictEqual(result, expected)
+    assert.deepEqual(result, expected)
   })
 
   testProperty("Removing a constraint", data => {
@@ -275,7 +275,7 @@ section("Tableau Tests", () => {
       ...tableauRest
     }
 
-    assert.deepStrictEqual(result, expected)
+    assert.deepEqual(result, expected)
   })
 
   testProperty("Removing a variable", data => {
@@ -321,7 +321,7 @@ section("Tableau Tests", () => {
       integers: tableauRest.integers.filter(x => x != index + 1).map(x => x <= index ? x : (x - 1))
     }
 
-    assert.deepStrictEqual(result, expected)
+    assert.deepEqual(result, expected)
   })
 
   testProperty("Binary has higher precedence than integer", data => {
@@ -330,7 +330,7 @@ section("Tableau Tests", () => {
     const [key, ] = randomElement(data.variables)
     const both = tableauModel({ ...data.model, integers: [key], binaries: [key] })
     const expected = tableauModel({ ...data.model, integers: [], binaries: [key] })
-    assert.deepStrictEqual(both, expected)
+    assert.deepEqual(both, expected)
   })
 })
 
@@ -338,9 +338,9 @@ const solutionOptimal = (data: TestCase, { status, result, variables }: Solution
   const sums = new Map<string, number>()
   if (status === "infeasible" || status === "cycled") {
     assert(Number.isNaN(result))
-    assert.deepStrictEqual(variables, [])
+    assert.deepEqual(variables, [])
   } else if (status === "unbounded") {
-    assert.strictEqual(result, Infinity)
+    assert.equal(result, Infinity)
   } else {
     const expected = data.expected.result
     let precision = data.options.precision * (relaxPrecision ? 1E3 : 1.0)
@@ -422,7 +422,7 @@ section("Solver Tests", () => {
     testProperty("Variable order is preserved in solution (zero variables included)", data => {
       const solution = solve(data.model, { ...data.options, includeZeroVariables: true })
       if (solution.status == "optimal") {
-        assert.deepStrictEqual(solution.variables.map(([key,]) => key), data.variables.map(([key,]) => key))
+        assert.deepEqual(solution.variables.map(([key,]) => key), data.variables.map(([key,]) => key))
       }
       solutionOptimal(data, solution)
     })

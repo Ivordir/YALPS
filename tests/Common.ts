@@ -1,6 +1,6 @@
 import { Constraint, OptimizationDirection, Options, Solution } from "../src/YALPS.js"
 import { defaultOptions } from "../src/YALPS.js"
-import * as File from "fs"
+import * as File from "node:fs"
 
 export type Variable = { readonly [constraint: string]: number }
 
