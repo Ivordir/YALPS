@@ -21,6 +21,26 @@
         "$tsc"
       ],
       "group": "build"
+    },
+    {
+      "label": "node inspect",
+      "type": "shell",
+      "isBackground": true,
+      "command": "pnpm",
+      "args": [
+        "inspect",
+        "${relativeFile}"
+      ],
+      "problemMatcher": {
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "node .*",
+          "endsPattern": "Debugger listening on .*"
+        },
+        "pattern": {
+          "regexp": ".*Command failed.*"
+        }
+      }
     }
   ]
 }
