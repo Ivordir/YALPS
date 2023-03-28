@@ -1,4 +1,4 @@
-NAME          FOREST
+NAME          FOREST6
 ROWS
  N  COST
  G  D1

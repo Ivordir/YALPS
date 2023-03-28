@@ -618,7 +618,7 @@
     "value": null
   },
   {
-    "name": "FOREST",
+    "name": "FOREST6",
     "rows": 67,
     "cols": 95,
     "value": null
@@ -669,7 +669,10 @@
     "name": "KLEIN2",
     "rows": 478,
     "cols": 54,
-    "value": null
+    "value": null,
+    "options": {
+      "checkCycles": true
+    }
   },
   {
     "name": "KLEIN3",
