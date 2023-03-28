@@ -38,8 +38,10 @@ const objectSet = (items: string[] | undefined) => {
 }
 
 const jsLPModel = (model: Model, options?: Options) => ({
-  ...model,
   opType: model.direction === "minimize" ? "min" : "max",
+  optimize: model.objective,
+  constraints: model.constraints,
+  variables: model.variables,
   ints: objectSet(model.integers),
   binaries: objectSet(model.binaries),
   options: jsLPOptions(options)
