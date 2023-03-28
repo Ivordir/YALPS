@@ -9,7 +9,7 @@ const test = it
 
 const testData = readCases()
 
-const randomIndex = (array: readonly any[]) => Math.floor(Math.random() * array.length)
+const randomIndex = (array: readonly any[]) => (Math.random() * array.length) | 0
 const randomElement = <T>(array: readonly T[]) => array[randomIndex(array)]
 
 section("Tableau Tests", () => {
@@ -45,7 +45,7 @@ section("Tableau Tests", () => {
     const result = tableauModel(noObj)
 
     const expected = tableauModel(data.model)
-    expected.tableau.matrix.fill(0, 0, expected.tableau.width)
+    expected.tableau.matrix.fill(0.0, 0, expected.tableau.width)
 
     assert.deepEqual(result, expected)
   })
@@ -62,7 +62,7 @@ section("Tableau Tests", () => {
       // for some reason: deepEquals(0, -0) === false
       // even though: 0 === -0
       // negate first row except for any zeros
-      expected.tableau.matrix[c] = v === 0 ? 0 : -v
+      expected.tableau.matrix[c] = v === 0.0 ? 0.0 : -v
     }
     (expected as any).sign = -expected.sign
 
@@ -84,16 +84,16 @@ section("Tableau Tests", () => {
     const conIndex = randomIndex(data.constraints)
     const [key, constraint] = data.constraints[conIndex]
     const sign =
-      constraint.equal || constraint.max ? 1
-      : constraint.min ? -1
-      : 0
-    if (sign === 0) return // not valid contraint for this test
+      constraint.equal || constraint.max ? 1.0
+      : constraint.min ? -1.0
+      : 0.0
+    if (sign === 0.0) return // not valid contraint for this test
 
     const result = tableauModel({ ...data.model, objective: key })
     // I swear to god why is: deepEquals(0, -0) === false
     for (let c = 0; c < result.tableau.width; c++) {
-      if (result.tableau.matrix[c] === 0) {
-        result.tableau.matrix[c] = 0
+      if (result.tableau.matrix[c] === 0.0) {
+        result.tableau.matrix[c] = 0.0
       }
     }
 
@@ -102,7 +102,7 @@ section("Tableau Tests", () => {
     // copy row of constraint to objective row
     for (let c = 1; c < expected.tableau.width; c++) {
       const value = index(expected.tableau, row, c)
-      expected.tableau.matrix[c] = value === 0 ? 0 : (expected.sign * sign * value)
+      expected.tableau.matrix[c] = value === 0.0 ? 0.0 : (expected.sign * sign * value)
     }
 
     assert.deepEqual(result, expected)
@@ -130,7 +130,7 @@ section("Tableau Tests", () => {
     // Fisher-Yates shuffle
     const sample = <T>(array: T[], n: number) => {
       for (let i = 0; i < n; i++) {
-        const j = Math.floor(Math.random() * (array.length - i)) + i
+        const j = (Math.random() * (array.length - i) | 0) + i
         const temp = array[i]
         array[i] = array[j]
         array[j] = temp
@@ -216,9 +216,9 @@ section("Tableau Tests", () => {
     // deepEquals(0, -0) === false
     for (let c = 0; c < result.tableau.width; c++) {
       const i = row * result.tableau.width + c
-      if (result.tableau.matrix[i] === 0) {
+      if (result.tableau.matrix[i] === 0.0) {
         const e = expected.tableau.matrix[i]
-        assert(e === 0)
+        assert(e === 0.0)
         result.tableau.matrix[i] = e
       }
     }
@@ -231,8 +231,8 @@ section("Tableau Tests", () => {
     const index = randomIndex(data.constraints)
     const [key, constraint] = data.constraints[index]
     const other = {
-      max: Math.random() * 100 - 50,
-      min: Math.random() * 100 - 50
+      max: Math.random() * 100.0 - 50.0,
+      min: Math.random() * 100.0 - 50.0
     }
 
     const sameKey = data.constraints.slice()
@@ -298,7 +298,7 @@ section("Tableau Tests", () => {
     if (binary) {
       let binaryRow = tableau.height - 1
       for (; binaryRow >= 0; binaryRow--) {
-        if (tableau.matrix[binaryRow * tableau.width + index + 1] === 1) {
+        if (tableau.matrix[binaryRow * tableau.width + index + 1] === 1.0) {
           break
         }
       }
@@ -343,27 +343,27 @@ const solutionOptimal = (data: TestCase, { status, result, variables }: Solution
     assert.equal(result, Infinity)
   } else {
     const expected = data.expected.result
-    let precision = data.options.precision * (relaxPrecision ? 1E3 : 1.0)
+    let precision = data.options.precision * (relaxPrecision ? 1e3 : 1.0)
     const tolerance = data.options.tolerance
     if (data.model.direction === "minimize") {
-      assert(expected / (1 + tolerance) - result <= precision
-        && result - expected * (1 + tolerance) <= precision)
+      assert(expected / (1.0 + tolerance) - result <= precision
+        && result - expected * (1.0 + tolerance) <= precision)
     } else {
-      assert(expected * (1 - tolerance) - result <= precision
-        && result - expected / (1 - tolerance) <= precision)
+      assert(expected * (1.0 - tolerance) - result <= precision
+        && result - expected / (1.0 - tolerance) <= precision)
     }
 
-    precision = data.options.precision * 1E3
+    precision = data.options.precision * 1e3
     for (const [key, num] of variables) {
       const variable = (data.model.variables as any)[key] as Coefficients
       for (const [constraint, coef] of Object.entries(variable)) {
-        sums.set(constraint, num * coef + (sums.get(constraint) ?? 0))
+        sums.set(constraint, num * coef + (sums.get(constraint) ?? 0.0))
       }
     }
-    const objectiveSum = data.model.objective == null ? 0 : (sums.get(data.model.objective) ?? 0)
+    const objectiveSum = data.model.objective == null ? 0.0 : (sums.get(data.model.objective) ?? 0.0)
     assert(Math.abs(objectiveSum - result) <= precision)
     for (const [key, constraint] of data.constraints) {
-      const sum = sums.get(key) ?? 0
+      const sum = sums.get(key) ?? 0.0
       if (constraint.equal == null) {
         if (constraint.min != null) {
           assert(constraint.min - sum <= precision)
@@ -462,15 +462,15 @@ section("Solver Tests", () => {
     testProperty("A more restrictive constraint that does not conflict with the optimal solution",
       (data, { solution, constraintSums }) => {
         // model not applicable, constraintSums does not reflect the actual/most optimal solution
-        if (data.options.tolerance !== 0 || solution.status === "cycled") return
+        if (data.options.tolerance !== 0.0 || solution.status === "cycled") return
 
         const constraints = data.constraints.slice()
         const nonEqual = constraints.filter(([, con]) => con.equal == null)
         if (nonEqual.length === 0) return // model not applicable
         const [key, constraint] = randomElement(nonEqual)
-        const sum = constraintSums.get(key) ?? 0
-        const lower = Math.max(constraint.min ?? -Infinity, sum / 2)
-        const upper = Math.min(constraint.max ?? Infinity, sum * 2)
+        const sum = constraintSums.get(key) ?? 0.0
+        const lower = Math.max(constraint.min ?? -Infinity, sum / 2.0)
+        const upper = Math.min(constraint.max ?? Infinity, sum * 2.0)
         const min = Math.random() * (sum - lower) + lower
         const max = Math.random() * (upper - sum) + sum
         constraints.push([key, { min, max }])

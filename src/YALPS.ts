@@ -211,7 +211,7 @@ export interface Options {
   /**
    * Numbers with magnitude equal to or less than the provided precision are treated as zero.
    * Similarly, the precision determines whether a number is sufficiently integer.
-   * The default value is `1E-8`.
+   * The default value is `1e-8`.
   */
   readonly precision?: number
 
@@ -347,10 +347,10 @@ export const tableauModel = <VarKey = string, ConKey = string>(
 ): TableauModel<VarKey, ConKey> => {
   const { direction, objective, integers, binaries } = model
   const sign =
-    direction === "maximize" || direction == null ? 1
-    : direction === "minimize" ? -1
-    : 0
-  if (sign === 0) throw `'${direction}' is not a valid optimization direction. Should be 'maximize', 'minimize', or left blank.`
+    direction === "maximize" || direction == null ? 1.0
+    : direction === "minimize" ? -1.0
+    : 0.0
+  if (sign === 0.0) throw `'${direction}' is not a valid optimization direction. Should be 'maximize', 'minimize', or left blank.`
 
   const constraintsIter = convertToIterable(model.constraints)
   const variablesIter = convertToIterable(model.variables)
@@ -433,8 +433,8 @@ export const tableauModel = <VarKey = string, ConKey = string>(
 
   for (let b = 0; b < binaryConstraintCol.length; b++) {
     const row = numConstraints + b
-    update(tableau, row, 0, 1)
-    update(tableau, row, binaryConstraintCol[b], 1)
+    update(tableau, row, 0, 1.0)
+    update(tableau, row, binaryConstraintCol[b], 1.0)
   }
 
   return { tableau, sign, variables, integers: ints }
@@ -453,20 +453,20 @@ const pivot = (tableau: Tableau, row: number, col: number) => {
   // (1 / quotient) * R_pivot -> R_pivot
   for (let c = 0; c < tableau.width; c++) {
     const value = index(tableau, row, c)
-    if (Math.abs(value) > 1E-16) {
+    if (Math.abs(value) > 1e-16) {
       update(tableau, row, c, value / quotient)
       nonZeroColumns.push(c)
     } else {
-      update(tableau, row, c, 0)
+      update(tableau, row, c, 0.0)
     }
   }
-  update(tableau, row, col, 1 / quotient)
+  update(tableau, row, col, 1.0 / quotient)
 
   // -M[r, col] * R_pivot + R_r -> R_r
   for (let r = 0; r < tableau.height; r++) {
     if (r === row) continue
     const coef = index(tableau, r, col)
-    if (Math.abs(coef) > 1E-16) {
+    if (Math.abs(coef) > 1e-16) {
       for (let i = 0; i < nonZeroColumns.length; i++) {
         const c = nonZeroColumns[i]
         update(tableau, r, c, index(tableau, r, c) - coef * index(tableau, row, c))
@@ -504,7 +504,7 @@ const hasCycle = (
 }
 
 const roundToPrecision = (num: number, precision: number) => {
-  const rounding = Math.round(1 / precision)
+  const rounding = Math.round(1.0 / precision)
   return Math.round((num + Number.EPSILON) * rounding) / rounding
 }
 
@@ -600,11 +600,11 @@ const solution = <VarKey, ConKey>(
     for (let i = 0; i < vars.length; i++) {
       const variable = vars[i][0]
       const row = tableau.positionOfVariable[i + 1] - tableau.width
-      const value = row >= 0 ? index(tableau, row, 0) : 0
+      const value = row >= 0 ? index(tableau, row, 0) : 0.0
       if (value > precision) {
         variables.push([variable, roundToPrecision(value, precision)])
       } else if (includeZeroVariables) {
-        variables.push([variable, 0])
+        variables.push([variable, 0.0])
       }
     }
     return {
@@ -661,7 +661,7 @@ const applyCuts = (
     const pos = tableau.positionOfVariable[variable]
     if (pos < width) {
       matrix[r] = sign * value
-      matrix.fill(0, r + 1, r + width)
+      matrix.fill(0.0, r + 1, r + width)
       matrix[r + pos] = sign
     } else {
       const row = (pos - width) * width
@@ -694,9 +694,9 @@ const mostFractionalVar = (
   tableau: Tableau,
   intVars: readonly number[]
 ): [variable: number, value: number, frac: number] => {
-  let highestFrac = 0
+  let highestFrac = 0.0
   let variable = 0
-  let value = 0
+  let value = 0.0
   for (let i = 0; i < intVars.length; i++) {
     const intVar = intVars[i]
     const row = tableau.positionOfVariable[intVar] - tableau.width
@@ -742,7 +742,7 @@ const branchAndCut = <VarKey, ConKey>(
   const bufferB = buffer(matrixLength, posVarLength)
   let currentBuffer = true
 
-  const optimalThreshold = initResult * (1 - sign * tolerance)
+  const optimalThreshold = initResult * (1.0 - sign * tolerance)
   const stopTime = timeout + Date.now()
   let timedout = Date.now() >= stopTime // in case options.timeout <= 0
   let solutionFound = false
@@ -818,7 +818,7 @@ const branchAndCut = <VarKey, ConKey>(
 }
 
 const defaultOptionValues: Required<Options> = {
-  precision: 1E-08,
+  precision: 1e-8,
   checkCycles: false,
   maxPivots: 8192,
   tolerance: 0,

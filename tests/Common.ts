@@ -30,7 +30,7 @@ export const readCases = (): readonly TestCase[] => {
     data.options = { ...defaultOptions, ...data.options }
     data.expected.result =
       data.expected.status === "optimal" ? data.expected.result
-      : data.expected.status === "unbounded" ? Infinity * (data.model.direction === "minimize" ? -1 : 1)
+      : data.expected.status === "unbounded" ? Infinity * (data.model.direction === "minimize" ? -1.0 : 1.0)
       : NaN
     return data
   })

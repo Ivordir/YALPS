@@ -80,9 +80,9 @@ const readRows = (s: ParseState, m: ModelFromMPS) => {
 
     const type = field1(line)
     switch (type) {
-      case "L": m.constraints.set(name, [-Infinity, 0]); break
-      case "G": m.constraints.set(name, [0, Infinity]); break
-      case "E": m.constraints.set(name, [0, 0]); break
+      case "L": m.constraints.set(name, [-Infinity, 0.0]); break
+      case "G": m.constraints.set(name, [0.0, Infinity]); break
+      case "E": m.constraints.set(name, [0.0, 0.0]); break
       case "N":
         m.objective ??= name
         m.constraints.set(name, [-Infinity, Infinity])
@@ -214,8 +214,8 @@ const addRange = (s: ParseState, m: ModelFromMPS, row: string, value: string) =>
 
   const bounds = m.constraints.get(row) as Bounds
   // ignore duplicates?
-  if (type === "L" || (type === "E" && val < 0)) bounds[0] = bounds[1] - Math.abs(val)
-  if (type === "G" || (type === "E" && val > 0)) bounds[1] = bounds[0] + Math.abs(val)
+  if (type === "L" || (type === "E" && val < 0.0)) bounds[0] = bounds[1] - Math.abs(val)
+  if (type === "G" || (type === "E" && val > 0.0)) bounds[1] = bounds[0] + Math.abs(val)
 
   return null
 }
@@ -245,7 +245,7 @@ const readRanges = (s: ParseState, m: ModelFromMPS) => {
 }
 
 const setBounds = ({ bounds }: ModelFromMPS, name: string, lower: number, upper: number) => {
-  const bnds = (bounds.has(name) ? bounds : bounds.set(name, [0, Infinity])).get(name) as Bounds
+  const bnds = (bounds.has(name) ? bounds : bounds.set(name, [0.0, Infinity])).get(name) as Bounds
   if (!Number.isNaN(lower)) bnds[0] = lower
   if (!Number.isNaN(upper)) bnds[1] = upper
 }
@@ -270,11 +270,11 @@ const readBounds = (s: ParseState, m: ModelFromMPS) => {
 
     switch (type) {
       case "LO": setBounds(m, col, val, Infinity); break
-      case "UP": setBounds(m, col, 0, val); break
+      case "UP": setBounds(m, col, 0.0, val); break
       case "FX": setBounds(m, col, val, val); break
       case "FR": setBounds(m, col, -Infinity, Infinity); break
-      case "MI": setBounds(m, col, -Infinity, 0); break
-      case "PL": setBounds(m, col, 0, Infinity); break
+      case "MI": setBounds(m, col, -Infinity, 0.0); break
+      case "PL": setBounds(m, col, 0.0, Infinity); break
       case "BV": m.binaries.add(col); break
       case "LI":
         m.integers.add(col)
@@ -282,7 +282,7 @@ const readBounds = (s: ParseState, m: ModelFromMPS) => {
         break
       case "UI":
         m.integers.add(col)
-        setBounds(m, col, 0, val)
+        setBounds(m, col, 0.0, val)
         break
       case "SC": return err("SC bound type is unsupported")
       case "": return err("Missing bound type")

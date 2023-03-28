@@ -155,8 +155,8 @@ const time = (runner: Runner, input: any) => {
 // https://en.wikipedia.org/wiki/Kahan_summation_algorithm#Further_enhancements
 // Might be overkill, but might as well since it's simple enough
 const kahanBabushkaNeumaierSum = (values: readonly number[]) => {
-  let sum = 0
-  let c = 0
+  let sum = 0.0
+  let c = 0.0
   for (const value of values) {
     const t = sum + value
     c +=
