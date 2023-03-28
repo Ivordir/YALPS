@@ -29,11 +29,11 @@ type ParseState = {
 }
 
 const field1 = (line: string) => line.substring(1, 3).trim()
-const field2 = (line: string) => line.substring(4, 12).trimEnd()
-const field3 = (line: string) => line.substring(14, 22).trimEnd()
-const field4 = (line: string) => line.substring(24, 36).trimEnd()
-const field5 = (line: string) => line.substring(39, 47).trimEnd()
-const field6 = (line: string) => line.substring(49, 61).trimEnd()
+const field2 = (line: string) => line.substring(4, 12).trim()
+const field3 = (line: string) => line.substring(14, 22).trim()
+const field4 = (line: string) => line.substring(24, 36).trim()
+const field5 = (line: string) => line.substring(39, 47).trim()
+const field6 = (line: string) => line.substring(49, 61).trim()
 
 const err = (msg: string) => new Error(msg)
 
