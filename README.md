@@ -1,4 +1,4 @@
-# YALPS ![](https://badgen.net/npm/v/yalps) ![](https://badgen.net/npm/license/yalps)
+# YALPS [![](https://badgen.net/npm/v/yalps)](https://www.npmjs.com/package/yalps) [![](https://badgen.net/npm/license/yalps)](https://github.com/Ivordir/YALPS/blob/main/LICENSE)
 
 ## What is This (For)?
 
