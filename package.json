@@ -1,11 +1,33 @@
 {
   "name": "yalps",
   "version": "0.4.2",
+  "description": "Yet another linear programming solver. (A rewrite of javascript-lp-solver.) Aims to be decently fast.",
+  "homepage": "https://github.com/Ivordir/YALPS",
+  "files": [
+    "build"
+  ],
+  "main": "build/main/index.js",
+  "module": "build/module/index.js",
+  "exports": {
+    "import": "./build/module/index.js",
+    "require": "./build/main/index.js",
+    "default": "./build/module/index.js"
+  },
+  "types": "build/types/index.d.ts",
+  "sideEffects": false,
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ivordir/YALPS.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Ivordir/YALPS/issues"
+  },
+  "license": "MIT",
   "author": {
     "name": "Ivordir",
     "email": "ivordir@pm.me"
   },
-  "description": "Yet another linear programming solver. (A rewrite of javascript-lp-solver.) Aims to be decently fast.",
   "keywords": [
     "Linear Programming",
     "Integer Programming",
@@ -16,38 +38,16 @@
     "Solver",
     "Linear Optimization"
   ],
-  "homepage": "https://github.com/Ivordir/YALPS",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Ivordir/YALPS.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Ivordir/YALPS/issues"
-  },
-  "license": "MIT",
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/YALPS.cjs.js",
-  "module": "./dist/YALPS.js",
-  "exports": {
-    "import": "./dist/YALPS.js",
-    "require": "./dist/YALPS.cjs.js",
-    "default": "./dist/YALPS.js"
-  },
-  "sideEffects": false,
-  "type": "module",
-  "types": "./dist/YALPS.d.ts",
   "scripts": {
-    "benchmark": "node --expose-gc --loader ts-node/esm benchmarks/Benchmark.ts",
+    "benchmark": "node --expose-gc --loader ts-node/esm benchmarks/benchmark.ts",
     "inspect": "node --inspect-brk --expose-gc --loader ts-node/esm",
-    "test:main": "ts-mocha tests/Tests.ts",
+    "test:main": "ts-mocha tests/tests.ts",
     "coverage": "c8 --check-coverage --lines 95 pnpm test:main",
     "test": "pnpm coverage",
     "start": "tsc -w",
     "build:esm": "tsc",
-    "build:cjs": "tsc -m commonjs && mv ./dist/YALPS.js ./dist/YALPS.cjs.js",
-    "build": "pnpm build:cjs && pnpm build:esm",
+    "build:cjs": "tsc -m commonjs --outDir build/main",
+    "build": "pnpm build:esm && pnpm build:cjs",
     "prepare": "pnpm build",
     "release": "np --no-cleanup"
   },

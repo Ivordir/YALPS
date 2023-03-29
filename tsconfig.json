@@ -1,42 +1,41 @@
 {
   "compilerOptions": { /* Docs: https://www.typescriptlang.org/tsconfig */
+    // Output
     "target": "ES2020",
     "module": "ES2020",
-    "outDir": "dist",
-    "rootDir": "src",
-    "strict": true,
+    "outDir": "build/module",
     "declaration": true,
+    "declarationDir": "build/types",
+
+    // Files and resolution
+    "rootDir": "src",
+    "moduleResolution": "node",
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
     "allowJs": true,
     "checkJs": true,
-    "moduleResolution": "node",
     "types": [
       "node",
       "mocha"
     ],
+
+    // Code related
+    "strict": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "alwaysStrict": true,
+    "exactOptionalPropertyTypes": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true,
     "noPropertyAccessFromIndexSignature": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "exactOptionalPropertyTypes": true,
-    "strictPropertyInitialization": true,
-    "sourceMap": false,
-    "isolatedModules": true
+    "noUnusedParameters": true
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.js"
+    "src/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "<node_internals>/**",
+    "node_modules/**"
   ],
   "ts-node": {
     "esm": true
