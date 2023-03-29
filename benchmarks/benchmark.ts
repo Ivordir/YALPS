@@ -1,8 +1,8 @@
-import { Constraint, defaultOptions, OptimizationDirection, Options, solve } from "../src/YALPS.js"
+import { Constraint, defaultOptions, OptimizationDirection, Options, solve } from "../src/index.js"
+import { modelFromMps } from "./mps.js"
+import * as File from "node:fs"
 import { performance } from "node:perf_hooks"
 import { strict as assert } from "node:assert"
-import * as File from "node:fs"
-import { modelFromMps } from "./MPS.js"
 // @ts-ignore
 import jsLP from "javascript-lp-solver"
 import GLPK from "glpk.js"

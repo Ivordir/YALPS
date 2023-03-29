@@ -1,7 +1,6 @@
-import { Coefficients, Constraint, Solution } from "../src/YALPS.js"
-import { tableauModel, index, solve } from "../src/YALPS.js"
-import { TestCase, Variable } from "./Common.js"
-import { readCases } from "./Common.js"
+import { Coefficients, Constraint, Solution, solve } from "../src/index.js"
+import { tableauModel, index } from "../src/tableau.js"
+import { TestCase, Variable, readCases } from "./common.js"
 import { strict as assert } from "node:assert"
 
 const section = describe

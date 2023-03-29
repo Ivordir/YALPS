@@ -1,4 +1,4 @@
-import { OptimizationDirection } from "../src/YALPS"
+import { OptimizationDirection } from "../src/index.js"
 
 // Reads and parses a MPS file
 // OBJSENSE, OBJNAME, and SOS sections are not supported
