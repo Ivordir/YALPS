@@ -21,10 +21,10 @@ export const update = (tableau: Tableau, row: number, col: number, value: number
   tableau.matrix[Math.imul(row, tableau.width) + col] = value
 }
 
-export type Variables<VarKey, ConKey> = readonly (readonly [VarKey, Coefficients<ConKey>])[]
+export type Variables<VarKey = string, ConKey = string> = readonly (readonly [VarKey, Coefficients<ConKey>])[]
 
 // A tableau with some additional context.
-export type TableauModel<VariableKey, ConstraintKey> = {
+export type TableauModel<VariableKey = string, ConstraintKey = string> = {
   readonly tableau: Tableau
   readonly sign: number
   readonly variables: Variables<VariableKey, ConstraintKey>
