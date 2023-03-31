@@ -26,13 +26,6 @@ export type Benchmark = {
   readonly expected: number
 }
 
-const time = (runner: Runner, input: any) => {
-  const start = performance.now()
-  runner.solve(input)
-  const fin = performance.now()
-  return fin - start
-}
-
 // https://en.wikipedia.org/wiki/Kahan_summation_algorithm#Further_enhancements
 // Might be overkill, but might as well since it's simple enough
 const kahanBabushkaNeumaierSum = (values: readonly number[]) => {
@@ -51,13 +44,6 @@ const kahanBabushkaNeumaierSum = (values: readonly number[]) => {
 
 const square = (x: number) => x * x
 
-const validate = ({ model, expected, options }: Benchmark, run: Runner) => {
-  const input = run.convert(model, options)
-  const solution = run.solve(input)
-  const result = run.value(solution)
-  assert(resultIsOptimal(result, expected, options))
-}
-
 type Stats = {
   mean: number
   variance: number
@@ -67,6 +53,13 @@ const stats = (samples: readonly number[]) => {
   const mean = kahanBabushkaNeumaierSum(samples) / samples.length
   const variance = kahanBabushkaNeumaierSum(samples.map(x => square(x - mean))) / (samples.length - 1)
   return { mean, variance }
+}
+
+const time = (runner: Runner, input: any) => {
+  const start = performance.now()
+  runner.solve(input)
+  const fin = performance.now()
+  return fin - start
 }
 
 type BenchmarkResults = (readonly [string, Stats])[]
@@ -103,6 +96,13 @@ const resultsTable = (results: BenchmarkResults) => {
     }
   }
   return table
+}
+
+const validate = ({ model, expected, options }: Benchmark, run: Runner) => {
+  const input = run.convert(model, options)
+  const solution = run.solve(input)
+  const result = run.value(solution)
+  assert(resultIsOptimal(result, expected, options))
 }
 
 export const benchmark = (
