@@ -110,9 +110,8 @@ export const branchAndCut = <VarKey, ConKey>(
   const maxExtraRows = integers.length * 2
   const matrixLength = tableau.matrix.length + maxExtraRows * tableau.width
   const posVarLength = tableau.positionOfVariable.length + maxExtraRows
-  const bufferA = buffer(matrixLength, posVarLength)
-  const bufferB = buffer(matrixLength, posVarLength)
-  let currentBuffer = true
+  let candidateBuffer = buffer(matrixLength, posVarLength)
+  let solutionBuffer = buffer(matrixLength, posVarLength)
 
   const optimalThreshold = initResult * (1.0 - sign * tolerance)
   const stopTime = timeout + Date.now()
@@ -131,7 +130,7 @@ export const branchAndCut = <VarKey, ConKey>(
     const [relaxedEval, cuts] = branches.pop()!
     if (relaxedEval > bestEval) break // the remaining branches are worse than the current best solution
 
-    const currentTableau = applyCuts(tableau, currentBuffer ? bufferA : bufferB, cuts)
+    const currentTableau = applyCuts(tableau, candidateBuffer, cuts)
     const [status, result] = simplex(currentTableau, options)
     // The initial tableau is not unbounded and adding more cuts/constraints cannot make it become unbounded
     // assert(status !== "unbounded")
@@ -142,7 +141,9 @@ export const branchAndCut = <VarKey, ConKey>(
         solutionFound = true
         bestEval = result
         bestTableau = currentTableau
-        currentBuffer = !currentBuffer
+        const temp = solutionBuffer
+        solutionBuffer = candidateBuffer
+        candidateBuffer = temp
       } else {
         const cutsUpper: Cut[] = []
         const cutsLower: Cut[] = []
