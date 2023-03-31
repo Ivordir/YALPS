@@ -23,7 +23,7 @@ const applyCuts = (
   tableau: Tableau,
   { matrix, positionOfVariable, variableAtPosition }: Buffer,
   cuts: readonly Cut[]
-) => {
+): Tableau => {
   const { width, height } = tableau
   matrix.set(tableau.matrix)
   for (let i = 0; i < cuts.length; i++) {
@@ -72,6 +72,7 @@ const mostFractionalVar = (
     const intVar = intVars[i]
     const row = tableau.positionOfVariable[intVar] - tableau.width
     if (row < 0) continue
+
     const val = index(tableau, row, 0)
     const frac = Math.abs(val - Math.round(val))
     if (frac > highestFrac) {
@@ -127,7 +128,7 @@ export const branchAndCut = <VarKey, ConKey>(
     && bestEval >= optimalThreshold
     && !timedout
   ) {
-    const [relaxedEval, cuts] = branches.pop() as Branch
+    const [relaxedEval, cuts] = branches.pop()!
     if (relaxedEval > bestEval) break // the remaining branches are worse than the current best solution
 
     const currentTableau = applyCuts(tableau, currentBuffer ? bufferA : bufferB, cuts)
