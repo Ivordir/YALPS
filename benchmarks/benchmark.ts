@@ -9,16 +9,16 @@ import GLPK from "glpk.js"
 
 const glpk = (GLPK as any)() as any
 
-type BenchModel = {
+export type BenchModel = {
   readonly direction?: OptimizationDirection
   readonly objective?: string
   readonly constraints: ReadonlyMap<string, Constraint>
   readonly variables: ReadonlyMap<string, ReadonlyMap<string, number>>
-  readonly integers?: Set<string>
-  readonly binaries?: Set<string>
+  readonly integers: ReadonlySet<string>
+  readonly binaries: ReadonlySet<string>
 }
 
-type Benchmark = {
+export type Benchmark = {
   readonly name: string
   readonly model: BenchModel
   readonly options: Required<Options>
@@ -247,7 +247,7 @@ const benchmark = (
     }
 
     const model = bench.model
-    const numInteger = (model.integers?.size ?? 0) + (model.binaries?.size ?? 0)
+    const numInteger = model.integers.size + model.binaries.size
     console.log(`${bench.name}: ${model.constraints.size} constraints, ${model.variables.size} variables, ${numInteger} integers:`)
     console.table(resultsTable(sampleBenchmark(solvers, bench, numSamples)))
     console.log("")
