@@ -251,98 +251,104 @@ For very large and/or integral problems, a more professional solver is recommend
 Nevertheless, below are the results from some benchmarks comparing YALPS to other solvers (all times are in milliseconds).
 The benchmarks were run on ts-node v10.9.1 and node v19.7.0.
 
-## YALPS vs jsLPSolver
 <pre>
-Large Farm MIP.json: 35 constraints, 100 variables, 100 integers:
-YALPS is 37.37% faster on average compared to jsLPSolver (t=35.24).
-┌────────────┬────┬───────┬────────┐
-│  (index)   │ n  │ mean  │ stdErr │
-├────────────┼────┼───────┼────────┤
-│   YALPS    │ 30 │ 35.83 │  0.33  │
-│ jsLPSolver │ 30 │ 57.22 │  0.51  │
-└────────────┴────┴───────┴────────┘
+Monster 2: 888 constraints, 924 variables, 112 integers:
+┌────────────┬────────┬────────┬──────────┐
+│  (index)   │  mean  │ stdDev │ slowdown │
+├────────────┼────────┼────────┼──────────┤
+│   YALPS    │ 53.95  │  2.25  │    1     │
+│  glpk.js   │ 116.19 │  3.2   │   2.15   │
+│ jsLPSolver │ 184.9  │ 10.43  │   3.43   │
+└────────────┴────────┴────────┴──────────┘
 
-Monster 2.json: 888 constraints, 924 variables, 112 integers:
-YALPS is 68.54% faster on average compared to jsLPSolver (t=81.82).
-┌────────────┬────┬────────┬────────┐
-│  (index)   │ n  │  mean  │ stdErr │
-├────────────┼────┼────────┼────────┤
-│   YALPS    │ 30 │ 55.37  │  0.65  │
-│ jsLPSolver │ 30 │ 175.98 │  1.32  │
-└────────────┴────┴────────┴────────┘
+Monster Problem: 600 constraints, 552 variables, 0 integers:
+┌────────────┬──────┬────────┬──────────┐
+│  (index)   │ mean │ stdDev │ slowdown │
+├────────────┼──────┼────────┼──────────┤
+│   YALPS    │ 1.85 │  1.28  │    1     │
+│  glpk.js   │ 4.78 │  1.07  │   2.58   │
+│ jsLPSolver │ 7.41 │  5.03  │    4     │
+└────────────┴──────┴────────┴──────────┘
 
-Monster Problem.json: 600 constraints, 552 variables, 0 integers:
-YALPS is 73.55% faster on average compared to jsLPSolver (t=14.57).
-┌────────────┬────┬──────┬────────┐
-│  (index)   │ n  │ mean │ stdErr │
-├────────────┼────┼──────┼────────┤
-│   YALPS    │ 30 │ 1.61 │  0.17  │
-│ jsLPSolver │ 30 │ 6.09 │  0.26  │
-└────────────┴────┴──────┴────────┘
+Vendor Selection: 1641 constraints, 1640 variables, 40 integers:
+┌────────────┬────────┬────────┬──────────┐
+│  (index)   │  mean  │ stdDev │ slowdown │
+├────────────┼────────┼────────┼──────────┤
+│  glpk.js   │  61.3  │  1.35  │    1     │
+│   YALPS    │ 296.05 │  3.21  │   4.83   │
+│ jsLPSolver │ 404.31 │ 15.73  │   6.6    │
+└────────────┴────────┴────────┴──────────┘
 
-Sudoku 4x4.json: 64 constraints, 64 variables, 64 integers:
-YALPS is 27.42% faster on average compared to jsLPSolver (t=4.41).
-┌────────────┬────┬──────┬────────┐
-│  (index)   │ n  │ mean │ stdErr │
-├────────────┼────┼──────┼────────┤
-│   YALPS    │ 37 │ 1.23 │  0.01  │
-│ jsLPSolver │ 37 │ 1.7  │  0.1   │
-└────────────┴────┴──────┴────────┘
+Large Farm MIP: 35 constraints, 100 variables, 100 integers:
+┌────────────┬───────┬────────┬──────────┐
+│  (index)   │ mean  │ stdDev │ slowdown │
+├────────────┼───────┼────────┼──────────┤
+│  glpk.js   │ 6.24  │  1.04  │    1     │
+│   YALPS    │ 30.46 │  1.29  │   4.88   │
+│ jsLPSolver │ 58.28 │  2.17  │   9.33   │
+└────────────┴───────┴────────┴──────────┘
 
-Vendor Selection.json: 1641 constraints, 1640 variables, 40 integers:
-YALPS is 6.94% faster on average compared to jsLPSolver (t=17.70).
-┌────────────┬────┬────────┬────────┐
-│  (index)   │ n  │  mean  │ stdErr │
-├────────────┼────┼────────┼────────┤
-│   YALPS    │ 30 │ 350.51 │  0.61  │
-│ jsLPSolver │ 30 │ 376.65 │  1.34  │
-└────────────┴────┴────────┴────────┘
-</pre>
-## YALPS vs glpk.js
-<pre>
-Large Farm MIP.json: 35 constraints, 100 variables, 100 integers:
-glpk.js is 71.72% faster on average compared to YALPS (t=65.31).
-┌─────────┬────┬───────┬────────┐
-│ (index) │ n  │ mean  │ stdErr │
-├─────────┼────┼───────┼────────┤
-│  YALPS  │ 30 │ 35.79 │  0.38  │
-│ glpk.js │ 30 │ 10.12 │  0.09  │
-└─────────┴────┴───────┴────────┘
+AGG2: 516 constraints, 302 variables, 0 integers:
+┌────────────┬──────┬────────┬──────────┐
+│  (index)   │ mean │ stdDev │ slowdown │
+├────────────┼──────┼────────┼──────────┤
+│   YALPS    │ 1.6  │  0.6   │    1     │
+│ jsLPSolver │ 7.09 │  3.05  │   4.44   │
+│  glpk.js   │ 7.57 │  0.96  │   4.74   │
+└────────────┴──────┴────────┴──────────┘
 
-Monster 2.json: 888 constraints, 924 variables, 112 integers:
-YALPS is 65.70% faster on average compared to glpk.js (t=63.94).
-┌─────────┬────┬────────┬────────┐
-│ (index) │ n  │  mean  │ stdErr │
-├─────────┼────┼────────┼────────┤
-│  YALPS  │ 30 │ 64.71  │  1.92  │
-│ glpk.js │ 30 │ 188.65 │  0.28  │
-└─────────┴────┴────────┴────────┘
+BEACONFD: 173 constraints, 262 variables, 0 integers:
+┌────────────┬──────┬────────┬──────────┐
+│  (index)   │ mean │ stdDev │ slowdown │
+├────────────┼──────┼────────┼──────────┤
+│  glpk.js   │ 2.42 │  0.5   │    1     │
+│   YALPS    │ 2.59 │  0.59  │   1.07   │
+│ jsLPSolver │ 5.35 │  1.25  │   2.21   │
+└────────────┴──────┴────────┴──────────┘
 
-Monster Problem.json: 600 constraints, 552 variables, 0 integers:
-YALPS is 76.62% faster on average compared to glpk.js (t=40.67).
-┌─────────┬────┬──────┬────────┐
-│ (index) │ n  │ mean │ stdErr │
-├─────────┼────┼──────┼────────┤
-│  YALPS  │ 30 │ 1.46 │  0.08  │
-│ glpk.js │ 30 │ 6.26 │  0.09  │
-└─────────┴────┴──────┴────────┘
+SC205: 205 constraints, 203 variables, 0 integers:
+┌────────────┬───────┬────────┬──────────┐
+│  (index)   │ mean  │ stdDev │ slowdown │
+├────────────┼───────┼────────┼──────────┤
+│  glpk.js   │  2.6  │  0.5   │    1     │
+│   YALPS    │ 7.18  │  0.23  │   2.76   │
+│ jsLPSolver │ 10.86 │  1.69  │   4.17   │
+└────────────┴───────┴────────┴──────────┘
 
-Sudoku 4x4.json: 64 constraints, 64 variables, 64 integers:
-glpk.js is 55.50% faster on average compared to YALPS (t=25.51).
-┌─────────┬────┬──────┬────────┐
-│ (index) │ n  │ mean │ stdErr │
-├─────────┼────┼──────┼────────┤
-│  YALPS  │ 30 │ 1.29 │  0.01  │
-│ glpk.js │ 30 │ 0.57 │  0.03  │
-└─────────┴────┴──────┴────────┘
+SCFXM1: 330 constraints, 457 variables, 0 integers:
+┌────────────┬───────┬────────┬──────────┐
+│  (index)   │ mean  │ stdDev │ slowdown │
+├────────────┼───────┼────────┼──────────┤
+│  glpk.js   │  6.3  │  0.31  │    1     │
+│   YALPS    │ 20.67 │   1    │   3.28   │
+│ jsLPSolver │ 33.22 │  4.81  │   5.27   │
+└────────────┴───────┴────────┴──────────┘
 
-Vendor Selection.json: 1641 constraints, 1640 variables, 40 integers:
-glpk.js is 67.99% faster on average compared to YALPS (t=356.17).
-┌─────────┬────┬────────┬────────┐
-│ (index) │ n  │  mean  │ stdErr │
-├─────────┼────┼────────┼────────┤
-│  YALPS  │ 30 │ 345.96 │  0.65  │
-│ glpk.js │ 30 │ 110.75 │  0.14  │
-└─────────┴────┴────────┴────────┘
+SCRS8: 490 constraints, 1169 variables, 0 integers:
+┌────────────┬────────┬────────┬──────────┐
+│  (index)   │  mean  │ stdDev │ slowdown │
+├────────────┼────────┼────────┼──────────┤
+│  glpk.js   │  18.1  │  1.54  │    1     │
+│   YALPS    │  56.8  │  1.08  │   3.14   │
+│ jsLPSolver │ 101.08 │  3.67  │   5.59   │
+└────────────┴────────┴────────┴──────────┘
+
+SCTAP2: 1090 constraints, 1880 variables, 0 integers:
+┌────────────┬───────┬────────┬──────────┐
+│  (index)   │ mean  │ stdDev │ slowdown │
+├────────────┼───────┼────────┼──────────┤
+│  glpk.js   │ 19.87 │  1.82  │    1     │
+│   YALPS    │ 49.98 │  2.39  │   2.51   │
+│ jsLPSolver │ 102.8 │ 12.74  │   5.17   │
+└────────────┴───────┴────────┴──────────┘
+
+SHIP08S: 778 constraints, 2387 variables, 0 integers:
+┌────────────┬───────┬────────┬──────────┐
+│  (index)   │ mean  │ stdDev │ slowdown │
+├────────────┼───────┼────────┼──────────┤
+│  glpk.js   │ 13.51 │  0.53  │    1     │
+│   YALPS    │ 17.86 │  1.75  │   1.32   │
+│ jsLPSolver │ 65.88 │ 10.59  │   4.88   │
+└────────────┴───────┴────────┴──────────┘
 </pre>
 The code used for these benchmarks is available under `tests/Bechmark.ts`. Measuring performance isn't always straightforward, so take these synthetic benchmarks with a grain of salt. It is always recommended to benchmark for your use case. Then again, if your problems are typically of small or medium size, then this solver should have no issue (and may be much faster!).
