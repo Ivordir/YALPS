@@ -1,9 +1,16 @@
-import { benchmark } from "./benchmark.js"
+import { Benchmark, benchmark } from "./benchmark.js"
 import { runners } from "./runners.js"
-import { read as readJson } from "./json/read.js"
-import { read as readNetlib } from "./netlib/read.js"
+import { readBenchmarks as readJson } from "./json/read.js"
+import { readBenchmarks as readNetlib } from "./netlib/read.js"
 
-benchmark([...readJson(), ...readNetlib()], runners)
+// current selection of netlib benchmarks included in the README
+const netlibSelection: readonly string[] = [
+  "AGG2", "BEACONFD", "SC205", "SCFXM1", "SCRS8", "SC205", "SCTAP2", "SHIP08S"
+]
+
+const benchmarks: readonly Benchmark[] = [ ...readJson(), ...readNetlib(netlibSelection) ]
+
+benchmark(benchmarks, runners)
 
 /*
 Take these synthetic benchmarks with a grain of salt;
