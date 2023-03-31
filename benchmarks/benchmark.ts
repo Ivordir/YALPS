@@ -1,4 +1,5 @@
 import { Constraint, OptimizationDirection, Options } from "../src/index.js"
+import { resultIsOptimal } from "../tests/helpers/validate.js"
 import { performance } from "node:perf_hooks"
 import { strict as assert } from "node:assert"
 
@@ -54,16 +55,7 @@ const validate = ({ model, expected, options }: Benchmark, run: Runner) => {
   const input = run.convert(model, options)
   const solution = run.solve(input)
   const result = run.value(solution)
-
-  if (Number.isNaN(expected)) {
-    assert(Number.isNaN(result))
-  } else if (!Number.isFinite(expected)) {
-    assert.equal(expected, result)
-  } else {
-    assert(Number.isFinite(result))
-    const error = (Math.abs(result - expected) - options.precision) / Math.abs(expected || 1.0)
-    assert(error <= Math.max(options.tolerance, 1e-5))
-  }
+  assert(resultIsOptimal(result, expected, options))
 }
 
 type Stats = {
