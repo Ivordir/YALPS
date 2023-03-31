@@ -13,7 +13,7 @@ export type Bounds = [number, number]
 
 export type ModelFromMPS = {
   name: string
-  direction: OptimizationDirection
+  direction?: OptimizationDirection
   objective?: string
   constraints: Map<string, Bounds>
   variables: Map<string, Map<string, number>>
@@ -23,7 +23,7 @@ export type ModelFromMPS = {
 }
 
 type ParseState = {
-  readonly lines: string[]
+  readonly lines: readonly string[]
   index: number
   readonly constraintTypes: Map<string, ConstraintType>
 }
@@ -167,7 +167,7 @@ const addConstraint = (s: ParseState, m: ModelFromMPS, row: string, value: strin
   if (Number.isNaN(val)) return err(`Failed to parse number '${value}'`)
 
   // ignore duplicates?
-  const constraint = m.constraints.get(row) as Bounds
+  const constraint = m.constraints.get(row)!
   if (type === "L" || type === "E") constraint[1] = val
   if (type === "G" || type === "E") constraint[0] = val
 
@@ -212,7 +212,7 @@ const addRange = (s: ParseState, m: ModelFromMPS, row: string, value: string) =>
   const val = parseFloat(value)
   if (Number.isNaN(val)) return err(`Failed to parse number '${value}'`)
 
-  const bounds = m.constraints.get(row) as Bounds
+  const bounds = m.constraints.get(row)!
   // ignore duplicates?
   if (type === "L" || (type === "E" && val < 0.0)) bounds[0] = bounds[1] - Math.abs(val)
   if (type === "G" || (type === "E" && val > 0.0)) bounds[1] = bounds[0] + Math.abs(val)
@@ -245,7 +245,7 @@ const readRanges = (s: ParseState, m: ModelFromMPS) => {
 }
 
 const setBounds = ({ bounds }: ModelFromMPS, name: string, lower: number, upper: number) => {
-  const bnds = (bounds.has(name) ? bounds : bounds.set(name, [0.0, Infinity])).get(name) as Bounds
+  const bnds = (bounds.has(name) ? bounds : bounds.set(name, [0.0, Infinity])).get(name)!
   if (!Number.isNaN(lower)) bnds[0] = lower
   if (!Number.isNaN(upper)) bnds[1] = upper
 }
@@ -293,21 +293,21 @@ const readBounds = (s: ParseState, m: ModelFromMPS) => {
   return expectSection(s, "ENDATA")
 }
 
-export const modelFromMps = (mps: string, direction: OptimizationDirection): ModelFromMPS => {
+export const modelFromMps = (mps: string, direction?: OptimizationDirection): ModelFromMPS => {
   const parseState = {
     lines: mps.split(/\r?\n/),
     index: 0,
-    constraintTypes: new Map<string, ConstraintType>()
+    constraintTypes: new Map()
   }
 
-  const model = {
+  const model: ModelFromMPS = {
     name: "",
     direction,
-    constraints: new Map<string, Bounds>(),
-    variables: new Map<string, Map<string, number>>(),
-    integers: new Set<string>(),
-    binaries: new Set<string>(),
-    bounds: new Map<string, Bounds>()
+    constraints: new Map(),
+    variables: new Map(),
+    integers: new Set(),
+    binaries: new Set(),
+    bounds: new Map()
   }
 
   const error = readName(parseState, model)
