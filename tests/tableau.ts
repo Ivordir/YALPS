@@ -1,10 +1,10 @@
 import { Coefficients, Constraint, Model } from "../src/index.js"
 import { tableauModel, index, TableauModel } from "../src/tableau.js"
-import { TupleArray, TestCase, readCases } from "./helpers/read.js"
+import { TupleArray, TestCase, testCases } from "./helpers/read.js"
 import { keys, newRand, randomIndex, randomElement, sample, enumerate, valueMapping } from "./helpers/util.js"
 import test, { ExecutionContext } from "ava"
 
-const testData: readonly TestCase[] = readCases()
+const testData: readonly TestCase[] = testCases()
 
 // deepEquals uses Object.is (sameValue algorithm) instead of sameValueZero algorithm, so deepEquals(0, -0) === false
 const negate = (x: number) => x === 0.0 ? 0.0 : -x

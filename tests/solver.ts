@@ -1,5 +1,5 @@
 import { Solution, solve } from "../src/index.js"
-import { TestCase, readCases } from "./helpers/read.js"
+import { TestCase, testCases } from "./helpers/read.js"
 import { validSolutionAndStatus, valueSums } from "./helpers/validate.js"
 import { keys, newRand, randomElement } from "./helpers/util.js"
 import test, { ExecutionContext } from "ava"
@@ -7,7 +7,7 @@ import test, { ExecutionContext } from "ava"
 type SolvedTestCase = TestCase & { readonly solution: Readonly<Solution> }
 
 const testData: readonly SolvedTestCase[] =
-  readCases().map(data => ({ ...data, solution: solve(data.model, data.options) }))
+  testCases().map(data => ({ ...data, solution: solve(data.model, data.options) }))
 
 const valid = (solution: Readonly<Solution>, { model, options, expected }: SolvedTestCase) =>
   validSolutionAndStatus(solution, expected, model, options)

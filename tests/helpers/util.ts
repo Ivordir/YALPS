@@ -7,6 +7,14 @@ export const valueMapping = <V1, V2, K>(mapping: (v: V1) => V2) =>
 
 export const enumerate = <T>(array: readonly T[]) => array.map((x, i): [number, T] => [i, x])
 
+export const lazy = <T>(thunk: () => T) => {
+  let value: T | null = null
+  return () => {
+    if (value == null) value = thunk()
+    return value
+  }
+}
+
 // https://github.com/skeeto/hash-prospector
 const prospectorHash = (x: number) => {
   x ^= x >>> 16

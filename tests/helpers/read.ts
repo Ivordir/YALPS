@@ -1,9 +1,10 @@
 import { Constraint, OptimizationDirection, Options, Solution, defaultOptions } from "../../src/index.js"
-import { hashString, valueMapping } from "./util.js"
+import { hashString, lazy, valueMapping } from "./util.js"
 import { Benchmark } from "../../benchmarks/benchmark.js"
 import * as File from "node:fs"
+import * as Path from "node:path"
 
-export type JsonTestCase = {
+type JsonTestCase = {
   readonly model: {
     readonly direction?: OptimizationDirection
     readonly objective?: string
@@ -33,9 +34,13 @@ export type TestCase = {
   readonly expected: Readonly<Solution>
 }
 
-export const readCases = (): TestCase[] =>
-  File.readdirSync("tests/cases").map(file => {
-    const data = JSON.parse(File.readFileSync(`tests/cases/${file}`, "utf-8")) as JsonTestCase
+export const allCases = lazy(() => File.readdirSync("tests/cases").map(file => Path.parse(file).name))
+
+export const largeCases: readonly string[] = [ "Monster 2", "Monster Problem", "Vendor Selection" ]
+
+export const readCases = (cases?: readonly string[]): TestCase[] =>
+  (cases ?? allCases()).map(file => {
+    const data = JSON.parse(File.readFileSync(`tests/cases/${file}.json`, "utf-8")) as JsonTestCase
 
     // hash the test case name as the random seed for reproducible tests
     const hash = hashString(file)
@@ -55,6 +60,8 @@ export const readCases = (): TestCase[] =>
     return { name: file, model, options, expected }
   })
 
+export const testCases = lazy(() => readCases(allCases().filter(name => !largeCases.includes(name))))
+
 const toArray = <K, V>(map: ReadonlyMap<K, V>) => Array.from(map.entries())
 
 export const convertBenchmark = (benchmark: Benchmark): TestCase => {
@@ -72,4 +79,4 @@ export const convertBenchmark = (benchmark: Benchmark): TestCase => {
   return { ...benchmark, model, expected }
 }
 
-export const convertBenchmarks = (benchmarks: Benchmark[]) => benchmarks.map(convertBenchmark)
+export const convertBenchmarks = (benchmarks: readonly Benchmark[]) => benchmarks.map(convertBenchmark)
