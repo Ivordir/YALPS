@@ -12,20 +12,20 @@
       "runtimeArgs": [
         "${relativeFile}"
       ],
-      "args": [],
       "skipFiles": [
         "<node_internals>/**"
       ]
     },
     {
-      "name": "Test via Mocha",
+      "name": "Test via AVA",
       "type": "node",
       "request": "launch",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": [
-        "test:main"
+      "program": "${workspaceFolder}/node_modules/ava/entrypoints/cli.mjs",
+      "outputCapture": "std",
+      "args": [
+        "--serial",
+        "${relativeFile}"
       ],
-      "args": [],
       "skipFiles": [
         "<node_internals>/**"
       ]

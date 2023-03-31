@@ -16,8 +16,7 @@
     "allowJs": true,
     "checkJs": true,
     "types": [
-      "node",
-      "mocha"
+      "node"
     ],
 
     // Code related
