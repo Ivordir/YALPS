@@ -14696,7 +14696,6 @@
     "status": "optimal",
     "result": 1483,
     "variables": {
-      "_timeout": 10000,
       "y_2_23": 1,
       "y_3_12": 1,
       "y_9_7": 1,
