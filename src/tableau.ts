@@ -15,10 +15,10 @@ export type Tableau = {
 }
 
 export const index = (tableau: Tableau, row: number, col: number) =>
-  tableau.matrix[row * tableau.width + col]
+  tableau.matrix[Math.imul(row, tableau.width) + col]
 
 export const update = (tableau: Tableau, row: number, col: number, value: number) => {
-  tableau.matrix[row * tableau.width + col] = value
+  tableau.matrix[Math.imul(row, tableau.width) + col] = value
 }
 
 export type Variables<VarKey, ConKey> = readonly (readonly [VarKey, Coefficients<ConKey>])[]
