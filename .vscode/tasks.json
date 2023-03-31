@@ -23,7 +23,7 @@
       "group": "build"
     },
     {
-      "label": "node inspect",
+      "label": "node: inspect",
       "type": "shell",
       "isBackground": true,
       "command": "pnpm",
