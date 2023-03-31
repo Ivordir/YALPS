@@ -105,9 +105,9 @@ const resultsTable = (results: BenchmarkResults) => {
   return table
 }
 
-const benchmark = (
-  solvers: readonly Runner[],
+export const benchmark = (
   benchmarks: readonly Benchmark[],
+  solvers: readonly Runner[],
   numSamples = 30,
   runValidation = true
 ) => {
