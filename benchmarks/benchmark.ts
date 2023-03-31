@@ -1,13 +1,13 @@
-import { Constraint, defaultOptions, OptimizationDirection, Options, solve } from "../src/index.js"
-import { modelFromMps } from "./mps.js"
-import * as File from "node:fs"
+import { Constraint, OptimizationDirection, Options } from "../src/index.js"
 import { performance } from "node:perf_hooks"
 import { strict as assert } from "node:assert"
-// @ts-ignore
-import jsLP from "javascript-lp-solver"
-import GLPK from "glpk.js"
 
-const glpk = (GLPK as any)() as any
+export type Runner = {
+  readonly name: string,
+  readonly convert: (model: BenchModel, options: Required<Options>) => any
+  readonly solve: (input: any) => any
+  readonly value: (solution: any) => number
+}
 
 export type BenchModel = {
   readonly direction?: OptimizationDirection
@@ -23,126 +23,6 @@ export type Benchmark = {
   readonly model: BenchModel
   readonly options: Required<Options>
   readonly expected: number
-}
-
-type Runner = {
-  readonly name: string,
-  readonly convert: (model: BenchModel, options: Required<Options>) => any
-  readonly solve: (input: any) => any
-  readonly value: (solution: any) => number
-}
-
-const yalpsRunner: Runner = {
-  name: "YALPS",
-  convert: (model, options) => ({ model, options: { ...options, maxPivots: Infinity } }),
-  solve: ({ model, options }) => solve(model, options),
-  value: solution => solution.result
-}
-
-const objectSet = (set: Set<string> | undefined) => {
-  const obj: any = {}
-  if (set != null) {
-    for (const key of set) {
-      obj[key] = 1
-    }
-  }
-  return obj
-}
-
-const jsLPVariablesObject = (model: BenchModel) => {
-  const obj: { [key: string]: { [key: string]: number } } = {}
-  for (const [key, variable] of model.variables) {
-    obj[key] = Object.fromEntries(variable)
-  }
-  return obj
-}
-
-const jsLPOptions = (options: Required<Options>) => ({
-  tolerance: options.tolerance,
-  timeout: options.timeout,
-  exitOnCycles: options.checkCycles
-})
-
-const jsLPModel = (model: BenchModel, options: Required<Options>) => ({
-  opType: model.direction === "minimize" ? "min" : "max",
-  optimize: model.objective,
-  constraints: Object.fromEntries(model.constraints),
-  variables: jsLPVariablesObject(model),
-  ints: objectSet(model.integers),
-  binaries: objectSet(model.binaries),
-  options: jsLPOptions(options)
-})
-
-const jsLPRunner: Runner = {
-  name: "jsLPSolver",
-  convert: (model, options) => ({
-    model: jsLPModel(model, options),
-    precision: options.precision
-  }),
-  solve: ({ model, precision }) => jsLP.Solve(model, precision),
-  value: solution => solution.feasible ? solution.result : NaN,
-}
-
-const glpkModel = (model: BenchModel) => {
-  type Bounds = { type: number, ub: number, lb: number }
-  type Coefs = { name: string, coef: number }[]
-  type Constraint = { name: string, vars: Coefs, bnds: Bounds }
-
-  const constraints = new Map<string, Constraint>()
-  for (const [name, constraint] of model.constraints) {
-    let bnds: Bounds
-    if (constraint.equal == null) {
-      const min = constraint.min != null
-      const max = constraint.max != null
-      bnds =
-        min && max ? { type: glpk.GLP_DB, ub: constraint.max, lb: constraint.min }
-        : min ? { type: glpk.GLP_LO, ub: 0.0, lb: constraint.min }
-        : max ? { type: glpk.GLP_UP, ub: constraint.max, lb: 0.0 }
-        : { type: glpk.GLP_FR, ub: 0.0, lb: 0.0 }
-    } else {
-      bnds = { type: glpk.GLP_FX, ub: 0.0, lb: constraint.equal }
-    }
-    constraints.set(name, { name, vars: [], bnds })
-  }
-
-  const objective: Coefs = []
-  for (const [name, variable] of model.variables) {
-    for (const [key, val] of variable) {
-      const coef = val as number
-      if (model.objective === key) {
-        objective.push({ name, coef })
-      }
-      const constraint = constraints.get(key)
-      if (constraint != null) {
-        constraint.vars.push({ name, coef })
-      }
-    }
-  }
-
-  return {
-    name: "GLPK",
-    objective: {
-      direction: model.direction === "minimize" ? glpk.GLP_MIN : glpk.GLP_MAX,
-      name: model.objective,
-      vars: objective
-    },
-    subjectTo: Array.from(constraints.values()),
-    binaries: Array.from(model.binaries ?? []),
-    generals: Array.from(model.integers ?? [])
-  }
-}
-
-const glpkOptions = (options: Required<Options>) => ({ mipgap: options.tolerance })
-
-const glpkRunner: Runner = {
-  name: "glpk.js",
-  convert: (model, options) => ({
-    model: glpkModel(model),
-    options: glpkOptions(options)
-  }),
-  solve: ({ model, options }) => glpk.solve(model, options),
-  value: ({ result }) =>
-    [glpk.GLP_OPT, glpk.GLP_FEAS, glpk.GLP_UNBND].includes(result.status) ? result.z : NaN
 }
 
 const time = (runner: Runner, input: any) => {
