@@ -374,7 +374,7 @@ SHIP08S: 778 constraints, 2387 variables, 0 integers:
 
 (More integer benchmarks are intended to be added at some point.)
 
-The code used for these benchmarks is available under `bechmarks/`.
+The code used for these benchmarks is available under `benchmarks/`.
 Measuring performance isn't always straightforward, so take these synthetic benchmarks with a grain of salt.
 It is always recommended to benchmark for your use case.
 Then again, if your problems are typically of small size, then this solver should have no issue (and may be faster)!
