@@ -42,7 +42,7 @@ export const newRand = (seed: number) => () => {
 }
 
 export const randomIndex = <T>(rand: () => number, array: readonly T[], startingIndex = 0) =>
-  ((rand() * (array.length - startingIndex)) | 0) + startingIndex
+  Math.trunc(rand() * (array.length - startingIndex)) + startingIndex
 
 export const randomElement = <T>(rand: () => number, array: readonly T[]) => array[randomIndex(rand, array)]
 

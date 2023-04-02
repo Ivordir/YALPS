@@ -46,7 +46,7 @@ const hasCycle = (history: PivotHistory, tableau: Tableau, row: number, col: num
   // but there was no? noticable impact in the benchmarks.
   history.push([tableau.variableAtPosition[tableau.width + row], tableau.variableAtPosition[col]])
   // the minimum length of a cycle is 6
-  for (let length = 6; length <= Math.floor(history.length / 2); length++) {
+  for (let length = 6; length <= Math.trunc(history.length / 2); length++) {
     let cycle = true
     for (let i = 0; i < length; i++) {
       const item = history.length - 1 - i
