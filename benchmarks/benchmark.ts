@@ -87,7 +87,7 @@ const resultsTable = (results: BenchmarkResults) => {
   const rows = results.sort((a, b) => a[1].mean - b[1].mean)
   const fastest = rows[0][1].mean
 
-  const table: { [runner: string]: any } = {}
+  const table: Record<string, Record<string, number>> = {}
   for (const [name, { mean, variance }] of rows) {
     table[name] = {
       mean: formatNum(mean),
@@ -118,7 +118,7 @@ export const benchmark = (
       }
     }
 
-    const model = bench.model
+    const { model } = bench
     const numInteger = model.integers.size + model.binaries.size
     console.log(`${bench.name}: ${model.constraints.size} constraints, ${model.variables.size} variables, ${numInteger} integers:`)
     console.table(resultsTable(sampleBenchmark(solvers, bench, numSamples)))

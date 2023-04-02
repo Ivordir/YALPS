@@ -16,7 +16,8 @@ export const lazy = <T>(thunk: () => T) => {
 }
 
 // https://github.com/skeeto/hash-prospector
-const prospectorHash = (x: number) => {
+const prospectorHash = (n: number) => {
+  let x = n
   x ^= x >>> 16
   x = Math.imul(x, 0x21f0aaad)
   x ^= x >>> 15
@@ -34,18 +35,18 @@ export const hashString = (s: string) => {
 }
 
 export const newRand = (seed: number) => () => {
-  seed += 0x9e3779b9
+  seed += 0x9e3779b9 // eslint-disable-line
   return (prospectorHash(seed) >>> 0) / 4294967296
 }
 
-export const randomIndex = (rand: () => number, array: readonly any[], startingIndex = 0) =>
+export const randomIndex = <T>(rand: () => number, array: readonly T[], startingIndex = 0) =>
   (rand() * (array.length - startingIndex) | 0) + startingIndex
 
 export const randomElement = <T>(rand: () => number, array: readonly T[]) => array[randomIndex(rand, array)]
 
 // Fisher-Yates shuffle
-export const sample = <T>(rand: () => number, array: T[], n?: number) => {
-  n ??= randomIndex(rand, array)
+export const sample = <T>(rand: () => number, array: T[], count?: number) => {
+  const n = count ?? randomIndex(rand, array)
   for (let i = 0; i < n; i++) {
     const j = randomIndex(rand, array, i)
     const temp = array[i]

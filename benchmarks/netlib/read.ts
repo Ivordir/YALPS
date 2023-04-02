@@ -11,7 +11,7 @@ type IndexEntry = {
   options?: Options
 }
 
-const readIndex = (): IndexEntry[] => JSON.parse(File.readFileSync("benchmarks/netlib/index.json", "utf-8"))
+const readIndex = () => JSON.parse(File.readFileSync("benchmarks/netlib/index.json", "utf-8")) as IndexEntry[]
 
 const convertConstraints = (map: ModelFromMPS["constraints"]) => {
   const constraints = new Map<string, Constraint>()
@@ -51,14 +51,12 @@ export const readBenchmarks = (benchmarks?: readonly string[]): Benchmark[] =>
 
 // of the benchmarks not filtered out by the function above,
 // these are the problems YALPS and jsLPSolver currently cannot handle
-// @ts-ignore
 export const timeout: readonly string[] = [
   "25FV47", "AGG", "BANDM", "BNL1", "BRANDY", "DEGEN2", "DEGEN3", "E226",
   "FFFFF800", "SCFXM2", "SCFXM3", "SCSD1", "SCSD8", "STOCFOR2",
   "WOOD1P", "KLEIN3"
 ]
 
-// @ts-ignore
 export const ok: readonly string[] = [
   "AGG2", "AGG3", "BEACONFD", "ISRAEL", "LOTFI", "SC105", "SC205", "SCAGR25", "SCAGR7",
   "SCFXM1", "SCORPION", "SCRS8", "SCSD6", "SCTAP1", "SCTAP2", "SCTAP3", "SHARE1B",

@@ -68,8 +68,8 @@ const hasCycle = (
 // Finds the optimal solution given some basic feasible solution.
 const phase2 = (tableau: Tableau, options: Required<Options>): [SolutionStatus, number] => {
   const pivotHistory: (readonly [number, number])[] = []
-  const precision = options.precision
-  for (let iter = 0; iter < options.maxPivots; iter++) {
+  const { precision, maxPivots, checkCycles } = options
+  for (let iter = 0; iter < maxPivots; iter++) {
     // Find the entering column/variable
     let col = 0
     let value = precision
@@ -98,7 +98,7 @@ const phase2 = (tableau: Tableau, options: Required<Options>): [SolutionStatus, 
     }
     if (row === 0) return ["unbounded", col]
 
-    if (options.checkCycles && hasCycle(pivotHistory, tableau, row, col)) return ["cycled", NaN]
+    if (checkCycles && hasCycle(pivotHistory, tableau, row, col)) return ["cycled", NaN]
 
     pivot(tableau, row, col)
   }
@@ -108,8 +108,8 @@ const phase2 = (tableau: Tableau, options: Required<Options>): [SolutionStatus, 
 // Transforms a tableau into a basic feasible solution.
 const phase1 = (tableau: Tableau, options: Required<Options>): [SolutionStatus, number] => {
   const pivotHistory: (readonly [number, number])[] = []
-  const precision = options.precision
-  for (let iter = 0; iter < options.maxPivots; iter++) {
+  const { precision, maxPivots, checkCycles } = options
+  for (let iter = 0; iter < maxPivots; iter++) {
     // Find the leaving row/variable
     let row = 0
     let rhs = -precision
@@ -137,7 +137,7 @@ const phase1 = (tableau: Tableau, options: Required<Options>): [SolutionStatus, 
     }
     if (col === 0) return ["infeasible", NaN]
 
-    if (options.checkCycles && hasCycle(pivotHistory, tableau, row, col)) return ["cycled", NaN]
+    if (checkCycles && hasCycle(pivotHistory, tableau, row, col)) return ["cycled", NaN]
 
     pivot(tableau, row, col)
   }

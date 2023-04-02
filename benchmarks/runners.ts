@@ -13,7 +13,7 @@ export const yalpsRunner: Runner<{ model: Model, options: Options }, Solution> =
 }
 
 const objectSet = (set: ReadonlySet<string> | undefined) => {
-  const obj: { [key: string]: 1 } = {}
+  const obj: Record<string, 1> = {}
   if (set != null) {
     for (const key of set) {
       obj[key] = 1
@@ -23,7 +23,7 @@ const objectSet = (set: ReadonlySet<string> | undefined) => {
 }
 
 const jsLPVariablesObject = (model: BenchModel) => {
-  const obj: { [key: string]: { [key: string]: number } } = {}
+  const obj: Record<string, Record<string, number>> = {}
   for (const [key, variable] of model.variables) {
     obj[key] = Object.fromEntries(variable)
   }

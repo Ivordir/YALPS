@@ -5,7 +5,7 @@ import { Benchmark } from "../benchmark.js"
 
 export const readBenchmarks = (): Benchmark[] =>
   readCases([ ...largeCases, "Large Farm MIP" ]).map(data => {
-    const name = data.name
+    const { name } = data
 
     const constraints = new Map(data.model.constraints)
     const variables = new Map(data.model.variables.map(valueMapping(x => new Map(x))))

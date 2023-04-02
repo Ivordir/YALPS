@@ -18,5 +18,3 @@ performance is not always straightforward to measure.
 Many various factors can have varying degrees of impact.
 May I recommend: https://youtu.be/r-TLSBdHe1A?t=428
 */
-
-debugger

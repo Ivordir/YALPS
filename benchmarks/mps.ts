@@ -45,7 +45,7 @@ const readName = (s: ParseState, m: ModelFromMPS) => {
   return readRows(s, m)
 }
 
-const notSectionEnd = (line: string | undefined): line is string => line !== undefined && line.startsWith(' ')
+const notSectionEnd = (line: string | undefined): line is string => line?.startsWith(' ') ?? false
 
 const nextLine = (s: ParseState) => {
   for (let i = s.index + 1; i < s.lines.length; i++) {

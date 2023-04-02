@@ -33,7 +33,7 @@ const testAll = test.macro((t, test: (t: ExecutionContext, model: TestCase["mode
 })
 
 const tableauFromModelWith = (key: keyof Model) =>
-  (model: Model, value: any): TableauModel => tableauModel({ ...model, [key]: value })
+  (model: Model, value: unknown): TableauModel => tableauModel({ ...model, [key]: value })
 
 const tableauFrom: { [key in keyof Model]-?: (model: Model, value: Model[key]) => TableauModel } = {
   direction: tableauFromModelWith("direction"),
@@ -59,7 +59,7 @@ test("Objective row and sign are negated for opposite optimization direction", t
   for (let c = 0; c < expected.tableau.width; c++) {
     expected.tableau.matrix[c] = negate(expected.tableau.matrix[c])
   }
-  (expected as any).sign = -expected.sign
+  (expected as any).sign = -expected.sign // eslint-disable-line
 
   t.deepEqual(result, expected)
 })
@@ -198,8 +198,8 @@ test("Swapping bound direction gives negated constraint row", testAll, (t, model
   const [index, [key, constraint]] = randomElement(rand, constraints)
   const swapped =
     constraint.min == null
-    ? { min: constraint.max } as Constraint
-    : { max: constraint.min }
+    ? { min: constraint.max } as const
+    : { max: constraint.min } as const
 
   const newConstraints = model.constraints.slice()
   newConstraints[index] = [key, swapped]
@@ -274,8 +274,8 @@ test("Duplicate variable keys do not affect matrix", testAll, (t, model) => {
   variables[indexChange] = [key, variables[indexChange][1]]
   const result = tableauFrom.variables(model, variables)
 
-  const expected = tableauModel(model) as any
-  expected.variables[indexChange][0] = key
+  const expected = tableauModel(model) as any // eslint-disable-line
+  expected.variables[indexChange][0] = key // eslint-disable-line
 
   t.deepEqual(result, expected)
 })
@@ -294,8 +294,8 @@ test("Last value is used for coefficients with the same key", testAll, (t, model
   newVariables[varIndex] = [varKey, newVariable]
   const result = tableauFrom.variables(model, newVariables)
 
-  const expected = tableauModel(model) as any
-  expected.variables[varIndex] = [varKey, newVariable]
+  const expected = tableauModel(model) as any // eslint-disable-line
+  expected.variables[varIndex] = [varKey, newVariable] // eslint-disable-line
 
   t.deepEqual(result, expected)
 })
@@ -374,7 +374,7 @@ test("Removing a variable gives one less column (and one row if binary)", testAl
     },
     sign,
     variables: removeIndex(variables, index),
-    integers: integers.filter(x => x != index + 1).map(x => x <= index ? x : (x - 1))
+    integers: integers.filter(x => x !== index + 1).map(x => x <= index ? x : (x - 1))
   }
 
   t.deepEqual(result, expected)

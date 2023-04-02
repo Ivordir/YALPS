@@ -32,7 +32,7 @@ export type TableauModel<VariableKey = string, ConstraintKey = string> = {
 }
 
 const convertToIterable = <K, V>(seq: Iterable<readonly [K, V]> | (K extends string ? { readonly [key in K]?: V } : never)) =>
-  typeof (seq as any)[Symbol.iterator] === "function"
+  typeof (seq as any)[Symbol.iterator] === "function" // eslint-disable-line
   ? seq as Iterable<readonly [K, V]>
   : Object.entries(seq) as Iterable<readonly [K, V]>
 
@@ -46,11 +46,7 @@ export const tableauModel = <VarKey = string, ConKey = string>(
   model: Model<VarKey, ConKey>
 ): TableauModel<VarKey, ConKey> => {
   const { direction, objective, integers, binaries } = model
-  const sign =
-    direction === "maximize" || direction == null ? 1.0
-    : direction === "minimize" ? -1.0
-    : 0.0
-  if (sign === 0.0) throw new Error(`'${direction}' is not a valid optimization direction. Should be 'maximize', 'minimize', or left blank.`)
+  const sign = direction === "minimize" ? -1.0 : 1.0
 
   const constraintsIter = convertToIterable(model.constraints)
   const variablesIter = convertToIterable(model.variables)
@@ -58,7 +54,7 @@ export const tableauModel = <VarKey = string, ConKey = string>(
 
   const binaryConstraintCol: number[] = []
   const ints: number[] = []
-  if (integers || binaries) {
+  if (integers != null || binaries != null) {
     const binaryVariables = convertToSet(binaries)
     const integerVariables = binaryVariables === true ? true : convertToSet(integers)
     for (let i = 1; i <= variables.length; i++) {

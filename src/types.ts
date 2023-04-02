@@ -1,5 +1,5 @@
 /** Specifies the bounds for the total of a value. */
-export interface Constraint {
+export type Constraint = {
   /**
    * The total should be equal to this number.
    * In the case that `min` or `max` are also defined, this is used instead.
@@ -45,7 +45,7 @@ export type OptimizationDirection = "maximize" | "minimize"
  * the objective, and the coefficients on each variable.
  * It should extend `string` if `constraints` or any variable's `Coefficients` is an object.
  */
-export interface Model<VariableKey = string, ConstraintKey = string> {
+export type Model<VariableKey = string, ConstraintKey = string> = {
   /**
    * Indicates whether to `"maximize"` or `"minimize"` the objective.
    * Defaults to `"maximize"` if left blank.
@@ -205,7 +205,7 @@ export type Solution<VariableKey = string> = {
 }
 
 /** An object specifying the options for the solver. */
-export interface Options {
+export type Options = {
   /**
    * Numbers with magnitude equal to or less than the provided precision are treated as zero.
    * Similarly, the precision determines whether a number is sufficiently integer.

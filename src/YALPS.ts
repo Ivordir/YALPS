@@ -14,7 +14,7 @@ const solution = <VarKey, ConKey>(
   if (status === "optimal" || (status === "timedout" && !Number.isNaN(result))) {
     const variables: [VarKey, number][] = []
     for (let i = 0; i < vars.length; i++) {
-      const variable = vars[i][0]
+      const [variable] = vars[i]
       const row = tableau.positionOfVariable[i + 1] - tableau.width
       const value = row >= 0 ? index(tableau, row, 0) : 0.0
       if (value > precision) {
@@ -34,7 +34,7 @@ const solution = <VarKey, ConKey>(
       status: "unbounded",
       result: sign * Infinity,
       variables:
-        0 <= variable && variable < vars.length
+        (0 <= variable && variable < vars.length)
         ? [[vars[variable][0], Infinity]]
         : []
     }
@@ -68,14 +68,11 @@ export const defaultOptions: Required<Options> = { ...defaultOptionValues }
  * @see `Model` on how to specify/create the model.
  * @see `Options` for the kinds of options available.
  * @see `Solution` for more detailed information on what is returned.
- * @throws `Error` if `model` is null or undefined or `model.direction` is invalid.
  */
 export const solve = <VarKey = string, ConKey = string>(
   model: Model<VarKey, ConKey>,
   options?: Options
 ): Solution<VarKey> => {
-  if (model == null) throw new Error("model was null or undefined")
-
   const tabmod = tableauModel(model)
   const opt = { ...defaultOptionValues, ...options }
   const [status, result] = simplex(tabmod.tableau, opt)

@@ -8,8 +8,8 @@ type JsonTestCase = {
   readonly model: {
     readonly direction?: OptimizationDirection
     readonly objective?: string
-    readonly constraints: { readonly [key: string]: Constraint }
-    readonly variables: { readonly [key: string]: { readonly [coef: string]: number } }
+    readonly constraints: Readonly<Record<string, Constraint>>
+    readonly variables: Readonly<Record<string, Readonly<Record<string, number>>>>
     readonly integers?: readonly string[]
     readonly binaries?: readonly string[]
   }

@@ -1,7 +1,7 @@
 import { Options, SolutionStatus } from "./types.js"
 import { index, Tableau, TableauModel } from "./tableau.js"
 import { simplex } from "./simplex.js"
-import heap from "heap"
+import Heap from "heap"
 
 type Buffer = {
   readonly matrix: Float64Array,
@@ -99,7 +99,7 @@ export const branchAndCut = <VarKey, ConKey>(
     return [ tabmod, "optimal", initResult ]
   }
 
-  const branches = new heap<Branch>((x, y) => x[0] - y[0])
+  const branches = new Heap<Branch>((x, y) => x[0] - y[0])
   branches.push([initResult, [[-1, initVariable, Math.ceil(initValue)]]])
   branches.push([initResult, [[1, initVariable, Math.floor(initValue)]]])
 
