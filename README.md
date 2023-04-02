@@ -60,8 +60,8 @@ import { Model, Constraint, Coefficients, OptimizationDirection, Options, Soluti
 Using objects:
 
 ```typescript
-const model: Model = {
-  direction: "maximize",
+const model = {
+  direction: "maximize" as const,
   objective: "profit",
   constraints: {
     wood: { max: 300 },
@@ -96,7 +96,7 @@ const dresser = new Map<string, number>()
   .set("profit", 1600)
   .set("storage", 50)
 
-const model: Model<string, string> = {
+const model: Model = {
   direction: "maximize",
   objective: "profit",
   constraints: constraints, // is an iterable
@@ -107,7 +107,7 @@ const model: Model<string, string> = {
   integers: true // all variables are indicated as integer
 }
 
-const solution: Solution<string> = solve(model)
+const solution: Solution = solve(model)
 // { status: "optimal", result: 14400, variables: [ ["table", 8], ["dresser", 3] ] }
 ```
 
@@ -115,7 +115,7 @@ const solution: Solution<string> = solve(model)
 
 ## API
 
-This is a stripped down version `YALPS.d.ts`.
+This is a stripped down version of YALPS's API.
 Use the JSDoc annotations / hover information in your editor for more extensive documentation.
 
 ```typescript
@@ -142,11 +142,11 @@ interface Model<VariableKey = string, ConstraintKey = string> {
 
   constraints:
     | Iterable<[ConstraintKey, Constraint]>
-    | (ConstraintKey extends string ? { [key in ConstraintKey]: Constraint } : never)
+    | (ConstraintKey extends string ? { [key in ConstraintKey]?: Constraint } : never)
 
   variables:
     | Iterable<[VariableKey, Coefficients<ConstraintKey>]>
-    | (VariableKey extends string ? { [key in VariableKey]: Coefficients<ConstraintKey> } : never)
+    | (VariableKey extends string ? { [key in VariableKey]?: Coefficients<ConstraintKey> } : never)
 
   /**
    * An `Iterable` of variable keys that indicate the corresponding variables are integer.
