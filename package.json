@@ -39,8 +39,9 @@
     "Linear Optimization"
   ],
   "scripts": {
-    "benchmark": "node --expose-gc --loader ts-node/esm benchmarks/run.ts",
+    "benchmark": "TS_NODE_PROJECT=benchmarks/tsconfig.json node --expose-gc --loader ts-node/esm benchmarks/run.ts",
     "inspect": "node --inspect-brk --expose-gc --loader ts-node/esm",
+    "inspect:benchmark": "TS_NODE_PROJECT=benchmarks/tsconfig.json pnpm inspect benchmarks/run.ts",
     "test": "c8 ava",
     "start": "tsc -w",
     "build:esm": "tsc",

@@ -41,6 +41,25 @@
           "regexp": ".*Command failed.*"
         }
       }
+    },
+    {
+      "label": "node: inspect benchmarks",
+      "type": "shell",
+      "isBackground": true,
+      "command": "pnpm",
+      "args": [
+        "inspect:benchmark"
+      ],
+      "problemMatcher": {
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "node .*",
+          "endsPattern": "Debugger listening on .*"
+        },
+        "pattern": {
+          "regexp": ".*Command failed.*"
+        }
+      }
     }
   ]
 }

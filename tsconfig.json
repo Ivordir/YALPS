@@ -8,16 +8,10 @@
     "declarationDir": "build/types",
 
     // Files and resolution
-    "rootDir": "src",
     "moduleResolution": "node",
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
-    "allowJs": true,
-    "checkJs": true,
-    "types": [
-      "node"
-    ],
 
     // Code related
     "strict": true,
@@ -31,9 +25,6 @@
   },
   "include": [
     "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules/**"
   ],
   "ts-node": {
     "esm": true

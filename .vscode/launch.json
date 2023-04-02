@@ -8,8 +8,9 @@
       "name": "Debug/Run TS",
       "type": "node",
       "request": "launch",
-      "runtimeExecutable": "ts-node",
-      "runtimeArgs": [
+      "runtimeExecutable": "pnpm",
+      "program": "ts-node",
+      "args": [
         "${relativeFile}"
       ],
       "skipFiles": [

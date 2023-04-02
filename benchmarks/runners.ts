@@ -1,12 +1,11 @@
-import { Options, solve } from "../src/index.js"
-import { BenchModel, Runner } from "./benchmark"
-// @ts-ignore
-import jsLP from "javascript-lp-solver"
-import GLPK from "glpk.js"
+import { Model, Options, Solution, solve } from "../src/index.js"
+import { BenchModel, Runner } from "./benchmark.js"
+import jsLP, { IModel as JsLPModel, Solution as JsLPSolution } from "javascript-lp-solver"
+import GLPK, { LP as GLPKModel, Options as GLPKOptions, Result as GLPKResult } from "glpk.js"
 
-const glpk = (GLPK as any)() as any
+const glpk = GLPK()
 
-export const yalpsRunner: Runner = {
+export const yalpsRunner: Runner<{ model: Model, options: Options }, Solution> = {
   name: "YALPS",
   convert: (model, options) => ({ model, options: { ...options, maxPivots: Infinity } }),
   solve: ({ model, options }) => solve(model, options),
@@ -37,7 +36,7 @@ const jsLPOptions = (options: Required<Options>) => ({
   exitOnCycles: options.checkCycles
 })
 
-const jsLPModel = (model: BenchModel, options: Required<Options>) => ({
+const jsLPModel = (model: BenchModel, options: Required<Options>): JsLPModel => ({
   opType: model.direction === "minimize" ? "min" : "max",
   optimize: model.objective,
   constraints: Object.fromEntries(model.constraints),
@@ -47,7 +46,7 @@ const jsLPModel = (model: BenchModel, options: Required<Options>) => ({
   options: jsLPOptions(options)
 })
 
-export const jsLPRunner: Runner = {
+export const jsLPRunner: Runner<{ model: JsLPModel, precision: number }, JsLPSolution> = {
   name: "jsLPSolver",
   convert: (model, options) => ({
     model: jsLPModel(model, options),
@@ -58,11 +57,7 @@ export const jsLPRunner: Runner = {
 }
 
 const glpkModel = (model: BenchModel) => {
-  type Bounds = { type: number, ub: number, lb: number }
-  type Coefs = { name: string, coef: number }[]
-  type Constraint = { name: string, vars: Coefs, bnds: Bounds }
-
-  const constraints = new Map<string, Constraint>()
+  const constraints = new Map<string, GLPKModel["subjectTo"][0]>()
   for (const [name, { equal, min, max }] of model.constraints) {
     const bnds =
       equal != null ? { type: glpk.GLP_FX, ub: 0.0, lb: equal }
@@ -74,7 +69,7 @@ const glpkModel = (model: BenchModel) => {
     constraints.set(name, { name, vars: [], bnds })
   }
 
-  const objective: Coefs = []
+  const objective: GLPKModel["objective"]["vars"] = []
   for (const [name, variable] of model.variables) {
     for (const [key, coef] of variable) {
       if (model.objective === key) {
@@ -88,7 +83,7 @@ const glpkModel = (model: BenchModel) => {
     name: "GLPK",
     objective: {
       direction: model.direction === "minimize" ? glpk.GLP_MIN : glpk.GLP_MAX,
-      name: model.objective,
+      name: model.objective ?? "",
       vars: objective
     },
     subjectTo: Array.from(constraints.values()),
@@ -99,7 +94,7 @@ const glpkModel = (model: BenchModel) => {
 
 const glpkOptions = (options: Required<Options>) => ({ mipgap: options.tolerance })
 
-export const glpkRunner: Runner = {
+export const glpkRunner: Runner<{ model: GLPKModel, options: GLPKOptions }, GLPKResult> = {
   name: "glpk.js",
   convert: (model, options) => ({
     model: glpkModel(model),
@@ -110,4 +105,4 @@ export const glpkRunner: Runner = {
     [glpk.GLP_OPT, glpk.GLP_FEAS, glpk.GLP_UNBND].includes(result.status) ? result.z : NaN
 }
 
-export const runners: readonly Runner[] = [yalpsRunner, jsLPRunner, glpkRunner]
+export const runners: readonly Runner[] = [yalpsRunner as Runner, jsLPRunner as Runner, glpkRunner as Runner ]

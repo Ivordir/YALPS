@@ -3,11 +3,11 @@ import { resultIsOptimal } from "../tests/helpers/validate.js"
 import { performance } from "node:perf_hooks"
 import { strict as assert } from "node:assert"
 
-export type Runner = {
+export type Runner<Input = unknown, Solution = unknown> = {
   readonly name: string,
-  readonly convert: (model: BenchModel, options: Required<Options>) => any
-  readonly solve: (input: any) => any
-  readonly value: (solution: any) => number
+  readonly convert: (model: BenchModel, options: Required<Options>) => Input
+  readonly solve: (input: Input) => Solution
+  readonly value: (solution: Solution) => number
 }
 
 export type BenchModel = {
@@ -55,7 +55,7 @@ const stats = (samples: readonly number[]) => {
   return { mean, variance }
 }
 
-const time = (runner: Runner, input: any) => {
+const time = <Input, Solution>(runner: Runner<Input, Solution>, input: Input) => {
   const start = performance.now()
   runner.solve(input)
   const fin = performance.now()
@@ -98,7 +98,7 @@ const resultsTable = (results: BenchmarkResults) => {
   return table
 }
 
-const validate = ({ model, expected, options }: Benchmark, run: Runner) => {
+const validate = <Input, Solution>({ model, expected, options }: Benchmark, run: Runner<Input, Solution>) => {
   const input = run.convert(model, options)
   const solution = run.solve(input)
   const result = run.value(solution)
