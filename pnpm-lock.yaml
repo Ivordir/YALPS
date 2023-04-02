@@ -36,6 +36,9 @@ devDependencies:
   eslint-config-standard-with-typescript:
     specifier: ^34.0.1
     version: 34.0.1(@typescript-eslint/eslint-plugin@5.57.0)(eslint-plugin-import@2.27.5)(eslint-plugin-n@15.7.0)(eslint-plugin-promise@6.1.1)(eslint@8.37.0)(typescript@4.9.5)
+  eslint-plugin-prefer-arrow:
+    specifier: ^1.2.3
+    version: 1.2.3(eslint@8.37.0)
   glpk.js:
     specifier: ^4.0.1
     version: 4.0.1
@@ -1100,6 +1103,14 @@ packages:
       minimatch: 3.1.2
       resolve: 1.22.1
       semver: 7.3.8
+    dev: true
+
+  /eslint-plugin-prefer-arrow@1.2.3(eslint@8.37.0):
+    resolution: {integrity: sha512-J9I5PKCOJretVuiZRGvPQxCbllxGAV/viI20JO3LYblAodofBxyMnZAJ+WGeClHgANnSJberTNoFWWjrWKBuXQ==}
+    peerDependencies:
+      eslint: '>=2.0.0'
+    dependencies:
+      eslint: 8.37.0
     dev: true
 
   /eslint-plugin-promise@6.1.1(eslint@8.37.0):

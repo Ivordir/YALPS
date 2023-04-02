@@ -77,7 +77,8 @@
       "project": "tsconfig.eslint.json"
     },
     "plugins": [
-      "@typescript-eslint"
+      "@typescript-eslint",
+      "prefer-arrow"
     ],
     "ignorePatterns": [
       "build/**"
@@ -127,7 +128,13 @@
       "@typescript-eslint/no-require-imports": "error",
       "@typescript-eslint/prefer-for-of": "off",
       "@typescript-eslint/no-useless-empty-export": "error",
-      "@typescript-eslint/default-param-last": "error"
+      "@typescript-eslint/default-param-last": "error",
+      "prefer-arrow/prefer-arrow-functions": [
+        "error",
+        {
+          "disallowPrototype": true
+        }
+      ]
     }
   },
   "prettier": {
@@ -150,6 +157,7 @@
     "eslint": "^8.37.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-config-standard-with-typescript": "^34.0.1",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
     "glpk.js": "^4.0.1",
     "javascript-lp-solver": "^0.4.24",
     "prettier": "^2.8.7",
