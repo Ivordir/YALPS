@@ -45,6 +45,7 @@
     "test": "c8 ava",
     "watch": "tsc -w",
     "lint": "eslint .",
+    "format": "prettier --write .",
     "build:esm": "tsc",
     "build:cjs": "tsc -m commonjs --outDir build/main",
     "build": "pnpm build:esm && pnpm build:cjs",
@@ -114,6 +115,12 @@
       "@typescript-eslint/default-param-last": "error"
     }
   },
+  "prettier": {
+    "printWidth": 120,
+    "semi": false,
+    "trailingComma": "none",
+    "arrowParens": "avoid"
+  },
   "dependencies": {
     "heap": "^0.2.7"
   },
@@ -129,6 +136,7 @@
     "eslint-config-standard-with-typescript": "^34.0.1",
     "glpk.js": "^4.0.1",
     "javascript-lp-solver": "^0.4.24",
+    "prettier": "^2.8.7",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.5"
   }
