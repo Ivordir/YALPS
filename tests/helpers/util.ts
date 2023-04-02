@@ -1,9 +1,11 @@
 import { TupleArray } from "./read.js"
 
-export const keys = <K, V>(array: TupleArray<K, V>) => array.map(([key, ]) => key)
+export const keys = <K, V>(array: TupleArray<K, V>) => array.map(([key]) => key)
 
-export const valueMapping = <V1, V2, K>(mapping: (v: V1) => V2) =>
-  ([key, value]: readonly [K, V1]): [K, V2] => [key, mapping(value)]
+export const valueMapping =
+  <V1, V2, K>(mapping: (v: V1) => V2) =>
+  ([key, value]: readonly [K, V1]): [K, V2] =>
+    [key, mapping(value)]
 
 export const enumerate = <T>(array: readonly T[]) => array.map((x, i): [number, T] => [i, x])
 
@@ -40,7 +42,7 @@ export const newRand = (seed: number) => () => {
 }
 
 export const randomIndex = <T>(rand: () => number, array: readonly T[], startingIndex = 0) =>
-  (rand() * (array.length - startingIndex) | 0) + startingIndex
+  ((rand() * (array.length - startingIndex)) | 0) + startingIndex
 
 export const randomElement = <T>(rand: () => number, array: readonly T[]) => array[randomIndex(rand, array)]
 

@@ -1,14 +1,15 @@
-import { Options, Solution } from "../../src/index.js";
-import { TestCase } from "./read.js";
+import { Options, Solution } from "../../src/index.js"
+import { TestCase } from "./read.js"
 
 const maxDiff = 1e-5
 
 const relativeDifferenceFrom = (delta: number, expected: number, precision: number) =>
   (delta - precision) / Math.max(Math.abs(expected), 1.0)
 
-const relativeDifference = (result: number , expected: number, precision: number) =>
+const relativeDifference = (result: number, expected: number, precision: number) =>
   relativeDifferenceFrom(Math.abs(result - expected), expected, precision)
 
+// prettier-ignore
 export const resultIsOptimal = (result: number, expected: number, options: Required<Options>) =>
   Number.isNaN(expected) ? Number.isNaN(result)
   : !Number.isFinite(expected) ? expected === result
@@ -44,10 +45,12 @@ export const variablesHaveValidValues = (
   { integers, binaries }: TestCase["model"],
   precision: number
 ) =>
-  solution.variables.every(([variable, n]) =>
-    n >= -precision
-    && (!(integers.has(variable) || binaries.has(variable)) || Math.abs(n - Math.round(n)) <= precision)
-    && (!binaries.has(variable) || n <= 1 + precision))
+  solution.variables.every(
+    ([variable, n]) =>
+      n >= -precision &&
+      (!(integers.has(variable) || binaries.has(variable)) || Math.abs(n - Math.round(n)) <= precision) &&
+      (!binaries.has(variable) || n <= 1 + precision)
+  )
 
 export const validSolution = (
   solution: Readonly<Solution>,
@@ -55,9 +58,9 @@ export const validSolution = (
   model: TestCase["model"],
   options: Required<Options>
 ) =>
-  resultIsOptimal(solution.result, expected, options)
-  && variablesHaveValidValues(solution, model, options.precision)
-  && (!Number.isFinite(expected) || constraintsAreSatisfied(solution, model, options.precision))
+  resultIsOptimal(solution.result, expected, options) &&
+  variablesHaveValidValues(solution, model, options.precision) &&
+  (!Number.isFinite(expected) || constraintsAreSatisfied(solution, model, options.precision))
 
 const validTimeout = (solution: Readonly<Solution>) => solution.status === "timedout" && Number.isNaN(solution.result)
 
@@ -66,4 +69,6 @@ export const validSolutionAndStatus = (
   expected: Readonly<Solution>,
   model: TestCase["model"],
   options: Required<Options>
-) => solution.status === expected.status && (validTimeout(solution) || validSolution(solution, expected.result, model, options))
+) =>
+  solution.status === expected.status &&
+  (validTimeout(solution) || validSolution(solution, expected.result, model, options))

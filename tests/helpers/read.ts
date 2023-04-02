@@ -36,7 +36,7 @@ export type TestCase = {
 
 export const allCases = lazy(() => File.readdirSync("tests/cases").map(file => Path.parse(file).name))
 
-export const largeCases: readonly string[] = [ "Monster 2", "Monster Problem", "Vendor Selection" ]
+export const largeCases: readonly string[] = ["Monster 2", "Monster Problem", "Vendor Selection"]
 
 export const readCases = (cases?: readonly string[]): TestCase[] =>
   (cases ?? allCases()).map(file => {
@@ -50,6 +50,7 @@ export const readCases = (cases?: readonly string[]): TestCase[] =>
     const binaries = new Set(data.model.binaries)
     const model = { ...data.model, hash, constraints, variables, integers, binaries }
     const options = { ...defaultOptions, ...data.options }
+    // prettier-ignore
     const result =
       data.expected.status === "optimal" ? data.expected.result
       : data.expected.status === "unbounded" ? Infinity * (data.model.direction === "minimize" ? -1.0 : 1.0)

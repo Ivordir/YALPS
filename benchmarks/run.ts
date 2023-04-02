@@ -4,11 +4,12 @@ import { readBenchmarks as readJson } from "./json/read.js"
 import { readBenchmarks as readNetlib } from "./netlib/read.js"
 
 // current selection of netlib benchmarks included in the README
+// prettier-ignore
 const netlibSelection: readonly string[] = [
   "AGG2", "BEACONFD", "SC205", "SCFXM1", "SCRS8", "SC205", "SCTAP2", "SHIP08S"
 ]
 
-const benchmarks: readonly Benchmark[] = [ ...readJson(), ...readNetlib(netlibSelection) ]
+const benchmarks: readonly Benchmark[] = [...readJson(), ...readNetlib(netlibSelection)]
 
 benchmark(benchmarks, runners)
 

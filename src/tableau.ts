@@ -14,8 +14,7 @@ export type Tableau = {
   readonly variableAtPosition: Int32Array
 }
 
-export const index = (tableau: Tableau, row: number, col: number) =>
-  tableau.matrix[Math.imul(row, tableau.width) + col]
+export const index = (tableau: Tableau, row: number, col: number) => tableau.matrix[Math.imul(row, tableau.width) + col]
 
 export const update = (tableau: Tableau, row: number, col: number, value: number) => {
   tableau.matrix[Math.imul(row, tableau.width) + col] = value
@@ -31,11 +30,14 @@ export type TableauModel<VariableKey = string, ConstraintKey = string> = {
   readonly integers: readonly number[]
 }
 
-const convertToIterable = <K, V>(seq: Iterable<readonly [K, V]> | (K extends string ? { readonly [key in K]?: V } : never)) =>
+const convertToIterable = <K, V>(
+  seq: Iterable<readonly [K, V]> | (K extends string ? { readonly [key in K]?: V } : never)
+) =>
   typeof (seq as any)[Symbol.iterator] === "function" // eslint-disable-line
-  ? seq as Iterable<readonly [K, V]>
-  : Object.entries(seq) as Iterable<readonly [K, V]>
+    ? (seq as Iterable<readonly [K, V]>)
+    : (Object.entries(seq) as Iterable<readonly [K, V]>)
 
+// prettier-ignore
 const convertToSet = <T>(set: boolean | Iterable<T> | undefined): true | Set<T> =>
   set === true ? true
   : set === false ? new Set()
@@ -58,7 +60,7 @@ export const tableauModel = <VarKey = string, ConKey = string>(
     const binaryVariables = convertToSet(binaries)
     const integerVariables = binaryVariables === true ? true : convertToSet(integers)
     for (let i = 1; i <= variables.length; i++) {
-      const [key, ] = variables[i - 1]
+      const [key] = variables[i - 1]
       if (binaryVariables === true || binaryVariables.has(key)) {
         binaryConstraintCol.push(i)
         ints.push(i)
@@ -68,7 +70,7 @@ export const tableauModel = <VarKey = string, ConKey = string>(
     }
   }
 
-  const constraints = new Map<ConKey, { row: number, lower: number, upper: number }>()
+  const constraints = new Map<ConKey, { row: number; lower: number; upper: number }>()
   for (const [key, constraint] of constraintsIter) {
     const bounds = constraints.get(key) ?? { row: NaN, lower: -Infinity, upper: Infinity }
     bounds.lower = Math.max(bounds.lower, constraint.equal ?? constraint.min ?? -Infinity)
@@ -80,9 +82,7 @@ export const tableauModel = <VarKey = string, ConKey = string>(
   let numConstraints = 1
   for (const constraint of constraints.values()) {
     constraint.row = numConstraints
-    numConstraints +=
-      (Number.isFinite(constraint.lower) ? 1 : 0)
-      + (Number.isFinite(constraint.upper) ? 1 : 0)
+    numConstraints += (Number.isFinite(constraint.lower) ? 1 : 0) + (Number.isFinite(constraint.upper) ? 1 : 0)
   }
   const width = variables.length + 1
   const height = numConstraints + binaryConstraintCol.length

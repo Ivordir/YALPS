@@ -33,10 +33,11 @@ const solution = <VarKey, ConKey>(
     return {
       status: "unbounded",
       result: sign * Infinity,
+      // prettier-ignore
       variables:
         (0 <= variable && variable < vars.length)
-        ? [[vars[variable][0], Infinity]]
-        : []
+          ? [[vars[variable][0], Infinity]]
+          : []
     }
   } else {
     // infeasible | cycled | (timedout and result is NaN)

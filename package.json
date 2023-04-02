@@ -103,9 +103,23 @@
       "prefer-destructuring": "error",
       "prefer-object-spread": "error",
       "prefer-template": "error",
-      "yoda": ["error", "never", { "exceptRange": true }],
-      "@typescript-eslint/array-type": ["error", { "default": "array" }],
-      "@typescript-eslint/consistent-type-definitions": ["error", "type"],
+      "yoda": [
+        "error",
+        "never",
+        {
+          "exceptRange": true
+        }
+      ],
+      "@typescript-eslint/array-type": [
+        "error",
+        {
+          "default": "array"
+        }
+      ],
+      "@typescript-eslint/consistent-type-definitions": [
+        "error",
+        "type"
+      ],
       "@typescript-eslint/consistent-type-imports": "off",
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/no-non-null-assertion": "off",

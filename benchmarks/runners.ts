@@ -5,7 +5,7 @@ import GLPK, { LP as GLPKModel, Options as GLPKOptions, Result as GLPKResult } f
 
 const glpk = GLPK()
 
-export const yalpsRunner: Runner<{ model: Model, options: Options }, Solution> = {
+export const yalpsRunner: Runner<{ model: Model; options: Options }, Solution> = {
   name: "YALPS",
   convert: (model, options) => ({ model, options: { ...options, maxPivots: Infinity } }),
   solve: ({ model, options }) => solve(model, options),
@@ -46,19 +46,20 @@ const jsLPModel = (model: BenchModel, options: Required<Options>): JsLPModel => 
   options: jsLPOptions(options)
 })
 
-export const jsLPRunner: Runner<{ model: JsLPModel, precision: number }, JsLPSolution> = {
+export const jsLPRunner: Runner<{ model: JsLPModel; precision: number }, JsLPSolution> = {
   name: "jsLPSolver",
   convert: (model, options) => ({
     model: jsLPModel(model, options),
     precision: options.precision
   }),
   solve: ({ model, precision }) => jsLP.Solve(model, precision),
-  value: solution => solution.feasible ? solution.result : NaN,
+  value: solution => (solution.feasible ? solution.result : NaN)
 }
 
 const glpkModel = (model: BenchModel) => {
   const constraints = new Map<string, GLPKModel["subjectTo"][0]>()
   for (const [name, { equal, min, max }] of model.constraints) {
+    // prettier-ignore
     const bnds =
       equal != null ? { type: glpk.GLP_FX, ub: 0.0, lb: equal }
       : min != null && max != null ? { type: glpk.GLP_DB, ub: max, lb: min }
@@ -94,15 +95,14 @@ const glpkModel = (model: BenchModel) => {
 
 const glpkOptions = (options: Required<Options>) => ({ mipgap: options.tolerance })
 
-export const glpkRunner: Runner<{ model: GLPKModel, options: GLPKOptions }, GLPKResult> = {
+export const glpkRunner: Runner<{ model: GLPKModel; options: GLPKOptions }, GLPKResult> = {
   name: "glpk.js",
   convert: (model, options) => ({
     model: glpkModel(model),
     options: glpkOptions(options)
   }),
   solve: ({ model, options }) => glpk.solve(model, options),
-  value: ({ result }) =>
-    [glpk.GLP_OPT, glpk.GLP_FEAS, glpk.GLP_UNBND].includes(result.status) ? result.z : NaN
+  value: ({ result }) => ([glpk.GLP_OPT, glpk.GLP_FEAS, glpk.GLP_UNBND].includes(result.status) ? result.z : NaN)
 }
 
-export const runners: readonly Runner[] = [yalpsRunner as Runner, jsLPRunner as Runner, glpkRunner as Runner ]
+export const runners: readonly Runner[] = [yalpsRunner as Runner, jsLPRunner as Runner, glpkRunner as Runner]

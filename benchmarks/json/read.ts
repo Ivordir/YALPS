@@ -4,7 +4,7 @@ import { valueMapping } from "../../tests/helpers/util.js"
 import { Benchmark } from "../benchmark.js"
 
 export const readBenchmarks = (): Benchmark[] =>
-  readCases([ ...largeCases, "Large Farm MIP" ]).map(data => {
+  readCases([...largeCases, "Large Farm MIP"]).map(data => {
     const { name } = data
 
     const constraints = new Map(data.model.constraints)

@@ -6,8 +6,10 @@ import test, { ExecutionContext } from "ava"
 
 type SolvedTestCase = TestCase & { readonly solution: Readonly<Solution> }
 
-const testData: readonly SolvedTestCase[] =
-  testCases().map(data => ({ ...data, solution: solve(data.model, data.options) }))
+const testData: readonly SolvedTestCase[] = testCases().map(data => ({
+  ...data,
+  solution: solve(data.model, data.options)
+}))
 
 const valid = (solution: Readonly<Solution>, { model, options, expected }: SolvedTestCase) =>
   validSolutionAndStatus(solution, expected, model, options)
@@ -25,7 +27,7 @@ test("Validate test case solutions", testAll, (t, data) => {
 test("Variable order is preserved in solution (zero variables not included)", testAll, (t, { model, solution }) => {
   // i.e., solution.variables should be a subsequence of data.variables
   let i = 0
-  for (const [key, ] of solution.variables) {
+  for (const [key] of solution.variables) {
     let found = false
     while (!found && i < model.variables.length) {
       found = key === model.variables[i][0]
@@ -48,7 +50,7 @@ test("Removing unused variables gives optimal solution", testAll, (t, data) => {
   const { model, solution } = data
   if (solution.status !== "optimal" || model.variables.length === solution.variables.length) return // model not applicable
 
-  const variables: (TestCase["model"]["variables"][0])[] = []
+  const variables: TestCase["model"]["variables"][0][] = []
   let i = 0
   for (const variable of model.variables) {
     // assume no duplicate keys
@@ -65,7 +67,7 @@ test("Removing unused variables gives optimal solution", testAll, (t, data) => {
 
 test("Duplicating non-binary variable gives optimal solution", testAll, (t, data) => {
   const { model } = data
-  const variables = model.variables.filter(([key, ]) => !model.binaries.has(key))
+  const variables = model.variables.filter(([key]) => !model.binaries.has(key))
   if (variables.length === 0) return // model not applicable
 
   const rand = newRand(model.hash)
@@ -84,8 +86,7 @@ test("A more restrictive constraint that does not conflict with the optimal solu
   if (lowerOrUpper.length === 0) return // model not applicable
 
   const sums = valueSums(solution, model)
-  const hasSlack =
-    lowerOrUpper
+  const hasSlack = lowerOrUpper
     .map(([key, constraint]) => {
       const sum = sums.get(key) ?? 0.0
       const lowerSlack = sum - (constraint.min ?? -Infinity)

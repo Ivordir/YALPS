@@ -7,7 +7,7 @@ import test, { ExecutionContext } from "ava"
 const testData: readonly TestCase[] = testCases()
 
 // deepEquals uses Object.is (sameValue algorithm) instead of sameValueZero algorithm, so deepEquals(0, -0) === false
-const negate = (x: number) => x === 0.0 ? 0.0 : -x
+const negate = (x: number) => (x === 0.0 ? 0.0 : -x)
 
 test("Empty model", t => {
   const result = tableauModel({ variables: {}, constraints: {} })
@@ -32,8 +32,10 @@ const testAll = test.macro((t, test: (t: ExecutionContext, model: TestCase["mode
   }
 })
 
-const tableauFromModelWith = (key: keyof Model) =>
-  (model: Model, value: unknown): TableauModel => tableauModel({ ...model, [key]: value })
+const tableauFromModelWith =
+  (key: keyof Model) =>
+  (model: Model, value: unknown): TableauModel =>
+    tableauModel({ ...model, [key]: value })
 
 const tableauFrom: { [key in keyof Model]-?: (model: Model, value: Model[key]) => TableauModel } = {
   direction: tableauFromModelWith("direction"),
@@ -52,30 +54,29 @@ test("Objective row is zero if no objective is given", testAll, (t, model) => {
 })
 
 test("Objective row and sign are negated for opposite optimization direction", testAll, (t, model) => {
-  const direction = model.direction === "minimize" ? "maximize": "minimize"
+  const direction = model.direction === "minimize" ? "maximize" : "minimize"
   const result = tableauFrom.direction(model, direction)
 
   const expected = tableauModel(model)
   for (let c = 0; c < expected.tableau.width; c++) {
     expected.tableau.matrix[c] = negate(expected.tableau.matrix[c])
   }
-  (expected as any).sign = -expected.sign // eslint-disable-line
+  ;(expected as any).sign = -expected.sign // eslint-disable-line
 
   t.deepEqual(result, expected)
 })
 
 const numRows = (constraint: Constraint) =>
-  constraint.equal != null ? 2 : ((constraint.max != null ? 1 : 0) + (constraint.min != null ? 1 : 0))
+  constraint.equal != null ? 2 : (constraint.max != null ? 1 : 0) + (constraint.min != null ? 1 : 0)
 
 const rowOfConstraint = (constraints: TestCase["model"]["constraints"], index: number) =>
-  constraints
-  .slice(0, index)
-  .reduce(((sum, [, con]) => sum + numRows(con)), 1)
+  constraints.slice(0, index).reduce((sum, [, con]) => sum + numRows(con), 1)
 
 test("Objective can share the same key as a constraint", testAll, (t, model) => {
   const rand = newRand(model.hash)
   const conIndex = randomIndex(rand, model.constraints)
   const [key, constraint] = model.constraints[conIndex]
+  // prettier-ignore
   const sign =
     constraint.equal != null || constraint.max != null ? 1.0
     : constraint.min != null ? -1.0
@@ -94,7 +95,7 @@ test("Objective can share the same key as a constraint", testAll, (t, model) => 
   // copy row of constraint to objective row
   for (let c = 1; c < expected.tableau.width; c++) {
     const value = index(expected.tableau, row, c)
-    expected.tableau.matrix[c] = value === 0.0 ? 0.0 : (expected.sign * sign * value)
+    expected.tableau.matrix[c] = value === 0.0 ? 0.0 : expected.sign * sign * value
   }
 
   t.deepEqual(result, expected)
@@ -183,23 +184,21 @@ test("Binaries as a set and array", testAll, (t, model) => {
 
 test("Binary has higher precedence than integer", testAll, (t, model) => {
   const rand = newRand(model.hash)
-  const [key, ] = randomElement(rand, model.variables)
+  const [key] = randomElement(rand, model.variables)
   const result = tableauModel({ ...model, integers: [key], binaries: [key] })
   const expected = tableauModel({ ...model, integers: [], binaries: [key] })
   t.deepEqual(result, expected)
 })
 
 test("Swapping bound direction gives negated constraint row", testAll, (t, model) => {
-  const constraints =
-    enumerate(model.constraints).filter(([, [, con]]) => con.equal == null && (con.max == null) !== (con.min == null))
+  const constraints = enumerate(model.constraints).filter(
+    ([, [, con]]) => con.equal == null && (con.max == null) !== (con.min == null)
+  )
   if (constraints.length === 0) return // model not applicable
 
   const rand = newRand(model.hash)
   const [index, [key, constraint]] = randomElement(rand, constraints)
-  const swapped =
-    constraint.min == null
-    ? { min: constraint.max } as const
-    : { max: constraint.min } as const
+  const swapped = constraint.min == null ? ({ min: constraint.max } as const) : ({ max: constraint.min } as const)
 
   const newConstraints = model.constraints.slice()
   newConstraints[index] = [key, swapped]
@@ -268,7 +267,7 @@ test("Constraints with the same key are merged", testAll, (t, model) => {
 test("Duplicate variable keys do not affect matrix", testAll, (t, model) => {
   const rand = newRand(model.hash)
   const indexCopy = randomIndex(rand, model.variables)
-  const [key, ] = model.variables[indexCopy]
+  const [key] = model.variables[indexCopy]
   const indexChange = randomIndex(rand, model.variables) // could be same index...
   const variables = model.variables.slice()
   variables[indexChange] = [key, variables[indexChange][1]]
@@ -374,7 +373,7 @@ test("Removing a variable gives one less column (and one row if binary)", testAl
     },
     sign,
     variables: removeIndex(variables, index),
-    integers: integers.filter(x => x !== index + 1).map(x => x <= index ? x : (x - 1))
+    integers: integers.filter(x => x !== index + 1).map(x => (x <= index ? x : x - 1))
   }
 
   t.deepEqual(result, expected)

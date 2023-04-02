@@ -4,8 +4,8 @@ import { simplex } from "./simplex.js"
 import Heap from "heap"
 
 type Buffer = {
-  readonly matrix: Float64Array,
-  readonly positionOfVariable: Int32Array,
+  readonly matrix: Float64Array
+  readonly positionOfVariable: Int32Array
   readonly variableAtPosition: Int32Array
 }
 
@@ -96,7 +96,7 @@ export const branchAndCut = <VarKey, ConKey>(
   const [initVariable, initValue, initFrac] = mostFractionalVar(tableau, integers)
   if (initFrac <= precision) {
     // Wow, the initial solution is integer
-    return [ tabmod, "optimal", initResult ]
+    return [tabmod, "optimal", initResult]
   }
 
   const branches = new Heap<Branch>((x, y) => x[0] - y[0])
@@ -121,12 +121,7 @@ export const branchAndCut = <VarKey, ConKey>(
   let bestTableau = tableau
   let iter = 0
 
-  while (
-    iter < maxIterations
-    && !branches.empty()
-    && bestEval >= optimalThreshold
-    && !timedout
-  ) {
+  while (iter < maxIterations && !branches.empty() && bestEval >= optimalThreshold && !timedout) {
     const [relaxedEval, cuts] = branches.pop()!
     if (relaxedEval > bestEval) break // the remaining branches are worse than the current best solution
 
@@ -149,7 +144,7 @@ export const branchAndCut = <VarKey, ConKey>(
         const cutsLower: Cut[] = []
         for (let i = 0; i < cuts.length; i++) {
           const cut = cuts[i]
-          const [dir, v, ] = cut
+          const [dir, v] = cut
           if (v === variable) {
             dir < 0 ? cutsLower.push(cut) : cutsUpper.push(cut)
           } else {
@@ -171,15 +166,13 @@ export const branchAndCut = <VarKey, ConKey>(
   }
 
   // Did the solver "timeout"?
-  const unfinished =
-    (timedout || iter >= maxIterations)
-    && !branches.empty()
-    && bestEval >= optimalThreshold
+  const unfinished = (timedout || iter >= maxIterations) && !branches.empty() && bestEval >= optimalThreshold
 
+  // prettier-ignore
   const status =
     unfinished ? "timedout"
     : !solutionFound ? "infeasible"
     : "optimal"
 
-  return [ { ...tabmod, tableau: bestTableau }, status, solutionFound ? bestEval : NaN ]
+  return [{ ...tabmod, tableau: bestTableau }, status, solutionFound ? bestEval : NaN]
 }

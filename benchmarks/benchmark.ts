@@ -4,7 +4,7 @@ import { performance } from "node:perf_hooks"
 import { strict as assert } from "node:assert"
 
 export type Runner<Input = unknown, Solution = unknown> = {
-  readonly name: string,
+  readonly name: string
   readonly convert: (model: BenchModel, options: Required<Options>) => Input
   readonly solve: (input: Input) => Solution
   readonly value: (solution: Solution) => number
@@ -33,10 +33,7 @@ const kahanBabushkaNeumaierSum = (values: readonly number[]) => {
   let c = 0.0
   for (const value of values) {
     const t = sum + value
-    c +=
-      Math.abs(sum) >= Math.abs(value)
-      ? ((sum - t) + value)
-      : ((value - t) + sum)
+    c += Math.abs(sum) >= Math.abs(value) ? sum - t + value : value - t + sum
     sum = t
   }
   return sum + c
@@ -120,7 +117,9 @@ export const benchmark = (
 
     const { model } = bench
     const numInteger = model.integers.size + model.binaries.size
-    console.log(`${bench.name}: ${model.constraints.size} constraints, ${model.variables.size} variables, ${numInteger} integers:`)
+    console.log(
+      `${bench.name}: ${model.constraints.size} constraints, ${model.variables.size} variables, ${numInteger} integers:`
+    )
     console.table(resultsTable(sampleBenchmark(solvers, bench, numSamples)))
     console.log("")
   }

@@ -1,4 +1,4 @@
-declare module 'glpk.js' {
+declare module "glpk.js" {
 // The typescript declaration file is fixed in the latest commit, but the package has not been updated yet
 // https://github.com/jvail/glpk.js/blob/master/dist/glpk.d.ts
 

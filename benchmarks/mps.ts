@@ -45,11 +45,11 @@ const readName = (s: ParseState, m: ModelFromMPS) => {
   return readRows(s, m)
 }
 
-const notSectionEnd = (line: string | undefined): line is string => line?.startsWith(' ') ?? false
+const notSectionEnd = (line: string | undefined): line is string => line?.startsWith(" ") ?? false
 
 const nextLine = (s: ParseState) => {
   for (let i = s.index + 1; i < s.lines.length; i++) {
-    if (!s.lines[i].startsWith('*')) {
+    if (!s.lines[i].startsWith("*")) {
       s.index = i
       return s.lines[i]
     }
@@ -79,6 +79,7 @@ const readRows = (s: ParseState, m: ModelFromMPS) => {
     if (s.constraintTypes.has(name)) return err(`The row '${name}' was already defined`)
 
     const type = field1(line)
+    // prettier-ignore
     switch (type) {
       case "L": m.constraints.set(name, [-Infinity, 0.0]); break
       case "G": m.constraints.set(name, [0.0, Infinity]); break
@@ -119,6 +120,7 @@ const readColumns = (s: ParseState, m: ModelFromMPS) => {
   while (notSectionEnd(line)) {
     if (field3(line) === "'MARKER'") {
       const marker = field4(line)
+      // prettier-ignore
       switch (marker) {
         case "'INTORG'": integerMarked = true; break
         case "'INTEND'": integerMarked = false; break
@@ -130,7 +132,10 @@ const readColumns = (s: ParseState, m: ModelFromMPS) => {
 
     const name = field2(line)
     if (name === "") return err("Missing column name")
-    if (m.variables.has(name)) return err(`Values for the column '${name}' were previously provided -- all values for a column must come consecutively`)
+    if (m.variables.has(name))
+      return err(
+        `Values for the column '${name}' were previously provided -- all values for a column must come consecutively`
+      )
 
     const variable = new Map<string, number>()
     do {
@@ -194,6 +199,7 @@ const readRHS = (s: ParseState, m: ModelFromMPS) => {
   }
 
   const section = readSection(s)
+  // prettier-ignore
   switch (section) {
     case "RANGES": return readRanges(s, m)
     case "BOUNDS": return readBounds(s, m)
@@ -237,6 +243,7 @@ const readRanges = (s: ParseState, m: ModelFromMPS) => {
   }
 
   const section = readSection(s)
+  // prettier-ignore
   switch (section) {
     case "BOUNDS": return readBounds(s, m)
     case "ENDATA": return null
@@ -268,6 +275,7 @@ const readBounds = (s: ParseState, m: ModelFromMPS) => {
       if (Number.isNaN(val)) return err(`Failed to parse number '${value}'`)
     }
 
+    // prettier-ignore
     switch (type) {
       case "LO": setBounds(m, col, val, Infinity); break
       case "UP": setBounds(m, col, 0.0, val); break

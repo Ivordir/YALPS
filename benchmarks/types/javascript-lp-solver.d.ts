@@ -1,4 +1,4 @@
-declare module 'javascript-lp-solver' {
+declare module "javascript-lp-solver" {
 // The typescript declaration file is not included in the package even though it exists, nice job
 // https://github.com/JWally/jsLPSolver/blob/master/types/main.d.ts
 

@@ -16,11 +16,13 @@ You can check out [jsLPSolver](https://www.npmjs.com/package/javascript-lp-solve
 for more background and information regarding LP problems.
 
 Compared to jsLPSolver, YALPS has the following differences:
+
 - More flexible API (e.g., support for Iterables alongside objects)
 - Better performance (especially for non-integer problems, see [Performance](#Performance) for more details.)
 - Good Typescript support (YALPS is written in Typescript)
 
 On the other hand, these features from jsLPSolver were dropped:
+
 - Unrestricted variables (might be added later)
 - Multiobjective optimization
 - External solvers
@@ -28,6 +30,7 @@ On the other hand, these features from jsLPSolver were dropped:
 # Usage
 
 ## Installation
+
 ```
 npm i yalps
 ```
@@ -35,16 +38,19 @@ npm i yalps
 ## Import
 
 The main solve function:
+
 ```typescript
 import { solve } from "yalps"
 ```
 
 Alternate helper functions:
+
 ```typescript
 import { lessEq, equalTo, greaterEq, inRange } from "yalps"
 ```
 
 Types, as necessary:
+
 ```typescript
 import { Model, Constraint, Coefficients, OptimizationDirection, Options, Solution } from "yalps"
 ```
@@ -52,20 +58,21 @@ import { Model, Constraint, Coefficients, OptimizationDirection, Options, Soluti
 ## Examples
 
 Using objects:
+
 ```typescript
 const model: Model = {
-    direction: "maximize",
-    objective: "profit",
-    constraints: {
-        wood: { max: 300 },
-        labor: { max: 110 }, // labor should be <= 110
-        storage: lessEq(400) // you can use the helper functions instead
-    },
-    variables: {
-        table: { wood: 30, labor: 5, profit: 1200, storage: 30 },
-        dresser: { wood: 20, labor: 10, profit: 1600, storage: 50 }
-    },
-    integers: [ "table", "dresser" ] // these variables must have an integer value in the solution
+  direction: "maximize",
+  objective: "profit",
+  constraints: {
+    wood: { max: 300 },
+    labor: { max: 110 }, // labor should be <= 110
+    storage: lessEq(400) // you can use the helper functions instead
+  },
+  variables: {
+    table: { wood: 30, labor: 5, profit: 1200, storage: 30 },
+    dresser: { wood: 20, labor: 10, profit: 1600, storage: 50 }
+  },
+  integers: ["table", "dresser"] // these variables must have an integer value in the solution
 }
 
 const solution = solve(model)
@@ -74,44 +81,48 @@ const solution = solve(model)
 
 Iterables and objects can be mixed and matched for the `constraints` and `variables` fields.
 Additionally, each variable's coefficients can be an object or an iterable. E.g.:
-```typescript
-const constraints =
-    new Map<string, Constraint>()
-        .set("wood", { max: 300 })
-        .set("labor", lessEq(110))
-        .set("storage", lessEq(400))
 
-const dresser =
-    new Map<string, number>()
-        .set("wood", 20)
-        .set("labor", 10)
-        .set("profit", 1600)
-        .set("storage", 50)
+<!-- prettier-ignore-start -->
+
+```typescript
+const constraints = new Map<string, Constraint>()
+  .set("wood", { max: 300 })
+  .set("labor", lessEq(110))
+  .set("storage", lessEq(400))
+
+const dresser = new Map<string, number>()
+  .set("wood", 20)
+  .set("labor", 10)
+  .set("profit", 1600)
+  .set("storage", 50)
 
 const model: Model<string, string> = {
-    direction: "maximize",
-    objective: "profit",
-    constraints: constraints, // is an iterable
-    variables: { // kept as an object
-        table: { wood: 30, labor: 5, profit: 1200, storage: 30 }, // an object
-        dresser: dresser // an iterable
-    },
-    integers: true // all variables are indicated as integer
+  direction: "maximize",
+  objective: "profit",
+  constraints: constraints, // is an iterable
+  variables: { // kept as an object
+    table: { wood: 30, labor: 5, profit: 1200, storage: 30 }, // an object
+    dresser: dresser // an iterable
+  },
+  integers: true // all variables are indicated as integer
 }
 
 const solution: Solution<string> = solve(model)
 // { status: "optimal", result: 14400, variables: [ ["table", 8], ["dresser", 3] ] }
 ```
 
+<!-- prettier-ignore-end -->
+
 ## API
 
 This is a stripped down version `YALPS.d.ts`.
 Use the JSDoc annotations / hover information in your editor for more extensive documentation.
+
 ```typescript
 interface Constraint {
-    equal?: number
-    min?: number
-    max?: number
+  equal?: number
+  min?: number
+  max?: number
 }
 
 const lessEq: (value: number) => Constraint
@@ -120,121 +131,121 @@ const equalTo: (value: number) => Constraint
 const inRange: (lower: number, upper: number) => Constraint
 
 type Coefficients<ConstraintKey = string> =
-    | Iterable<[ConstraintKey, number]>
-    | (ConstraintKey extends string ? { [key in ConstraintKey]?: number } : never)
+  | Iterable<[ConstraintKey, number]>
+  | (ConstraintKey extends string ? { [key in ConstraintKey]?: number } : never)
 
 type OptimizationDirection = "maximize" | "minimize"
 
 interface Model<VariableKey = string, ConstraintKey = string> {
-    direction?: OptimizationDirection // defaults to `"maximize"` if left blank
-    objective?: ConstraintKey // the value to optimize
+  direction?: OptimizationDirection // defaults to `"maximize"` if left blank
+  objective?: ConstraintKey // the value to optimize
 
-    constraints:
-        | Iterable<[ConstraintKey, Constraint]>
-        | (ConstraintKey extends string ? { [key in ConstraintKey]: Constraint } : never)
+  constraints:
+    | Iterable<[ConstraintKey, Constraint]>
+    | (ConstraintKey extends string ? { [key in ConstraintKey]: Constraint } : never)
 
-    variables:
-        | Iterable<[VariableKey, Coefficients<ConstraintKey>]>
-        | (VariableKey extends string ? { [key in VariableKey]: Coefficients<ConstraintKey> } : never)
+  variables:
+    | Iterable<[VariableKey, Coefficients<ConstraintKey>]>
+    | (VariableKey extends string ? { [key in VariableKey]: Coefficients<ConstraintKey> } : never)
 
-    /**
-     * An `Iterable` of variable keys that indicate the corresponding variables are integer.
-     * It can also be a `boolean`, indicating whether all variables are integer or not.
-     * If this is left blank, then all variables are treated as not integer.
-     */
-    integers?: boolean | Iterable<VariableKey>
+  /**
+   * An `Iterable` of variable keys that indicate the corresponding variables are integer.
+   * It can also be a `boolean`, indicating whether all variables are integer or not.
+   * If this is left blank, then all variables are treated as not integer.
+   */
+  integers?: boolean | Iterable<VariableKey>
 
-    /**
-     * An `Iterable` of variable keys that indicate the corresponding variables are binary
-     * (can only be 0 or 1 in the solution).
-     * It can also be a `boolean`, indicating whether all variables are binary or not.
-     * If this is left blank, then all variables are treated as not binary.
-     */
-    binaries?: boolean | Iterable<VariableKey>
+  /**
+   * An `Iterable` of variable keys that indicate the corresponding variables are binary
+   * (can only be 0 or 1 in the solution).
+   * It can also be a `boolean`, indicating whether all variables are binary or not.
+   * If this is left blank, then all variables are treated as not binary.
+   */
+  binaries?: boolean | Iterable<VariableKey>
 }
 
 type SolutionStatus = "optimal" | "infeasible" | "unbounded" | "timedout" | "cycled"
 
 type Solution<VariableKey = string> = {
-    /**
-     * `status` indicates what type of solution, if any, the solver was able to find.
-     *
-     * `"optimal"` indicates everything went ok, and the solver found an optimal solution.
-     * `"infeasible"` indicates that the problem has no possible solutions.
-     * `"unbounded"` indicates a variable, or combination of variables, are not sufficiently constrained.
-     * `"timedout"` indicates that the solver exited early for an integer problem.
-     * `"cycled"` indicates that the simplex method cycled and exited (this is rare).
-     */
-    status: SolutionStatus
+  /**
+   * `status` indicates what type of solution, if any, the solver was able to find.
+   *
+   * `"optimal"` indicates everything went ok, and the solver found an optimal solution.
+   * `"infeasible"` indicates that the problem has no possible solutions.
+   * `"unbounded"` indicates a variable, or combination of variables, are not sufficiently constrained.
+   * `"timedout"` indicates that the solver exited early for an integer problem.
+   * `"cycled"` indicates that the simplex method cycled and exited (this is rare).
+   */
+  status: SolutionStatus
 
-    /**
-     * The final, maximized or minimized value of the objective.
-     * It may be `NaN` in the case that `status` is `"infeasible"`, `"cycled"`, or `"timedout"`.
-     * It may also be +-`Infinity` in the case that `status` is `"unbounded"`.
-     */
-    result: number
+  /**
+   * The final, maximized or minimized value of the objective.
+   * It may be `NaN` in the case that `status` is `"infeasible"`, `"cycled"`, or `"timedout"`.
+   * It may also be +-`Infinity` in the case that `status` is `"unbounded"`.
+   */
+  result: number
 
-    /**
-     * An array of variables and their coefficients that add up to `result` while satisfying the constraints of the problem.
-     * Variables with a coefficient of `0` are not included in this by default.
-     */
-    variables: [VariableKey, number][]
+  /**
+   * An array of variables and their coefficients that add up to `result` while satisfying the constraints of the problem.
+   * Variables with a coefficient of `0` are not included in this by default.
+   */
+  variables: [VariableKey, number][]
 }
 
 interface Options {
-    /**
-     * Numbers with magnitude equal to or less than the provided precision are treated as zero.
-     * Similarly, the precision determines whether a number is sufficiently integer.
-     * The default value is `1E-8`.
-    */
-    precision?: number
+  /**
+   * Numbers with magnitude equal to or less than the provided precision are treated as zero.
+   * Similarly, the precision determines whether a number is sufficiently integer.
+   * The default value is `1E-8`.
+   */
+  precision?: number
 
-    /**
-     * In rare cases, the solver can cycle.
-     * This is assumed to be the case when the number of pivots exceeds `maxPivots`.
-     * Setting this to `true` will cause the solver to explicitly check for cycles and stop early if one is found.
-     * The default value is `false`.
-     */
-    checkCycles?: boolean
+  /**
+   * In rare cases, the solver can cycle.
+   * This is assumed to be the case when the number of pivots exceeds `maxPivots`.
+   * Setting this to `true` will cause the solver to explicitly check for cycles and stop early if one is found.
+   * The default value is `false`.
+   */
+  checkCycles?: boolean
 
-    /**
-     * This determines the maximum number of pivots allowed within the simplex method.
-     * If this is exceeded, then it assumed that the solver cycled.
-     * The default value is `8192`.
-     */
-    maxPivots?: number
+  /**
+   * This determines the maximum number of pivots allowed within the simplex method.
+   * If this is exceeded, then it assumed that the solver cycled.
+   * The default value is `8192`.
+   */
+  maxPivots?: number
 
-    /**
-     * This option applies to integer problems only.
-     * If an integer solution is found within
-     * `(1 +- tolerance) * {the problem's non-integer solution}`,
-     * then this approximate integer solution is returned.
-     * For example, a tolereance of `0.05` allows integer solutions found within 5% of the non-integer solution to be returned.
-     * The default value is `0` (only find the most optimal solution).
-     */
-    tolerance?: number
+  /**
+   * This option applies to integer problems only.
+   * If an integer solution is found within
+   * `(1 +- tolerance) * {the problem's non-integer solution}`,
+   * then this approximate integer solution is returned.
+   * For example, a tolereance of `0.05` allows integer solutions found within 5% of the non-integer solution to be returned.
+   * The default value is `0` (only find the most optimal solution).
+   */
+  tolerance?: number
 
-    /**
-     * This option applies to integer problems only.
-     * It specifies, in milliseconds, the maximum amount of time the solver may take.
-     * The default value is `Infinity` (no timeout).
-     */
-    timeout?: number
+  /**
+   * This option applies to integer problems only.
+   * It specifies, in milliseconds, the maximum amount of time the solver may take.
+   * The default value is `Infinity` (no timeout).
+   */
+  timeout?: number
 
-    /**
-     * This option applies to integer problems only.
-     * It determines the maximum number of iterations for the main branch and cut algorithm.
-     * It can be used alongside or instead of `timeout` to prevent the solver from taking too long.
-     * The default value is `32768`.
-     */
-    maxIterations?: number
+  /**
+   * This option applies to integer problems only.
+   * It determines the maximum number of iterations for the main branch and cut algorithm.
+   * It can be used alongside or instead of `timeout` to prevent the solver from taking too long.
+   * The default value is `32768`.
+   */
+  maxIterations?: number
 
-    /**
-     * Controls whether variables that end up having a value of `0`
-     * should be included in `variables` in the resulting `Solution`.
-     * The default value is `false`.
-     */
-    includeZeroVariables?: boolean
+  /**
+   * Controls whether variables that end up having a value of `0`
+   * should be included in `variables` in the resulting `Solution`.
+   * The default value is `false`.
+   */
+  includeZeroVariables?: boolean
 }
 
 const defaultOptions: Required<Options>
@@ -360,6 +371,7 @@ SHIP08S: 778 constraints, 2387 variables, 0 integers:
 │ jsLPSolver │ 65.88 │ 10.59  │   4.88   │
 └────────────┴───────┴────────┴──────────┘
 </pre>
+
 (More integer benchmarks are intended to be added at some point.)
 
 The code used for these benchmarks is available under `bechmarks/`.

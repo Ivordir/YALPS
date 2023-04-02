@@ -53,20 +53,20 @@ export type Model<VariableKey = string, ConstraintKey = string> = {
   readonly direction?: OptimizationDirection
 
   /**
-  * The key of the value to optimize. Can be omitted,
-  * in which case the solver gives some solution (if any) that satisfies the constraints.
-  * @example
-  * Note that constraints can be placed upon the objective itself.
-  * Maximize up to a certain point:
-  * ```
-  * {
-  *   direction: "maximize",
-  *   objective: "obj",
-  *   constraints: { obj: { max: 100 } },
-  *   variables: [ ... ]
-  * }
-  * ```
-  */
+   * The key of the value to optimize. Can be omitted,
+   * in which case the solver gives some solution (if any) that satisfies the constraints.
+   * @example
+   * Note that constraints can be placed upon the objective itself.
+   * Maximize up to a certain point:
+   * ```
+   * {
+   *   direction: "maximize",
+   *   objective: "obj",
+   *   constraints: { obj: { max: 100 } },
+   *   variables: [ ... ]
+   * }
+   * ```
+   */
   readonly objective?: ConstraintKey
 
   /**
@@ -138,12 +138,12 @@ export type Model<VariableKey = string, ConstraintKey = string> = {
    */
   readonly integers?: boolean | Iterable<VariableKey>
 
-   /**
-    * An `Iterable` of variable keys that indicate the corresponding variables are binary
-    * (can only be 0 or 1 in the solution).
-    * It can also be a `boolean`, indicating whether all variables are binary or not.
-    * If this is left blank, then all variables are treated as not binary.
-    */
+  /**
+   * An `Iterable` of variable keys that indicate the corresponding variables are binary
+   * (can only be 0 or 1 in the solution).
+   * It can also be a `boolean`, indicating whether all variables are binary or not.
+   * If this is left blank, then all variables are treated as not binary.
+   */
   readonly binaries?: boolean | Iterable<VariableKey>
 }
 
@@ -151,12 +151,7 @@ export type Model<VariableKey = string, ConstraintKey = string> = {
  * This indicates what type of solution, if any, the solver was able to find.
  * @see `status` on `Solution` for detailed information.
  */
-export type SolutionStatus =
-  | "optimal"
-  | "infeasible"
-  | "unbounded"
-  | "timedout"
-  | "cycled"
+export type SolutionStatus = "optimal" | "infeasible" | "unbounded" | "timedout" | "cycled"
 
 /**
  * The solution object returned by the solver.
@@ -210,7 +205,7 @@ export type Options = {
    * Numbers with magnitude equal to or less than the provided precision are treated as zero.
    * Similarly, the precision determines whether a number is sufficiently integer.
    * The default value is `1e-8`.
-  */
+   */
   readonly precision?: number
 
   /**

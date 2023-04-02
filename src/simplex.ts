@@ -38,13 +38,10 @@ const pivot = (tableau: Tableau, row: number, col: number) => {
   }
 }
 
+type PivotHistory = (readonly [row: number, col: number])[]
+
 // Checks if the simplex method has encountered a cycle.
-const hasCycle = (
-  history: (readonly [row: number, col: number])[],
-  tableau: Tableau,
-  row: number,
-  col: number
-) => {
+const hasCycle = (history: PivotHistory, tableau: Tableau, row: number, col: number) => {
   // This whole function seems somewhat inefficient,
   // but there was no? noticable impact in the benchmarks.
   history.push([tableau.variableAtPosition[tableau.width + row], tableau.variableAtPosition[col]])
@@ -67,7 +64,7 @@ const hasCycle = (
 
 // Finds the optimal solution given some basic feasible solution.
 const phase2 = (tableau: Tableau, options: Required<Options>): [SolutionStatus, number] => {
-  const pivotHistory: (readonly [number, number])[] = []
+  const pivotHistory: PivotHistory = []
   const { precision, maxPivots, checkCycles } = options
   for (let iter = 0; iter < maxPivots; iter++) {
     // Find the entering column/variable
@@ -107,7 +104,7 @@ const phase2 = (tableau: Tableau, options: Required<Options>): [SolutionStatus, 
 
 // Transforms a tableau into a basic feasible solution.
 const phase1 = (tableau: Tableau, options: Required<Options>): [SolutionStatus, number] => {
-  const pivotHistory: (readonly [number, number])[] = []
+  const pivotHistory: PivotHistory = []
   const { precision, maxPivots, checkCycles } = options
   for (let iter = 0; iter < maxPivots; iter++) {
     // Find the leaving row/variable
