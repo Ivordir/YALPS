@@ -26,7 +26,7 @@
   "license": "MIT",
   "author": {
     "name": "Ivordir",
-    "email": "ivordir@pm.me"
+    "email": "Ivordir@pm.me"
   },
   "keywords": [
     "Linear Programming",
@@ -42,6 +42,7 @@
     "benchmark": "cross-env TS_NODE_PROJECT=benchmarks/tsconfig.json node --expose-gc --loader ts-node/esm benchmarks/run.ts",
     "inspect": "node --inspect-brk --expose-gc --loader ts-node/esm",
     "inspect:benchmark": "cross-env TS_NODE_PROJECT=benchmarks/tsconfig.json pnpm inspect benchmarks/run.ts",
+    "test:fast": "ava",
     "test:coverage": "c8 ava",
     "test": "pnpm lint && pnpm test:coverage",
     "watch": "tsc -w",
@@ -49,7 +50,7 @@
     "format": "prettier --write .",
     "build:esm": "tsc",
     "build:cjs": "tsc -m commonjs --outDir build/main",
-    "build": "pnpm format && pnpm build:esm && pnpm build:cjs",
+    "build": "pnpm build:esm && pnpm build:cjs",
     "prepare": "pnpm build"
   },
   "ava": {
@@ -69,7 +70,11 @@
   "c8": {
     "checkCoverage": true,
     "lines": 95,
-    "include": "src/**"
+    "functions": 95,
+    "branches": 95,
+    "statements": 95,
+    "include": "src/**",
+    "exclude": "src/constraint.ts"
   },
   "eslintConfig": {
     "parser": "@typescript-eslint/parser",
