@@ -31,7 +31,7 @@ export type TableauModel<VariableKey = string, ConstraintKey = string> = {
 }
 
 const convertToIterable = <K, V>(
-  seq: Iterable<readonly [K, V]> | (K extends string ? { readonly [key in K]?: V } : never)
+  seq: Iterable<readonly [K, V]> | ([K] extends [string] ? { readonly [key in K]?: V } : never)
 ) =>
   typeof (seq as any)[Symbol.iterator] === "function" // eslint-disable-line
     ? (seq as Iterable<readonly [K, V]>)

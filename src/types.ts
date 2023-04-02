@@ -26,7 +26,7 @@ export type Constraint = {
  */
 export type Coefficients<ConstraintKey = string> =
   | Iterable<readonly [ConstraintKey, number]>
-  | (ConstraintKey extends string ? { readonly [key in ConstraintKey]?: number } : never)
+  | ([ConstraintKey] extends [string] ? { readonly [key in ConstraintKey]?: number } : never)
 
 /**
  * Indicates whether to maximize or minimize the objective.
@@ -95,7 +95,7 @@ export type Model<VariableKey = string, ConstraintKey = string> = {
    */
   readonly constraints:
     | Iterable<readonly [ConstraintKey, Constraint]>
-    | (ConstraintKey extends string ? { readonly [key in ConstraintKey]: Constraint } : never)
+    | ([ConstraintKey] extends [string] ? { readonly [key in ConstraintKey]?: Constraint } : never)
 
   /**
    * An object or `Iterable` representing the variables of the problem.
@@ -129,7 +129,7 @@ export type Model<VariableKey = string, ConstraintKey = string> = {
    */
   readonly variables:
     | Iterable<readonly [VariableKey, Coefficients<ConstraintKey>]>
-    | (VariableKey extends string ? { readonly [key in VariableKey]: Coefficients<ConstraintKey> } : never)
+    | ([VariableKey] extends [string] ? { readonly [key in VariableKey]?: Coefficients<ConstraintKey> } : never)
 
   /**
    * An `Iterable` of variable keys that indicate the corresponding variables are integer.
