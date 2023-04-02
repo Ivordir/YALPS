@@ -42,13 +42,14 @@
     "benchmark": "TS_NODE_PROJECT=benchmarks/tsconfig.json node --expose-gc --loader ts-node/esm benchmarks/run.ts",
     "inspect": "node --inspect-brk --expose-gc --loader ts-node/esm",
     "inspect:benchmark": "TS_NODE_PROJECT=benchmarks/tsconfig.json pnpm inspect benchmarks/run.ts",
-    "test": "c8 ava",
+    "test:coverage": "c8 ava",
+    "test": "pnpm lint && pnpm test:coverage",
     "watch": "tsc -w",
     "lint": "eslint .",
     "format": "prettier --write .",
     "build:esm": "tsc",
     "build:cjs": "tsc -m commonjs --outDir build/main",
-    "build": "pnpm build:esm && pnpm build:cjs",
+    "build": "pnpm format && pnpm build:esm && pnpm build:cjs",
     "prepare": "pnpm build"
   },
   "ava": {
