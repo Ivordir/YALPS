@@ -49,7 +49,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "build:esm": "tsc",
-    "build:cjs": "tsc -m commonjs --outDir lib/main && pnpm renamer --find .js --replace .cjs lib/main/**",
+    "build:cjs": "tsc -m commonjs --outDir lib/main && pnpm renamer --force --find .js --replace .cjs lib/main/**",
     "build": "pnpm build:esm && pnpm build:cjs",
     "prepare": "pnpm build"
   },
