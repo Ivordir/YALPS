@@ -9,21 +9,8 @@ on:
 
 jobs:
   build_test:
-    name: Build and Test
+    name: Build and test
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 19
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-
-      - name: Install, build, and test
-        run: pnpm it
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/build-and-test

@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Type of semantic release
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - none
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Publish release
+    if: github.ref_name == 'main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build and Test
+        uses: ./.github/actions/build-and-test
+
+      - name: Bump version
+        if: inputs.version != 'none'
+        run: |
+          git config --global user.email Ivordir@pm.me
+          git config --global user.name Ivordir
+          pnpm version ${{ inputs.version }}
+          git push --follow-tags
+
+      - name: Publish
+        run: pnpm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.npm_token }}
