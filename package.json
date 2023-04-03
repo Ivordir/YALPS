@@ -4,16 +4,16 @@
   "description": "Yet another linear programming solver. (A rewrite of javascript-lp-solver.) Aims to be decently fast.",
   "homepage": "https://github.com/Ivordir/YALPS",
   "files": [
-    "build"
+    "lib"
   ],
-  "main": "build/main/index.js",
-  "module": "build/module/index.js",
+  "main": "lib/main/index.js",
+  "module": "lib/module/index.js",
   "exports": {
-    "import": "./build/module/index.js",
-    "require": "./build/main/index.js",
-    "default": "./build/module/index.js"
+    "import": "./lib/module/index.js",
+    "require": "./lib/main/index.js",
+    "default": "./lib/module/index.js"
   },
-  "types": "build/types/index.d.ts",
+  "types": "lib/types/index.d.ts",
   "sideEffects": false,
   "type": "module",
   "repository": {
@@ -49,7 +49,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "build:esm": "tsc",
-    "build:cjs": "tsc -m commonjs --outDir build/main",
+    "build:cjs": "tsc -m commonjs --outDir lib/main",
     "build": "pnpm build:esm && pnpm build:cjs",
     "prepare": "pnpm build"
   },
@@ -86,7 +86,7 @@
       "prefer-arrow"
     ],
     "ignorePatterns": [
-      "build/**"
+      "lib/**"
     ],
     "extends": [
       "plugin:@typescript-eslint/recommended",

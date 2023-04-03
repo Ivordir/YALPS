@@ -4,9 +4,9 @@
     // Output
     "target": "ES2020",
     "module": "ES2020",
-    "outDir": "build/module",
+    "outDir": "lib/module",
     "declaration": true,
-    "declarationDir": "build/types",
+    "declarationDir": "lib/types",
 
     // Files and resolution
     "moduleResolution": "node",
