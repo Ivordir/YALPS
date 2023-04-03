@@ -94,10 +94,8 @@ export const branchAndCut = <VarKey, ConKey>(
   const { tableau, sign, integers } = tabmod
   const { precision, maxIterations, tolerance, timeout } = options
   const [initVariable, initValue, initFrac] = mostFractionalVar(tableau, integers)
-  if (initFrac <= precision) {
-    // Wow, the initial solution is integer
-    return [tabmod, "optimal", initResult]
-  }
+  // Wow, the initial solution is integer
+  if (initFrac <= precision) return [tabmod, "optimal", initResult]
 
   const branches = new Heap<Branch>((x, y) => x[0] - y[0])
   branches.push([initResult, [[-1, initVariable, Math.ceil(initValue)]]])

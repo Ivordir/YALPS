@@ -353,9 +353,7 @@ test("Removing a variable gives one less column (and one row if binary)", testAl
     // remove the binary variable's constraint row
     let binaryRow = tableau.height - 1
     for (; binaryRow >= 0; binaryRow--) {
-      if (tableau.matrix[binaryRow * tableau.width + index + 1] === 1.0) {
-        break
-      }
+      if (tableau.matrix[binaryRow * tableau.width + index + 1] === 1.0) break
     }
     const width = tableau.width - 1
     matrix.set(matrix.subarray((binaryRow + 1) * width), binaryRow * width)

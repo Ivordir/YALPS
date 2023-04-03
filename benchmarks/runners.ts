@@ -73,9 +73,7 @@ const glpkModel = (model: BenchModel) => {
   const objective: GLPKModel["objective"]["vars"] = []
   for (const [name, variable] of model.variables) {
     for (const [key, coef] of variable) {
-      if (model.objective === key) {
-        objective.push({ name, coef })
-      }
+      if (model.objective === key) objective.push({ name, coef })
       constraints.get(key)?.vars.push({ name, coef })
     }
   }
