@@ -119,7 +119,7 @@ This is a stripped down version of YALPS's API.
 Use the JSDoc annotations / hover information in your editor for more extensive documentation.
 
 ```typescript
-interface Constraint {
+type Constraint = {
   equal?: number
   min?: number
   max?: number
@@ -136,7 +136,7 @@ type Coefficients<ConstraintKey = string> =
 
 type OptimizationDirection = "maximize" | "minimize"
 
-interface Model<VariableKey = string, ConstraintKey = string> {
+type Model<VariableKey = string, ConstraintKey = string> = {
   direction?: OptimizationDirection // defaults to `"maximize"` if left blank
   objective?: ConstraintKey // the value to optimize
 
@@ -192,7 +192,7 @@ type Solution<VariableKey = string> = {
   variables: [VariableKey, number][]
 }
 
-interface Options {
+type Options = {
   /**
    * Numbers with magnitude equal to or less than the provided precision are treated as zero.
    * Similarly, the precision determines whether a number is sufficiently integer.
