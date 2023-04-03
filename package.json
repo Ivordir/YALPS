@@ -8,12 +8,12 @@
   ],
   "main": "lib/main/index.js",
   "module": "lib/module/index.js",
+  "types": "lib/types/index.d.ts",
   "exports": {
     "import": "./lib/module/index.js",
     "require": "./lib/main/index.js",
     "default": "./lib/module/index.js"
   },
-  "types": "lib/types/index.d.ts",
   "sideEffects": false,
   "type": "module",
   "repository": {
@@ -49,7 +49,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "build:esm": "tsc",
-    "build:cjs": "tsc -m commonjs --outDir lib/main",
+    "build:cjs": "tsc -m commonjs --outDir lib/main && rename .js .cjs lib/main/*.js",
     "build": "pnpm build:esm && pnpm build:cjs",
     "prepare": "pnpm build"
   },
