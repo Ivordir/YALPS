@@ -6,12 +6,12 @@
   "files": [
     "lib"
   ],
-  "main": "lib/main/index.cjs",
+  "main": "lib/main/index.js",
   "module": "lib/module/index.js",
   "types": "lib/types/index.d.ts",
   "exports": {
     "import": "./lib/module/index.js",
-    "require": "./lib/main/index.cjs"
+    "require": "./lib/main/index.js"
   },
   "sideEffects": false,
   "type": "module",
