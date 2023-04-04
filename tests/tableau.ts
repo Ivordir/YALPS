@@ -151,9 +151,9 @@ test("All variables marked as integer", testAll, (t, model) => {
 
 test("Integers as a set and array", testAll, (t, model) => {
   const rand = newRand(model.hash)
-  const varSmaple = sample(rand, keys(model.variables))
-  const setSample = tableauFrom.integers(model, new Set(varSmaple))
-  const iterSample = tableauFrom.integers(model, varSmaple)
+  const varSample = sample(rand, keys(model.variables))
+  const setSample = tableauFrom.integers(model, new Set(varSample))
+  const iterSample = tableauFrom.integers(model, varSample)
   t.deepEqual(iterSample, setSample)
 })
 

@@ -264,7 +264,7 @@ const readBounds = (s: ParseState, m: ModelFromMPS) => {
     const type = field1(line)
 
     const col = field3(line)
-    if (col === "") return err("Mising column name")
+    if (col === "") return err("Missing column name")
     if (!m.variables.has(col)) return err(`The column '${col}' was not defined in the COLUMNS section`)
 
     let val = NaN

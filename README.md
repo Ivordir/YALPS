@@ -267,9 +267,9 @@ e.g. [glpk.js](https://www.npmjs.com/package/glpk.js).
 
 Nevertheless, below are the results from some benchmarks comparing YALPS to other solvers.
 Each solver was run 30 times for each benchmark problem.
-A full garbage collection was manually trigged before starting each solver's 30 trials.
-The averages and standard deviations are measured in miliseconds. Slowdown is calculated as `mean / fastest mean`.
-The benchmarks were run on ts-node v10.9.1 and node v19.8.1. Your milage may vary in a browser setting.
+A full garbage collection was manually triggered before starting each solver's 30 trials.
+The averages and standard deviations are measured in milliseconds. Slowdown is calculated as `mean / fastest mean`.
+The benchmarks were run on ts-node v10.9.1 and node v19.8.1. Your mileage may vary in a browser setting.
 
 <pre>
 Monster 2: 888 constraints, 924 variables, 112 integers:

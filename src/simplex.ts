@@ -43,7 +43,7 @@ type PivotHistory = (readonly [row: number, col: number])[]
 // Checks if the simplex method has encountered a cycle.
 const hasCycle = (history: PivotHistory, tableau: Tableau, row: number, col: number) => {
   // This whole function seems somewhat inefficient,
-  // but there was no? noticable impact in the benchmarks.
+  // but there was no? noticeable impact in the benchmarks.
   history.push([tableau.variableAtPosition[tableau.width + row], tableau.variableAtPosition[col]])
   // the minimum length of a cycle is 6
   for (let length = 6; length <= Math.trunc(history.length / 2); length++) {

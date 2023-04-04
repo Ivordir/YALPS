@@ -102,7 +102,7 @@ export const branchAndCut = <VarKey, ConKey>(
   branches.push([initResult, [[1, initVariable, Math.floor(initValue)]]])
 
   // Set aside arrays/buffers to be reused over the course of the algorithm.
-  // One set of buffers stores the state of the currrent best solution.
+  // One set of buffers stores the state of the current best solution.
   // The other is used to solve the current candidate solution.
   // The two buffers are "swapped" once a new best solution is found.
   const maxExtraRows = integers.length * 2
