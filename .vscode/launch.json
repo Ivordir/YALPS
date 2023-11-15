@@ -8,14 +8,14 @@
       "name": "Debug/Run TS",
       "type": "node",
       "request": "launch",
-      "runtimeExecutable": "pnpm",
-      "program": "ts-node",
+      "outputCapture": "std",
       "args": [
+        "--import=tsimp",
         "${relativeFile}"
       ],
       "skipFiles": [
         "<node_internals>/**"
-      ]
+      ],
     },
     {
       "name": "Test via AVA",

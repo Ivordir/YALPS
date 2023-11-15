@@ -2,6 +2,7 @@
 /lib
 /coverage
 /temp
+/.tsimp
 
 # Visual Studio Code
 .vscode/*

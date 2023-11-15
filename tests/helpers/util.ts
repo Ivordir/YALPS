@@ -4,8 +4,7 @@ export const keys = <K, V>(array: TupleArray<K, V>) => array.map(([key]) => key)
 
 export const valueMapping =
   <V1, V2, K>(mapping: (v: V1) => V2) =>
-  ([key, value]: readonly [K, V1]): [K, V2] =>
-    [key, mapping(value)]
+  ([key, value]: readonly [K, V1]): [K, V2] => [key, mapping(value)]
 
 export const enumerate = <T>(array: readonly T[]) => array.map((x, i): [number, T] => [i, x])
 
