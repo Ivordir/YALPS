@@ -42,8 +42,11 @@
     "benchmark": "node --import=tsimp --expose-gc benchmarks/run.ts",
     "inspect": "node --import=tsimp --expose-gc --inspect-brk",
     "inspect:benchmark": "run-s \"inspect benchmarks/run.ts\"",
-    "test": "ava",
-    "test:coverage": "c8 ava",
+    "test:build": "tsimp --start",
+    "test:run": "ava",
+    "test": "run-s test:build test:run",
+    "test:coverage:run": "c8 ava",
+    "test:coverage": "run-s test:build test:coverage:run",
     "watch": "tsc -w",
     "lint": "eslint .",
     "format": "prettier --write .",
@@ -63,7 +66,6 @@
     "extensions": {
       "ts": "module"
     },
-    "workerThreads": false,
     "nodeArguments": [
       "--import=tsimp"
     ],
