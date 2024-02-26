@@ -5,9 +5,5 @@
     "allowJs": true,
     "checkJs": true,
     "types": ["node"],
-    "paths": {
-      "javascript-lp-solver": ["./types/javascript-lp-solver.d.ts"],
-      "glpk.js": ["./types/glpk.js.d.ts"]
-    }
   }
 }
