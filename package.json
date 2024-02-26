@@ -63,6 +63,7 @@
     "extensions": {
       "ts": "module"
     },
+    "workerThreads": false,
     "nodeArguments": [
       "--import=tsimp"
     ],
@@ -157,11 +158,11 @@
     "@types/node": "^20.11.20",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
-    "ava": "^5.3.1",
-    "c8": "^8.0.1",
+    "ava": "^6.1.1",
+    "c8": "^9.1.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
-    "eslint-config-standard-with-typescript": "^39.1.1",
+    "eslint-config-standard-with-typescript": "^43.0.1",
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "glpk.js": "^4.0.2",
     "javascript-lp-solver": "^0.4.24",
