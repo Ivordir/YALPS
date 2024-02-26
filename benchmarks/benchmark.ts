@@ -89,7 +89,7 @@ const resultsTable = (results: BenchmarkResults) => {
     table[name] = {
       mean: formatNum(mean),
       stdDev: formatNum(Math.sqrt(variance)),
-      slowdown: formatNum(mean / fastest)
+      slowdown: formatNum(mean / fastest),
     }
   }
   return table
@@ -106,7 +106,7 @@ export const benchmark = (
   benchmarks: readonly Benchmark[],
   solvers: readonly Runner[],
   numSamples = 30,
-  runValidation = true
+  runValidation = true,
 ) => {
   for (const bench of benchmarks) {
     if (runValidation) {
@@ -118,7 +118,7 @@ export const benchmark = (
     const { model } = bench
     const numInteger = model.integers.size + model.binaries.size
     console.log(
-      `${bench.name}: ${model.constraints.size} constraints, ${model.variables.size} variables, ${numInteger} integers:`
+      `${bench.name}: ${model.constraints.size} constraints, ${model.variables.size} variables, ${numInteger} integers:`,
     )
     console.table(resultsTable(sampleBenchmark(solvers, bench, numSamples)))
     console.log("")

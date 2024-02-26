@@ -70,12 +70,12 @@ export const convertBenchmark = (benchmark: Benchmark): TestCase => {
     ...benchmark.model,
     hash: 0,
     constraints: toArray(benchmark.model.constraints),
-    variables: toArray(benchmark.model.variables).map(valueMapping(toArray))
+    variables: toArray(benchmark.model.variables).map(valueMapping(toArray)),
   }
   const expected: Solution = {
     status: "optimal",
     result: benchmark.expected,
-    variables: []
+    variables: [],
   }
   return { ...benchmark, model, expected }
 }

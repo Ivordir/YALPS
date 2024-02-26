@@ -9,7 +9,7 @@ export const yalpsRunner: Runner<{ model: Model; options: Options }, Solution> =
   name: "YALPS",
   convert: (model, options) => ({ model, options: { ...options, maxPivots: Infinity } }),
   solve: ({ model, options }) => solve(model, options),
-  value: solution => solution.result
+  value: solution => solution.result,
 }
 
 const objectSet = (set: ReadonlySet<string> | undefined) => {
@@ -33,7 +33,7 @@ const jsLPVariablesObject = (model: BenchModel) => {
 const jsLPOptions = (options: Required<Options>) => ({
   tolerance: options.tolerance,
   timeout: options.timeout,
-  exitOnCycles: options.checkCycles
+  exitOnCycles: options.checkCycles,
 })
 
 const jsLPModel = (model: BenchModel, options: Required<Options>): JsLPModel => ({
@@ -43,17 +43,17 @@ const jsLPModel = (model: BenchModel, options: Required<Options>): JsLPModel => 
   variables: jsLPVariablesObject(model),
   ints: objectSet(model.integers),
   binaries: objectSet(model.binaries),
-  options: jsLPOptions(options)
+  options: jsLPOptions(options),
 })
 
 export const jsLPRunner: Runner<{ model: JsLPModel; precision: number }, JsLPSolution> = {
   name: "jsLPSolver",
   convert: (model, options) => ({
     model: jsLPModel(model, options),
-    precision: options.precision
+    precision: options.precision,
   }),
   solve: ({ model, precision }) => jsLP.Solve(model, precision),
-  value: solution => (solution.feasible ? solution.result : NaN)
+  value: solution => (solution.feasible ? solution.result : NaN),
 }
 
 const glpkModel = (model: BenchModel) => {
@@ -83,11 +83,11 @@ const glpkModel = (model: BenchModel) => {
     objective: {
       direction: model.direction === "minimize" ? glpk.GLP_MIN : glpk.GLP_MAX,
       name: model.objective ?? "",
-      vars: objective
+      vars: objective,
     },
     subjectTo: Array.from(constraints.values()),
     binaries: Array.from(model.binaries),
-    generals: Array.from(model.integers)
+    generals: Array.from(model.integers),
   }
 }
 
@@ -97,10 +97,10 @@ export const glpkRunner: Runner<{ model: GLPKModel; options: GLPKOptions }, GLPK
   name: "glpk.js",
   convert: (model, options) => ({
     model: glpkModel(model),
-    options: glpkOptions(options)
+    options: glpkOptions(options),
   }),
   solve: ({ model, options }) => glpk.solve(model, options),
-  value: ({ result }) => ([glpk.GLP_OPT, glpk.GLP_FEAS, glpk.GLP_UNBND].includes(result.status) ? result.z : NaN)
+  value: ({ result }) => ([glpk.GLP_OPT, glpk.GLP_FEAS, glpk.GLP_UNBND].includes(result.status) ? result.z : NaN),
 }
 
 export const runners: readonly Runner[] = [yalpsRunner as Runner, jsLPRunner as Runner, glpkRunner as Runner]

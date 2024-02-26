@@ -8,7 +8,7 @@ type SolvedTestCase = TestCase & { readonly solution: Readonly<Solution> }
 
 const testData: readonly SolvedTestCase[] = testCases().map(data => ({
   ...data,
-  solution: solve(data.model, data.options)
+  solution: solve(data.model, data.options),
 }))
 
 const valid = (solution: Readonly<Solution>, { model, options, expected }: SolvedTestCase) =>
@@ -95,7 +95,7 @@ test("A more restrictive constraint that does not conflict with the optimal solu
         key,
         constraint,
         lowerSlack,
-        upperSlack
+        upperSlack,
       }
     })
     .filter(x => x.lowerSlack > 0.0 || x.upperSlack > 0.0)

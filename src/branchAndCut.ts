@@ -12,7 +12,7 @@ type Buffer = {
 const buffer = (matrixLength: number, posVarLength: number): Buffer => ({
   matrix: new Float64Array(matrixLength),
   positionOfVariable: new Int32Array(posVarLength),
-  variableAtPosition: new Int32Array(posVarLength)
+  variableAtPosition: new Int32Array(posVarLength),
 })
 
 type Cut = readonly [sign: number, variable: number, value: number]
@@ -22,7 +22,7 @@ type Branch = readonly [eval: number, cuts: readonly Cut[]]
 const applyCuts = (
   tableau: Tableau,
   { matrix, positionOfVariable, variableAtPosition }: Buffer,
-  cuts: readonly Cut[]
+  cuts: readonly Cut[],
 ): Tableau => {
   const { width, height } = tableau
   matrix.set(tableau.matrix)
@@ -56,14 +56,14 @@ const applyCuts = (
     width,
     height: height + cuts.length,
     positionOfVariable: positionOfVariable.subarray(0, length),
-    variableAtPosition: variableAtPosition.subarray(0, length)
+    variableAtPosition: variableAtPosition.subarray(0, length),
   }
 }
 
 // Finds the integer variable with the most fractional value.
 const mostFractionalVar = (
   tableau: Tableau,
-  intVars: readonly number[]
+  intVars: readonly number[],
 ): [variable: number, value: number, frac: number] => {
   let highestFrac = 0.0
   let variable = 0
@@ -89,7 +89,7 @@ const mostFractionalVar = (
 export const branchAndCut = <VarKey, ConKey>(
   tabmod: TableauModel<VarKey, ConKey>,
   initResult: number,
-  options: Required<Options>
+  options: Required<Options>,
 ): [TableauModel<VarKey, ConKey>, SolutionStatus, number] => {
   const { tableau, sign, integers } = tabmod
   const { precision, maxIterations, tolerance, timeout } = options

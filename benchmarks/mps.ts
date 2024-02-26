@@ -134,7 +134,7 @@ const readColumns = (s: ParseState, m: ModelFromMPS) => {
     if (name === "") return err("Missing column name")
     if (m.variables.has(name))
       return err(
-        `Values for the column '${name}' were previously provided -- all values for a column must come consecutively`
+        `Values for the column '${name}' were previously provided -- all values for a column must come consecutively`,
       )
 
     const variable = new Map<string, number>()
@@ -305,7 +305,7 @@ export const modelFromMps = (mps: string, direction?: OptimizationDirection): Mo
   const parseState = {
     lines: mps.split(/\r?\n/),
     index: 0,
-    constraintTypes: new Map()
+    constraintTypes: new Map(),
   }
 
   const model: ModelFromMPS = {
@@ -315,7 +315,7 @@ export const modelFromMps = (mps: string, direction?: OptimizationDirection): Mo
     variables: new Map(),
     integers: new Set(),
     binaries: new Set(),
-    bounds: new Map()
+    bounds: new Map(),
   }
 
   const error = readName(parseState, model)

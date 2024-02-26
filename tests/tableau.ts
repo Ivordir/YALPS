@@ -17,11 +17,11 @@ test("Empty model", t => {
       width: 1,
       height: 1,
       positionOfVariable: new Int32Array([0, 1]),
-      variableAtPosition: new Int32Array([0, 1])
+      variableAtPosition: new Int32Array([0, 1]),
     },
     sign: 1.0,
     variables: [],
-    integers: []
+    integers: [],
   }
   t.deepEqual(result, expected)
 })
@@ -43,7 +43,7 @@ const tableauFrom: { [key in keyof Model]-?: (model: Model, value: Model[key]) =
   constraints: tableauFromModelWith("constraints"),
   variables: tableauFromModelWith("variables"),
   integers: tableauFromModelWith("integers"),
-  binaries: tableauFromModelWith("binaries")
+  binaries: tableauFromModelWith("binaries"),
 }
 
 test("Objective row is zero if no objective is given", testAll, (t, model) => {
@@ -192,7 +192,7 @@ test("Binary has higher precedence than integer", testAll, (t, model) => {
 
 test("Swapping bound direction gives negated constraint row", testAll, (t, model) => {
   const constraints = enumerate(model.constraints).filter(
-    ([, [, con]]) => con.equal == null && (con.max == null) !== (con.min == null)
+    ([, [, con]]) => con.equal == null && (con.max == null) !== (con.min == null),
   )
   if (constraints.length === 0) return // model not applicable
 
@@ -231,7 +231,7 @@ test("Equal has higher precedence than min and max", testAll, (t, model) => {
   const multiple = {
     equal: value,
     min: value + 1.0,
-    max: value - 1.0
+    max: value - 1.0,
   }
   modified[index] = [key, multiple]
   const result = tableauFrom.constraints(model, modified)
@@ -247,7 +247,7 @@ test("Constraints with the same key are merged", testAll, (t, model) => {
   const [key, constraint] = model.constraints[index]
   const other = {
     max: rand() * 100.0 + (constraint.max ?? 0.0),
-    min: rand() * 100.0 + (constraint.min ?? 0.0)
+    min: rand() * 100.0 + (constraint.min ?? 0.0),
   }
   const sameKey = model.constraints.slice()
   sameKey.push([key, other])
@@ -255,7 +255,7 @@ test("Constraints with the same key are merged", testAll, (t, model) => {
 
   const merged = {
     max: Math.min(constraint.equal ?? constraint.max ?? Infinity, other.max),
-    min: Math.max(constraint.equal ?? constraint.min ?? -Infinity, other.min)
+    min: Math.max(constraint.equal ?? constraint.min ?? -Infinity, other.min),
   }
   const constraints = model.constraints.slice()
   constraints[index] = [key, merged]
@@ -324,9 +324,9 @@ test("Removing a constraint gives less rows", testAll, (t, model) => {
       width: tableau.width,
       height: tableau.height - removedRows,
       positionOfVariable: tableau.positionOfVariable.subarray(0, tableau.positionOfVariable.length - removedRows),
-      variableAtPosition: tableau.variableAtPosition.subarray(0, tableau.variableAtPosition.length - removedRows)
+      variableAtPosition: tableau.variableAtPosition.subarray(0, tableau.variableAtPosition.length - removedRows),
     },
-    ...tableauRest
+    ...tableauRest,
   }
 
   t.deepEqual(result, expected)
@@ -367,11 +367,11 @@ test("Removing a variable gives one less column (and one row if binary)", testAl
       width: tableau.width - 1,
       height: tableau.height - b,
       positionOfVariable: tableau.positionOfVariable.subarray(0, tableau.positionOfVariable.length - 1 - b),
-      variableAtPosition: tableau.variableAtPosition.subarray(0, tableau.variableAtPosition.length - 1 - b)
+      variableAtPosition: tableau.variableAtPosition.subarray(0, tableau.variableAtPosition.length - 1 - b),
     },
     sign,
     variables: removeIndex(variables, index),
-    integers: integers.filter(x => x !== index + 1).map(x => (x <= index ? x : x - 1))
+    integers: integers.filter(x => x !== index + 1).map(x => (x <= index ? x : x - 1)),
   }
 
   t.deepEqual(result, expected)

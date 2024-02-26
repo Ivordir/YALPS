@@ -12,7 +12,7 @@ export const readBenchmarks = (): Benchmark[] =>
     const model = {
       ...data.model,
       constraints,
-      variables
+      variables,
     }
 
     const options = { ...defaultOptions, ...data.options }

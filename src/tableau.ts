@@ -31,7 +31,7 @@ export type TableauModel<VariableKey = string, ConstraintKey = string> = {
 }
 
 const convertToIterable = <K, V>(
-  seq: Iterable<readonly [K, V]> | ([K] extends [string] ? { readonly [key in K]?: V } : never)
+  seq: Iterable<readonly [K, V]> | ([K] extends [string] ? { readonly [key in K]?: V } : never),
 ) =>
   typeof (seq as any)[Symbol.iterator] === "function" // eslint-disable-line
     ? (seq as Iterable<readonly [K, V]>)
@@ -45,7 +45,7 @@ const convertToSet = <T>(set: boolean | Iterable<T> | undefined): true | Set<T> 
   : new Set(set)
 
 export const tableauModel = <VarKey = string, ConKey = string>(
-  model: Model<VarKey, ConKey>
+  model: Model<VarKey, ConKey>,
 ): TableauModel<VarKey, ConKey> => {
   const { direction, objective, integers, binaries } = model
   const sign = direction === "minimize" ? -1.0 : 1.0

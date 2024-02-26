@@ -43,20 +43,20 @@ export const constraintsAreSatisfied = (solution: Readonly<Solution>, model: Tes
 export const variablesHaveValidValues = (
   solution: Readonly<Solution>,
   { integers, binaries }: TestCase["model"],
-  precision: number
+  precision: number,
 ) =>
   solution.variables.every(
     ([variable, n]) =>
       n >= -precision &&
       (!(integers.has(variable) || binaries.has(variable)) || Math.abs(n - Math.round(n)) <= precision) &&
-      (!binaries.has(variable) || n <= 1 + precision)
+      (!binaries.has(variable) || n <= 1 + precision),
   )
 
 export const validSolution = (
   solution: Readonly<Solution>,
   expected: number,
   model: TestCase["model"],
-  options: Required<Options>
+  options: Required<Options>,
 ) =>
   resultIsOptimal(solution.result, expected, options) &&
   variablesHaveValidValues(solution, model, options.precision) &&
@@ -68,7 +68,7 @@ export const validSolutionAndStatus = (
   solution: Readonly<Solution>,
   expected: Readonly<Solution>,
   model: TestCase["model"],
-  options: Required<Options>
+  options: Required<Options>,
 ) =>
   solution.status === expected.status &&
   (validTimeout(solution) || validSolution(solution, expected.result, model, options))

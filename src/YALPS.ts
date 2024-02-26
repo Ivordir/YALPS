@@ -9,7 +9,7 @@ const solution = <VarKey, ConKey>(
   { tableau, sign, variables: vars }: TableauModel<VarKey, ConKey>,
   status: SolutionStatus,
   result: number,
-  { precision, includeZeroVariables }: Required<Options>
+  { precision, includeZeroVariables }: Required<Options>,
 ): Solution<VarKey> => {
   if (status === "optimal" || (status === "timedout" && !Number.isNaN(result))) {
     const variables: [VarKey, number][] = []
@@ -26,7 +26,7 @@ const solution = <VarKey, ConKey>(
     return {
       status,
       result: -sign * result,
-      variables
+      variables,
     }
   } else if (status === "unbounded") {
     const variable = tableau.variableAtPosition[result] - 1
@@ -37,14 +37,14 @@ const solution = <VarKey, ConKey>(
       variables:
         (0 <= variable && variable < vars.length)
           ? [[vars[variable][0], Infinity]]
-          : []
+          : [],
     }
   } else {
     // infeasible | cycled | (timedout and result is NaN)
     return {
       status,
       result: NaN,
-      variables: []
+      variables: [],
     }
   }
 }
@@ -56,7 +56,7 @@ const defaultOptionValues: Required<Options> = {
   tolerance: 0,
   timeout: Infinity,
   maxIterations: 32768,
-  includeZeroVariables: false
+  includeZeroVariables: false,
 }
 
 /**
@@ -72,7 +72,7 @@ export const defaultOptions: Required<Options> = { ...defaultOptionValues }
  */
 export const solve = <VarKey = string, ConKey = string>(
   model: Model<VarKey, ConKey>,
-  options?: Options
+  options?: Options,
 ): Solution<VarKey> => {
   const tabmod = tableauModel(model)
   const opt = { ...defaultOptionValues, ...options }

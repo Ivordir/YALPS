@@ -126,6 +126,6 @@ declare module "javascript-lp-solver" {
     model: IModel<TSolutionVar, TInternalVar>,
     precision?: number,
     full?: boolean,
-    validate?: unknown
+    validate?: unknown,
   ): Solution<TSolutionVar>
 }

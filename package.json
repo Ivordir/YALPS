@@ -149,7 +149,6 @@
   "prettier": {
     "printWidth": 120,
     "semi": false,
-    "trailingComma": "none",
     "arrowParens": "avoid"
   },
   "dependencies": {
