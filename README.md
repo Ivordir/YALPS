@@ -170,11 +170,11 @@ type Solution<VariableKey = string> = {
   /**
    * `status` indicates what type of solution, if any, the solver was able to find.
    *
-   * `"optimal"` indicates everything went ok, and the solver found an optimal solution.
-   * `"infeasible"` indicates that the problem has no possible solutions.
-   * `"unbounded"` indicates a variable, or combination of variables, are not sufficiently constrained.
-   * `"timedout"` indicates that the solver exited early for an integer problem.
-   * `"cycled"` indicates that the simplex method cycled and exited (this is rare).
+   * `"optimal"`: everything went ok, and the solver found an optimal solution.
+   * `"infeasible"`: the model has no possible solutions.
+   * `"unbounded"`: a variable, or combination of variables, are not sufficiently constrained.
+   * `"timedout"`: the solver exited early for an integer problem (due to the `timeout` or `maxIterations` options).
+   * `"cycled"`: the simplex method cycled and exited (this is rare).
    */
   status: SolutionStatus
 
@@ -220,7 +220,8 @@ type Options = {
    * If an integer solution is found within
    * `(1 +- tolerance) * {the problem's non-integer solution}`,
    * then this approximate integer solution is returned.
-   * For example, a tolereance of `0.05` allows integer solutions found within 5% of the non-integer solution to be returned.
+   * For example, a tolerance of `0.05` will return the first
+   * integer solution found within 5% of the non-integer solution.
    * The default value is `0` (only find the most optimal solution).
    */
   tolerance?: number

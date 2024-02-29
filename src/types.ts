@@ -172,7 +172,7 @@ export type Solution<VariableKey = string> = {
    *
    * `"timedout"` indicates that the solver exited early for an integer problem.
    * This may happen if the solver takes too long and exceeds the `timeout` option.
-   * Similarly, the number of branch and cut iterations may exceed `maxIterations` as set in the options.
+   * This may also happen if the number of branch and cut iterations exceeds the `maxIterations` option.
    * In both of these cases, the current sub-optimal solution, if any, is returned.
    * If `result` is `NaN`, then this means no integer solutions were found before the solver timed out.
    *
@@ -231,9 +231,9 @@ export type Options = {
    * If an integer solution is found within
    * `(1 +- tolerance) * {the problem's non-integer solution}`,
    * then this approximate integer solution is returned.
-   * For example, a tolereance of `0.05` allows integer solutions found within 5% of the non-integer solution to be returned.
+   * For example, a tolerance of `0.05` will return the first integer solution found within 5% of the non-integer solution.
    * This option is helpful for large integer problems where the most optimal solution becomes harder to find,
-   * but other solutions that are relatively close to the optimal one may be much easier to find.
+   * but approximate or near-optimal solutions may be much easier to find.
    * The default value is `0` (only find the most optimal solution).
    */
   readonly tolerance?: number
