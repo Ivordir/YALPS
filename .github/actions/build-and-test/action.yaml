@@ -17,4 +17,3 @@ runs:
 
     - name: Install, build, and test
       run: pnpm it
-      shell: bash

@@ -41,8 +41,8 @@ declare module "javascript-lp-solver" {
 
   /**
    * Represents an LP/MILP problem.
-   * @typeparam TSolutionVar the decision variables that will be outputed to the `Solution` object.
-   * @typeparam TInternalVar the decision variables that will not be outputed to the `Solution` object.
+   * @typeparam TSolutionVar the decision variables that will be outputted to the `Solution` object.
+   * @typeparam TInternalVar the decision variables that will not be outputted to the `Solution` object.
    */
   export type IModel<TSolutionVar extends string = string, TInternalVar extends string = string> = {
     /** Name of the variable that will be the optimization objective. */
