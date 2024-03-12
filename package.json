@@ -10,6 +10,7 @@
   "module": "lib/module/index.js",
   "types": "lib/types/index.d.ts",
   "exports": {
+    "types": "./lib/types/index.d.ts",
     "import": "./lib/module/index.js",
     "require": "./lib/main/index.js",
     "default": "./lib/module/index.js"
