@@ -4,7 +4,8 @@
   "description": "Yet another linear programming solver. (A rewrite of javascript-lp-solver.) Aims to be decently fast.",
   "homepage": "https://github.com/Ivordir/YALPS",
   "files": [
-    "lib"
+    "lib",
+    "!**/*.tsbuildinfo"
   ],
   "main": "lib/main/index.js",
   "module": "lib/module/index.js",
